@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<database>
+    <element label="Assdets Transfer" max_length="40" name="x_naci_e_tracking_assdets_transfer" type="collection">
+        <element label="Asset" max_length="32" name="asset" reference="x_naci_e_tracking_etrack_assets" type="reference"/>
+        <element label="current user" max_length="32" name="current_user" reference="sys_user" type="reference"/>
+        <element label="from" max_length="32" name="from" reference="x_naci_e_tracking_stock_room" type="reference"/>
+        <element label="id" max_length="100" name="id" type="string"/>
+        <element label="quantity" max_length="40" name="quantity" type="integer"/>
+        <element label="Receive By" max_length="32" name="receive_by" reference="sys_user" type="reference"/>
+        <element label="to" max_length="32" name="to" reference="x_naci_e_tracking_stock_room" type="reference"/>
+        <element label="transfer complete time" max_length="40" name="transfer_complete_time" type="glide_date_time"/>
+        <element label="transfer start time" max_length="40" name="transfer_start_time" type="glide_date_time"/>
+        <element label="Type" max_length="100" name="type" type="string"/>
+        <index name="index">
+            <element name="from"/>
+        </index>
+        <index name="index2">
+            <element name="receive_by"/>
+        </index>
+        <index name="index3">
+            <element name="to"/>
+        </index>
+        <index name="index4">
+            <element name="asset"/>
+        </index>
+        <index name="index5">
+            <element name="current_user"/>
+        </index>
+    </element>
+</database>

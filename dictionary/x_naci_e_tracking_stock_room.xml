@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<database>
+    <element label="Stock Room" max_length="40" name="x_naci_e_tracking_stock_room" type="collection">
+        <element label="Description" max_length="1000" name="description" type="string"/>
+        <element label="Location" max_length="32" name="location" reference="x_naci_e_tracking_location" type="reference"/>
+        <element label="Name" max_length="300" name="name" type="string"/>
+        <element label="Owner" max_length="32" name="owner" reference="sys_user" type="reference"/>
+        <element label="Type" max_length="32" name="type" reference="x_naci_e_tracking_stockroom_type" type="reference"/>
+        <index name="index">
+            <element name="owner"/>
+        </index>
+        <index name="index2">
+            <element name="location"/>
+        </index>
+        <index name="index3">
+            <element name="type"/>
+        </index>
+    </element>
+</database>

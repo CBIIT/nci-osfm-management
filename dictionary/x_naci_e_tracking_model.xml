@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<database>
+    <element label="Model" max_length="40" name="x_naci_e_tracking_model" type="collection">
+        <element label="Description" max_length="1000" name="description" type="string"/>
+        <element label="Manufacture" max_length="32" name="manufacture" reference="x_naci_e_tracking_manufacture" type="reference"/>
+        <element label="Model Number" max_length="100" name="model_number" type="string"/>
+        <element label="Name" max_length="200" name="name" type="string"/>
+        <element label="Owner" max_length="32" name="owner" reference="sys_user" type="reference"/>
+        <element label="Quantity" max_length="40" name="quantity" type="integer"/>
+        <index name="index">
+            <element name="owner"/>
+        </index>
+        <index name="index2">
+            <element name="manufacture"/>
+        </index>
+    </element>
+</database>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sp_column">
+    <sp_column action="INSERT_OR_UPDATE">
+        <class_name/>
+        <order>2</order>
+        <size>8</size>
+        <size_lg/>
+        <size_sm/>
+        <size_xs/>
+        <sp_row display_value="1">510c4869dbfba300b86770c08c961931</sp_row>
+        <sys_class_name>sp_column</sys_class_name>
+        <sys_created_by>zhoujim@nih.gov</sys_created_by>
+        <sys_created_on>2019-02-22 21:15:01</sys_created_on>
+        <sys_customer_update>false</sys_customer_update>
+        <sys_id>d10c80a9dbfba300b86770c08c961988</sys_id>
+        <sys_mod_count>3</sys_mod_count>
+        <sys_name>2</sys_name>
+        <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
+        <sys_policy/>
+        <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
+        <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
+        <sys_update_name>sp_column_d10c80a9dbfba300b86770c08c961988</sys_update_name>
+        <sys_updated_by>zhoujim@nih.gov</sys_updated_by>
+        <sys_updated_on>2019-02-22 21:26:43</sys_updated_on>
+    </sp_column>
+</record_update>

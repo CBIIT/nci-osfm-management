@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<database>
+    <element label="Etrack Assets" max_length="40" name="x_naci_e_tracking_etrack_assets" type="collection">
+        <element label="Barcode" max_length="50" name="barcode" type="string"/>
+        <element label="Cost" max_length="20" name="cost" type="currency"/>
+        <element label="Model" max_length="32" name="model" reference="x_naci_e_tracking_model" type="reference"/>
+        <element label="Owner" max_length="32" name="owner" reference="sys_user" type="reference"/>
+        <element label="Quantity" max_length="40" name="quantity" type="integer"/>
+        <element label="Stockroom" max_length="32" name="stockroom" reference="x_naci_e_tracking_stock_room" type="reference"/>
+        <index name="index">
+            <element name="owner"/>
+        </index>
+        <index name="index2">
+            <element name="stockroom"/>
+        </index>
+        <index name="index3">
+            <element name="model"/>
+        </index>
+    </element>
+</database>

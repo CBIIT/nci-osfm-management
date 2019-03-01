@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<database>
+    <element label="Manufacture" max_length="40" name="x_naci_e_tracking_manufacture" type="collection">
+        <element label="Description" max_length="500" name="description" type="string"/>
+        <element label="Name" max_length="200" name="name" type="string"/>
+    </element>
+</database>

@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sp_widget">
+    <sp_widget action="INSERT_OR_UPDATE">
+        <category>custom</category>
+        <client_script><![CDATA[function($scope) {
+  /* widget controller */
+  var c = this;
+	c.form = getFormValues();
+	
+	c.data.existingModels = [];
+	
+	for(i = 0; i < 40; i++){
+		c.data.existingModels.push("Asset Model  " + i)
+	}
+	
+
+	
+	function getFormValues(){
+		return {
+			existingModels: null,
+			name: null,
+			manufacture: null,
+			description: null,
+			model_number: null,
+			unit_cost: null,
+			owner_custodian: null,
+			quantity: null,
+			stockroom: null
+		}
+	}
+	
+}]]></client_script>
+        <controller_as>c</controller_as>
+        <css>.md-errors-spacer { display: none; }
+</css>
+        <data_table>sp_instance</data_table>
+        <demo_data/>
+        <description/>
+        <docs/>
+        <field_list/>
+        <has_preview>false</has_preview>
+        <id>etrack_add_assets</id>
+        <internal>false</internal>
+        <link/>
+        <name>Etrack Add Assets</name>
+        <option_schema/>
+        <public>false</public>
+        <roles/>
+        <script><![CDATA[(function() {
+  var user = gs.getUser();
+
+	data.isLoggedIn = gs.getSession().isLoggedIn();
+
+})();]]></script>
+        <servicenow>false</servicenow>
+        <sys_class_name>sp_widget</sys_class_name>
+        <sys_created_by>abdullahz2@nih.gov</sys_created_by>
+        <sys_created_on>2019-02-27 15:57:17</sys_created_on>
+        <sys_customer_update>false</sys_customer_update>
+        <sys_id>3b333443dbf3e700b86770c08c96199a</sys_id>
+        <sys_mod_count>82</sys_mod_count>
+        <sys_name>Etrack Add Assets</sys_name>
+        <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
+        <sys_policy/>
+        <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
+        <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
+        <sys_update_name>sp_widget_3b333443dbf3e700b86770c08c96199a</sys_update_name>
+        <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
+        <sys_updated_on>2019-02-28 21:45:45</sys_updated_on>
+        <template><![CDATA[<div ng-show="c.data.isLoggedIn">
+	<div ng-controller="c" layout="column" ng-cloak>
+     <md-toolbar class="md-hue-2">
+      <div class="md-toolbar-tools">
+        <h2 flex md-truncate>Add Assets</h2>
+      </div>
+    </md-toolbar>
+    
+		<md-content layout-padding>
+      
+			<form name="userForm">
+        
+        <p>
+          If the Model exist, please select one. Otherwise a new model will be created for this asset.
+        </p>
+				<div layout="column" >
+         	<md-input-container class="md-block" flex-gt-sm>
+            <label>Existing Model</label>
+            <md-select ng-model="c.form.existingModels">
+              <md-option ng-repeat="model in c.data.existingModels" value="{{model}}">
+                {{model}}
+              </md-option>
+            </md-select>
+          </md-input-container>
+          
+          <h4>
+            Model Information
+          </h4>
+					<md-input-container class="md-block" flex-gt-sm>
+						<label>Name</label>
+						<input required name="name" ng-model="c.form.name" />
+					</md-input-container >
+					<md-input-container class="md-block" flex-gt-sm>
+						<label>Manufacture</label>
+						<input required name="manufacture" ng-model="c.form.manufacture" />
+					</md-input-container>
+					<md-input-container class="md-block">
+						<label>Description</label>
+						<textarea  ng-model="c.form.description" required md-maxlength="150" rows="3" md-select-on-focus></textarea>
+					</md-input-container>
+          <md-input-container class="md-block" flex-gt-sm>
+						<label>Model Number</label>
+						<input required name="model_number" ng-model="c.form.model_number" />
+					</md-input-container>
+          
+          <h4>
+           	Asset Information
+          </h4>
+          <md-input-container class="md-block" flex-gt-sm>
+						<label>Unit Cost</label>
+						<input required name="unit_cost" ng-model="c.form.unit_cost" />
+					</md-input-container >
+          <md-input-container class="md-block" flex-gt-sm>
+						<label>Owner Custodian</label>
+						<input required name="owner_custodian" ng-model="c.form.owner_custodian" />
+					</md-input-container >
+          <md-input-container class="md-block" flex-gt-sm>
+						<label>Quantity</label>
+						<input required name="quantity" ng-model="c.form.quantity" />
+					</md-input-container >
+          <md-input-container class="md-block" flex-gt-sm>
+						<label>Stockroom</label>
+						<input required name="stockroom" ng-model="c.form.stockroom" />
+					</md-input-container >
+          
+          
+				</div>
+        <br>
+         <div class="d-flex justify-content-center">
+         <md-button ng-href="?id=etrack_asset_details" class="md-raised md-primary">Submit</md-button>
+      </div>
+			</form>
+       
+		</md-content>
+	</div>
+</div>
+
+
+
+]]></template>
+    </sp_widget>
+</record_update>

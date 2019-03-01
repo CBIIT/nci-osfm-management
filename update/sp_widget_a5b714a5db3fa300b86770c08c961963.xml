@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sp_widget">
+    <sp_widget action="INSERT_OR_UPDATE">
+        <category>custom</category>
+        <client_script><![CDATA[function($scope, spUtil) {
+  /* widget controller */
+  var c = this;
+	
+	c.data.assets = [];
+	
+	
+	for(i=0; i< 50; i++){
+		c.data.assets.push({
+			name: "name " + i ,
+			manufacture: "manufacture " + i,
+			description: "description " + i,
+			model_number: "model_number " + i, 
+			unit_cost: "unit_cost " + i,
+			owner_custodian: "owner_custodian "+ i,
+			quantity: "quantity "+ i,
+			stockroom: "stockroom "+ i
+		})
+	}
+	
+	$scope.sort = function(keyname){
+	   $scope.sortKey = keyname;
+	   $scope.reverse = !$scope.reverse;
+	};
+	
+	spUtil.recordWatch($scope, "", "", function(name, data) {  
+			spUtil.update($scope);
+	});
+
+}]]></client_script>
+        <controller_as>c</controller_as>
+        <css/>
+        <data_table>sp_instance</data_table>
+        <demo_data/>
+        <description/>
+        <docs/>
+        <field_list/>
+        <has_preview>false</has_preview>
+        <id>etrack_assets</id>
+        <internal>false</internal>
+        <link/>
+        <name>Etrack Assets</name>
+        <option_schema/>
+        <public>false</public>
+        <roles/>
+        <script><![CDATA[(function() {
+	
+	data.assets = [];
+	
+	
+
+
+
+})();]]></script>
+        <servicenow>false</servicenow>
+        <sys_class_name>sp_widget</sys_class_name>
+        <sys_created_by>zhoujim@nih.gov</sys_created_by>
+        <sys_created_on>2019-02-22 22:06:06</sys_created_on>
+        <sys_customer_update>false</sys_customer_update>
+        <sys_id>a5b714a5db3fa300b86770c08c961963</sys_id>
+        <sys_mod_count>283</sys_mod_count>
+        <sys_name>Etrack Assets</sys_name>
+        <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
+        <sys_policy/>
+        <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
+        <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
+        <sys_update_name>sp_widget_a5b714a5db3fa300b86770c08c961963</sys_update_name>
+        <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
+        <sys_updated_on>2019-03-01 21:39:39</sys_updated_on>
+        <template><![CDATA[<!-- Filter search -->
+
+<div ng-controller="c" ng-cloak>
+    <md-card class="filter-card">
+        <md-card-content>
+            <div layout-gt-sm="row">
+                <md-input-container class="md-block" flex-gt-sm>
+                    <label>Name</label>
+                    <input name="name" ng-model="search" />
+                </md-input-container>
+                <div flex="4" hide-xs hide-sm></div>
+                <md-input-container class="md-block" flex-gt-sm>
+                    <label>Manufacture</label>
+                    <input name="manufacture" ng-model="manufacture" />
+                </md-input-container>
+                <div flex="5" hide-xs hide-sm></div>
+                <md-input-container class="md-block" flex-gt-sm>
+                    <label>Model Number</label>
+                    <input name="modelNumber" ng-model="modelNumber" />
+                </md-input-container>
+                <div flex="5" hide-xs hide-sm></div>
+                <md-input-container class="md-block" flex-gt-sm>
+                    <label>Stockroom</label>
+                    <input name="stockroom" ng-model="stockroom" />
+                </md-input-container>
+                <div flex="5" hide-xs hide-sm></div>
+                <md-input-container class="md-block" flex-gt-sm>
+                    <label>Owner</label>
+                    <input name="owner" ng-model="owner" />
+                </md-input-container>
+                <div flex="5" hide-xs hide-sm></div>
+                <div>
+                    <md-button ng-href="?id=etrack_add_assets" class="md-raised md-primary">Add Assets</md-button>
+                </div>
+            </div>
+        </md-card-content>
+    </md-card>
+
+    <!-- Assets table -->
+    <md-card>
+        <md-card-content>
+            <div ng-if="c.data.assets.length > 0" style="margin-left:10px; margin-right: 10px;">
+                <div class="panel margin-bottom-small">
+                    <div class="panel-heading blue-panel" role="tab" id="heading_savedItems">
+                        <h1 class="h4 panel-title">
+                            <a role="button" data-toggle="collapse" data-target="#collapsesavedItems" aria-expanded="true" aria-controls="collapsesavedItems">
+                  <span class="accordion_icon"><i class="fa fa-minus-square"></i></span> Assets <span class="badge" id="ritm_count">{{c.data.assets.length}}</span>
+                </a>
+                        </h1>
+                    </div>
+
+                    <div id="collapsesavedItems" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading_savedItems">
+                        <table class="table table-bordered table-striped table-condensed">
+                            <tr>
+                                <th ng-click="sort('name')">Name<span class="glyphicon sort-icon" ng-show="sortKey=='name'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+                                <th ng-click="sort('manufacture')">Manufacture<span class="glyphicon sort-icon" ng-show="sortKey=='manufacture'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+                                <th ng-click="sort('description')">Description<span class="glyphicon sort-icon" ng-show="sortKey=='description'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+                                <th ng-click="sort('model_number')">Model Number<span class="glyphicon sort-icon" ng-show="sortKey=='model_number'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+                                <th ng-click="sort('owner_custodian')">Owner<span class="glyphicon sort-icon" ng-show="sortKey=='owner_custodian'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+                                <th ng-click="sort('quantity')">Quantity<span class="glyphicon sort-icon" ng-show="sortKey=='quantity'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+                                <th>Actions</th>
+                            </tr>
+                            <tr dir-paginate="data in c.data.assets|filter:search|orderBy:sortKey:reverse|itemsPerPage:pageSize" pagination-id="taskDataPagination">
+                                <td class="ritm_number">{{data.name}}</td>
+                                <td class="ritm_cat_item">{{data.manufacture}}</td>
+                                <td class="ritm_cat_item">{{data.description}}</td>
+                                <td class="ritm_cat_item">{{data.model_number}}</td>
+                                <td class="ritm_cat_item">{{data.owner_custodian}}</td>
+                                <td class="ritm_cat_item">{{data.quantity}}</td>
+                              <td> <md-button  class="md-primary" ng-href="?id=etrack_asset"> View</md-button>  </td>
+                                  
+                            </tr>
+                        </table>
+                        <div>
+                            <table width="100%" border="0">
+                                <tr>
+                                    <td width="70%">
+                                        <dir-pagination-controls pagination-id="taskDataPagination" direction-links="true" boundary-links="true"></dir-pagination-controls>
+                                    </td>
+                                    <td width="25%" align="right"><label for="page-size">Items per page&#160;&#160;</label></td>
+                                    <td width="5%" align="right">
+                                        <select class="form-control" id="page-size" ng-model="pageSize" ng-init="pageSize='5'" style="width:80px;">
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="15">15</option>
+                        <option value="20">20</option>
+                      </select>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+          <div ng-if="c.data.assets.length > 0" style="margin-left:10px; margin-right: 10px;">
+                <div class="panel margin-bottom-small">
+                    <div class="panel-heading blue-panel" role="tab" id="heading_savedItems">
+                        <h1 class="h4 panel-title">
+                            <a role="button" data-toggle="collapse" data-target="#collapsesavedItems" aria-expanded="true" aria-controls="collapsesavedItems">
+                  <span class="accordion_icon"><i class="fa fa-minus-square"></i></span> Checked out Assets <span class="badge" id="ritm_count">{{c.data.assets.length}}</span>
+                </a>
+                        </h1>
+                    </div>
+
+                    <div id="collapsesavedItems" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading_savedItems">
+                        <table class="table table-bordered table-striped table-condensed">
+                            <tr>
+                                <th ng-click="sort('name')">Name<span class="glyphicon sort-icon" ng-show="sortKey=='name'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+                                <th ng-click="sort('manufacture')">Manufacture<span class="glyphicon sort-icon" ng-show="sortKey=='manufacture'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+                                <th ng-click="sort('description')">Description<span class="glyphicon sort-icon" ng-show="sortKey=='description'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+                                <th ng-click="sort('model_number')">Model Number<span class="glyphicon sort-icon" ng-show="sortKey=='model_number'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+                                <th ng-click="sort('owner_custodian')">Owner<span class="glyphicon sort-icon" ng-show="sortKey=='owner_custodian'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+                                <th ng-click="sort('quantity')">Quantity<span class="glyphicon sort-icon" ng-show="sortKey=='quantity'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+                                <th>Actions</th>
+                            </tr>
+                            <tr dir-paginate="data in c.data.assets|filter:search|orderBy:sortKey:reverse|itemsPerPage:pageSize" pagination-id="taskDataPagination">
+                                <td class="ritm_number">{{data.name}}</td>
+                                <td class="ritm_cat_item">{{data.manufacture}}</td>
+                                <td class="ritm_cat_item">{{data.description}}</td>
+                                <td class="ritm_cat_item">{{data.model_number}}</td>
+                                <td class="ritm_cat_item">{{data.owner_custodian}}</td>
+                                <td class="ritm_cat_item">{{data.quantity}}</td>
+                                <td>
+                                    <md-button class="md-raised" ng-click="view(data.id);">View</md-button>&#160;
+                              			<md-button class="md-raised" ng-click="view(data.id);">Check in</md-button>&#160;
+                                  </td>
+                            </tr>
+                        </table>
+                        <div>
+                            <table width="100%" border="0">
+                                <tr>
+                                    <td width="70%">
+                                        <dir-pagination-controls pagination-id="taskDataPagination" direction-links="true" boundary-links="true"></dir-pagination-controls>
+                                    </td>
+                                    <td width="25%" align="right"><label for="page-size">Items per page&#160;&#160;</label></td>
+                                    <td width="5%" align="right">
+                                        <select class="form-control" id="page-size" ng-model="pageSize" ng-init="pageSize='5'" style="width:80px;">
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="15">15</option>
+                        <option value="20">20</option>
+                      </select>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+          <div ng-if="c.data.assets.length > 0" style="margin-left:10px; margin-right: 10px;">
+                <div class="panel margin-bottom-small">
+                    <div class="panel-heading blue-panel" role="tab" id="heading_savedItems">
+                        <h1 class="h4 panel-title">
+                            <a role="button" data-toggle="collapse" data-target="#collapsesavedItems" aria-expanded="true" aria-controls="collapsesavedItems">
+                  <span class="accordion_icon"><i class="fa fa-minus-square"></i></span> Assets in Transfer <span class="badge" id="ritm_count">{{c.data.assets.length}}</span>
+                </a>
+                        </h1>
+                    </div>
+
+                    <div id="collapsesavedItems" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading_savedItems">
+                        <table class="table table-bordered table-striped table-condensed">
+                            <tr>
+                                <th ng-click="sort('name')">Name<span class="glyphicon sort-icon" ng-show="sortKey=='name'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+                                <th ng-click="sort('manufacture')">Manufacture<span class="glyphicon sort-icon" ng-show="sortKey=='manufacture'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+                                <th ng-click="sort('description')">Description<span class="glyphicon sort-icon" ng-show="sortKey=='description'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+                                <th ng-click="sort('model_number')">Model Number<span class="glyphicon sort-icon" ng-show="sortKey=='model_number'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+                                <th ng-click="sort('owner_custodian')">Owner<span class="glyphicon sort-icon" ng-show="sortKey=='owner_custodian'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+                                <th ng-click="sort('quantity')">Quantity<span class="glyphicon sort-icon" ng-show="sortKey=='quantity'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+                                <th>Actions</th>
+                            </tr>
+                            <tr dir-paginate="data in c.data.assets|filter:search|orderBy:sortKey:reverse|itemsPerPage:pageSize" pagination-id="taskDataPagination">
+                                <td class="ritm_number">{{data.name}}</td>
+                                <td class="ritm_cat_item">{{data.manufacture}}</td>
+                                <td class="ritm_cat_item">{{data.description}}</td>
+                                <td class="ritm_cat_item">{{data.model_number}}</td>
+                                <td class="ritm_cat_item">{{data.owner_custodian}}</td>
+                                <td class="ritm_cat_item">{{data.quantity}}</td>
+                                <td>
+                                    <md-button class="md-raised" ng-click="view(data.id);"> View</md-button>&#160;
+                                  	<md-button class="md-raised" ng-click="view(data.id);"> Complete</md-button>&#160;
+                              	</td>
+                              
+                            </tr>
+                        </table>
+                        <div>
+                            <table width="100%" border="0">
+                                <tr>
+                                    <td width="70%">
+                                        <dir-pagination-controls pagination-id="taskDataPagination" direction-links="true" boundary-links="true"></dir-pagination-controls>
+                                    </td>
+                                    <td width="25%" align="right"><label for="page-size">Items per page&#160;&#160;</label></td>
+                                    <td width="5%" align="right">
+                                        <select class="form-control" id="page-size" ng-model="pageSize" ng-init="pageSize='5'" style="width:80px;">
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="15">15</option>
+                        <option value="20">20</option>
+                      </select>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </md-card-content>
+    </md-card>
+  
+  
+
+
+</div>]]></template>
+    </sp_widget>
+</record_update>

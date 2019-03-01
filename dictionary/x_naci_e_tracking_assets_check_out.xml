@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<database>
+    <element label="Assets Check Out " max_length="40" name="x_naci_e_tracking_assets_check_out" type="collection">
+        <element label="asset" max_length="32" name="asset" reference="x_naci_e_tracking_etrack_assets" type="reference"/>
+        <element label="checkin by" max_length="32" name="checkin_by" reference="sys_user" type="reference"/>
+        <element label="checkin time" max_length="40" name="checkin_time" type="glide_date_time"/>
+        <element label="checkout time" max_length="40" name="checkout_time" type="glide_date_time"/>
+        <element label="Current User" max_length="32" name="current_user" reference="sys_user" type="reference"/>
+        <element label="quantity" max_length="40" name="quantity" type="integer"/>
+        <index name="index">
+            <element name="asset"/>
+        </index>
+        <index name="index2">
+            <element name="checkin_by"/>
+        </index>
+        <index name="index3">
+            <element name="current_user"/>
+        </index>
+    </element>
+</database>
