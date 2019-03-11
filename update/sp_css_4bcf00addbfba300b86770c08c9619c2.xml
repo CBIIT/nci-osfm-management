@@ -125,11 +125,13 @@ table .md-button {&#13;
   height: 20px;&#13;
   line-height: 20px;&#13;
   min-height: 20px;&#13;
+  &#13;
 }&#13;
 &#13;
-table td{&#13;
-  font-size: 13px;&#13;
+.md-button {&#13;
+  text-transform: none;&#13;
 }&#13;
+&#13;
 &#13;
 .blue-panel{&#13;
     background-color: #162e51;&#13;
@@ -159,6 +161,23 @@ table td{&#13;
 .form-control{&#13;
   	width: 90%;&#13;
     height: 25px;&#13;
+}&#13;
+&#13;
+&#13;
+table th{&#13;
+  font-size: 13px;&#13;
+}&#13;
+&#13;
+table td{&#13;
+  font-size: 13px;&#13;
+}&#13;
+&#13;
+md-toolbar.md-default-theme:not(.md-menu-toolbar), md-toolbar:not(.md-menu-toolbar) {&#13;
+    background-color: rgb(63,81,181);&#13;
+    color: white;&#13;
+}&#13;
+md-toolbar {&#13;
+  min-height: 10px;&#13;
 }</css>
         <name>nci-etrack.css</name>
         <sys_class_name>sp_css</sys_class_name>
@@ -166,7 +185,7 @@ table td{&#13;
         <sys_created_on>2019-02-22 21:31:45</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>4bcf00addbfba300b86770c08c9619c2</sys_id>
-        <sys_mod_count>39</sys_mod_count>
+        <sys_mod_count>86</sys_mod_count>
         <sys_name>nci-etrack.css</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
@@ -174,6 +193,6 @@ table td{&#13;
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sp_css_4bcf00addbfba300b86770c08c9619c2</sys_update_name>
         <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-03-01 21:42:45</sys_updated_on>
+        <sys_updated_on>2019-03-11 14:53:04</sys_updated_on>
     </sp_css>
 </record_update>

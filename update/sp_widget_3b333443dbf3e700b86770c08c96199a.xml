@@ -2,37 +2,90 @@
 <record_update table="sp_widget">
     <sp_widget action="INSERT_OR_UPDATE">
         <category>custom</category>
-        <client_script><![CDATA[function($scope) {
-  /* widget controller */
-  var c = this;
-	c.form = getFormValues();
-	
-	c.data.existingModels = [];
-	
-	for(i = 0; i < 40; i++){
-		c.data.existingModels.push("Asset Model  " + i)
-	}
-	
+        <client_script><![CDATA[function($scope, $q, $timeout, $log) {
+    /* widget controller */
+    var c = this;
+    c.form = getFormValues();
+    c.data.existingModels = loadAllModels();
+    c.querySearch = querySearch;
+    c.selectedItemChange = selectedItemChange;
 
+    /**
+     * Search for barcodes
+     */
+    function querySearch(query) {
+        var results = query ? c.data.existingModels.filter(createFilterFor(query)) : c.data.existingModels,
+            deferred;
+        if (c.simulateQuery) {
+            deferred = $q.defer();
+            $timeout(function() {
+                deferred.resolve(results);
+            }, Math.random() * 1000, false);
+            return deferred.promise;
+        } else {
+            return results;
+        }
+    }
 	
-	function getFormValues(){
-		return {
-			existingModels: null,
-			name: null,
-			manufacture: null,
-			description: null,
-			model_number: null,
-			unit_cost: null,
-			owner_custodian: null,
-			quantity: null,
-			stockroom: null
+    function selectedItemChange(item) {
+			updateFromValues({
+				"name": "test Name",
+				"manufacture": "test manufacture",
+				"model_number": "test model_number",
+				"description": "test description"
+				});
+    }	
+
+    /**
+     * Build `models` list of key/value pairs
+     */
+    function loadAllModels() {
+        var test_data = '23423, 21345234, 123ed312ed23, bodsf34, qweew34, zzzzzrs, 3421efcwef431, dfdsqfreqr23';
+        return test_data.split(/, +/g).map(function(barcode) {
+            return {
+                value: barcode.toLowerCase(),
+                display: barcode
+            };
+        });
+    }
+
+    /**
+     * Create filter function for a query string
+     */
+    function createFilterFor(query) {
+        var lowercaseQuery = query.toLowerCase();
+        return function filterFn(barcode) {
+            return (barcode.value.indexOf(lowercaseQuery) === 0);
+        };
+
+
+    }
+	
+		function updateFromValues(update_form){
+			Object.assign(c.form, {"name": "test Name",
+												 "manufacture": "test manufacture",
+												 "model_number": "test model_number",
+												 "description": "test description"})
+
 		}
-	}
-	
+
+    function getFormValues() {
+        return {
+            name: null,
+            manufacture: null,
+            description: null,
+            model_number: null,
+            unit_cost: null,
+            owner_custodian: null,
+            quantity: null,
+            stockroom: null
+        }
+    }
+
 }]]></client_script>
         <controller_as>c</controller_as>
-        <css>.md-errors-spacer { display: none; }
-</css>
+        <css>
+.md-errors-spacer { display: none; }</css>
         <data_table>sp_instance</data_table>
         <demo_data/>
         <description/>
@@ -58,7 +111,7 @@
         <sys_created_on>2019-02-27 15:57:17</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>3b333443dbf3e700b86770c08c96199a</sys_id>
-        <sys_mod_count>82</sys_mod_count>
+        <sys_mod_count>180</sys_mod_count>
         <sys_name>Etrack Add Assets</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
@@ -66,86 +119,86 @@
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sp_widget_3b333443dbf3e700b86770c08c96199a</sys_update_name>
         <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-02-28 21:45:45</sys_updated_on>
-        <template><![CDATA[<div ng-show="c.data.isLoggedIn">
-	<div ng-controller="c" layout="column" ng-cloak>
-     <md-toolbar class="md-hue-2">
-      <div class="md-toolbar-tools">
-        <h2 flex md-truncate>Add Assets</h2>
-      </div>
-    </md-toolbar>
-    
-		<md-content layout-padding>
-      
-			<form name="userForm">
-        
-        <p>
-          If the Model exist, please select one. Otherwise a new model will be created for this asset.
-        </p>
-				<div layout="column" >
-         	<md-input-container class="md-block" flex-gt-sm>
-            <label>Existing Model</label>
-            <md-select ng-model="c.form.existingModels">
-              <md-option ng-repeat="model in c.data.existingModels" value="{{model}}">
-                {{model}}
-              </md-option>
-            </md-select>
-          </md-input-container>
-          
-          <h4>
-            Model Information
-          </h4>
-					<md-input-container class="md-block" flex-gt-sm>
-						<label>Name</label>
-						<input required name="name" ng-model="c.form.name" />
-					</md-input-container >
-					<md-input-container class="md-block" flex-gt-sm>
-						<label>Manufacture</label>
-						<input required name="manufacture" ng-model="c.form.manufacture" />
-					</md-input-container>
-					<md-input-container class="md-block">
-						<label>Description</label>
-						<textarea  ng-model="c.form.description" required md-maxlength="150" rows="3" md-select-on-focus></textarea>
-					</md-input-container>
-          <md-input-container class="md-block" flex-gt-sm>
-						<label>Model Number</label>
-						<input required name="model_number" ng-model="c.form.model_number" />
-					</md-input-container>
-          
-          <h4>
-           	Asset Information
-          </h4>
-          <md-input-container class="md-block" flex-gt-sm>
-						<label>Unit Cost</label>
-						<input required name="unit_cost" ng-model="c.form.unit_cost" />
-					</md-input-container >
-          <md-input-container class="md-block" flex-gt-sm>
-						<label>Owner Custodian</label>
-						<input required name="owner_custodian" ng-model="c.form.owner_custodian" />
-					</md-input-container >
-          <md-input-container class="md-block" flex-gt-sm>
-						<label>Quantity</label>
-						<input required name="quantity" ng-model="c.form.quantity" />
-					</md-input-container >
-          <md-input-container class="md-block" flex-gt-sm>
-						<label>Stockroom</label>
-						<input required name="stockroom" ng-model="c.form.stockroom" />
-					</md-input-container >
-          
-          
-				</div>
-        <br>
-         <div class="d-flex justify-content-center">
-         <md-button ng-href="?id=etrack_asset_details" class="md-raised md-primary">Submit</md-button>
-      </div>
-			</form>
-       
-		</md-content>
-	</div>
-</div>
+        <sys_updated_on>2019-03-11 14:25:46</sys_updated_on>
+        <template><![CDATA[<div ng-controller="c" ng-cloak>
+    <md-card>
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <h2 flex md-truncate>Add Assets</h2>
+            </div>
+        </md-toolbar>
+        <md-subheader class="md-primary">If the Model exist, please select one. Otherwise a new model will be created for this asset.</md-subheader>
+        <md-card-content>
+            <form name="userForm">
+                <div layout="column">
+                    <label>Search existing Model</label>
+                    <md-autocomplete 
+                                     md-selected-item="c.selectedItem"
+                                     md-search-text="c.searchText" 
+                                     md-selected-item-change="c.selectedItemChange(item)" 
+                                     md-items="item in c.querySearch(c.searchText)" 
+                                     md-item-text="item.display"
+                                     md-min-length="0" 
+                                     placeholder="Enter Barcode" 
+                                     input-aria-labelledby="favoriteStateLabel" 
+                                     input-aria-describedby="autocompleteDetailedDescription">
+                        <md-item-template>
+                            <span md-highlight-text="c.searchText" md-highlight-flags="^i">{{item.display}}</span>
+                        </md-item-template>
+                        <md-not-found>
+                            No assets matching " {{c.searchText}} " were found.
+                        </md-not-found>
+                    </md-autocomplete>
+                    <br>
+                    <h4>
+                        Model Information
+                    </h4>
+                    <md-input-container class="md-block" flex-gt-sm>
+                        <label>Name</label>
+                        <input required name="name" ng-model="c.form.name" />
+                    </md-input-container>
+                    <md-input-container class="md-block" flex-gt-sm>
+                        <label>Manufacture</label>
+                        <input required name="manufacture" ng-model="c.form.manufacture" />
+                    </md-input-container>
+                    <md-input-container class="md-block">
+                        <label>Description</label>
+                        <textarea ng-model="c.form.description" required md-maxlength="150" rows="3" md-select-on-focus></textarea>
+                    </md-input-container>
+                    <md-input-container class="md-block" flex-gt-sm>
+                        <label>Model Number</label>
+                        <input required name="model_number" ng-model="c.form.model_number" />
+                    </md-input-container>
+                    <h4>
+                        Asset Information
+                    </h4>
+                    <md-input-container class="md-block" flex-gt-sm>
+                        <label>Unit Cost</label>
+                        <input required name="unit_cost" ng-model="c.form.unit_cost" />
+                    </md-input-container>
+                    <md-input-container class="md-block" flex-gt-sm>
+                        <label>Owner Custodian</label>
+                        <input required name="owner_custodian" ng-model="c.form.owner_custodian" />
+                    </md-input-container>
+                    <md-input-container class="md-block" flex-gt-sm>
+                        <label>Quantity</label>
+                        <input required name="quantity" ng-model="c.form.quantity" />
+                    </md-input-container>
+                    <md-input-container class="md-block" flex-gt-sm>
+                        <label>Stockroom</label>
+                        <input required name="stockroom" ng-model="c.form.stockroom" />
+                    </md-input-container>
+                </div>
+                <br>
+                <div class="d-flex justify-content-center">
+                    <md-button ng-href="?id=etrack_asset_details" class="md-raised md-primary">Submit</md-button>
+                </div>
+            </form>
 
 
+        </md-card-content>
+    </md-card>
 
-]]></template>
+</div>]]></template>
     </sp_widget>
 </record_update>

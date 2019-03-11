@@ -11,10 +11,10 @@
         <docs/>
         <field_list/>
         <has_preview>false</has_preview>
-        <id>etrack_asset_transfer_check_in</id>
+        <id>etrack_asset_in_transfer_complete</id>
         <internal>false</internal>
         <link/>
-        <name>Etrack Asset Transfer Check In</name>
+        <name>Etrack Asset In Transfer Complete</name>
         <option_schema/>
         <public>false</public>
         <roles/>
@@ -25,15 +25,28 @@
         <sys_created_on>2019-03-01 15:49:41</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>00b44fe3dbff2b00b86770c08c9619de</sys_id>
-        <sys_mod_count>0</sys_mod_count>
-        <sys_name>Etrack Asset Transfer Check In</sys_name>
+        <sys_mod_count>3</sys_mod_count>
+        <sys_name>Etrack Asset In Transfer Complete</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
         <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sp_widget_00b44fe3dbff2b00b86770c08c9619de</sys_update_name>
         <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-03-01 15:49:41</sys_updated_on>
-        <template><![CDATA[<div><!-- your widget template --></div>]]></template>
+        <sys_updated_on>2019-03-06 17:29:00</sys_updated_on>
+        <template><![CDATA[<div ng-controller="c" ng-cloak>
+    <md-card>
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <h2 flex md-truncate>Asset in Trasnfer Complete</h2>
+            </div>
+        </md-toolbar>
+       <md-subheader class="md-primary">Sub Header </md-subheader>
+        <md-card-content>
+      
+        </md-card-content>
+    </md-card>
+
+</div>]]></template>
     </sp_widget>
 </record_update>

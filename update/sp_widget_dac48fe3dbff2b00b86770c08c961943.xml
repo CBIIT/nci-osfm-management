@@ -2,7 +2,32 @@
 <record_update table="sp_widget">
     <sp_widget action="INSERT_OR_UPDATE">
         <category>custom</category>
-        <client_script><![CDATA[function() {  /* widget controller */  var c = this;}]]></client_script>
+        <client_script><![CDATA[function($scope, spUtil) {
+  /* widget controller */
+  var c = this;
+	
+	c.data.stockrooms = [];
+
+	
+	for(i = 0; i < 100; i++){
+		c.data.stockrooms.push(
+			{"name": "stockrooms " + i}
+		)
+
+	}
+	
+	
+	
+	$scope.sort = function(keyname){
+	   $scope.sortKey = keyname;
+	   $scope.reverse = !$scope.reverse;
+	};
+	
+	spUtil.recordWatch($scope, "", "", function(name, data) {  
+			spUtil.update($scope);
+	});
+
+}]]></client_script>
         <controller_as>c</controller_as>
         <css/>
         <data_table>sp_instance</data_table>
@@ -18,14 +43,17 @@
         <option_schema/>
         <public>false</public>
         <roles/>
-        <script><![CDATA[(function() {  /* populate the 'data' object */  /* e.g., data.table = $sp.getValue('table'); */})();]]></script>
+        <script><![CDATA[(function() {
+	
+	data.stockrooms = [];
+})();]]></script>
         <servicenow>false</servicenow>
         <sys_class_name>sp_widget</sys_class_name>
         <sys_created_by>abdullahz2@nih.gov</sys_created_by>
         <sys_created_on>2019-03-01 15:50:07</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>dac48fe3dbff2b00b86770c08c961943</sys_id>
-        <sys_mod_count>2</sys_mod_count>
+        <sys_mod_count>16</sys_mod_count>
         <sys_name>Etrack Stockrooms</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
@@ -33,7 +61,103 @@
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sp_widget_dac48fe3dbff2b00b86770c08c961943</sys_update_name>
         <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-03-01 15:51:56</sys_updated_on>
-        <template><![CDATA[<div><!-- your widget template --></div>]]></template>
+        <sys_updated_on>2019-03-11 14:35:20</sys_updated_on>
+        <template><![CDATA[<div ng-controller="c" ng-cloak>
+
+    <md-card>
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <h2 flex md-truncate>Search Stockrooms</h2>
+            </div>
+        </md-toolbar>
+        <md-card-content>
+
+            <!-- Filter search -->
+            <div layout-gt-sm="row">
+                <md-input-container class="md-block" flex-gt-sm>
+                    <label>Name</label>
+                    <input name="name" ng-model="search.name" />
+                </md-input-container>
+                
+                <md-input-container class="md-block" flex-gt-sm>
+                    <label>Location</label>
+                    <input name="location" ng-model="search.location" />
+                </md-input-container>
+              
+                <md-input-container class="md-block" flex-gt-sm>
+                    <label>Owner/Custodian</label>
+                    <input name="owner" ng-model="search.owner" />
+                </md-input-container>
+          
+                
+                <div>
+                    <md-button ng-href="?id=etrack_add_stockroom" class="md-raised md-primary">Add Stockroom</md-button>
+                </div>
+            </div>
+         
+
+            <!-- Stoackrooms table -->
+            <div>
+                <div class="panel margin-bottom-small">
+                    <div class="panel-heading blue-panel" role="tab" id="heading_savedItems">
+                        <h1 class="h4 panel-title">
+                            <a role="button" data-toggle="collapse" data-target="#collapseStockrooms" aria-expanded="true" aria-controls="collapseStockrooms">
+                  <span class="accordion_icon"><i class="fa fa-minus-square"></i></span> Assets <span class="badge" id="ritm_count" >{{(c.data.stockrooms|filter:search).length}}</span>
+                </a>
+                        </h1>
+                    </div>
+                    <div ng-if="c.data.stockrooms.length > 0" id="collapseStockrooms" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading_savedItems">
+                        <table class="table table-bordered table-striped table-condensed">
+                            <tr>
+                                <th ng-click="sort('name')">Name<span class="glyphicon sort-icon" ng-show="sortKey=='name'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+                                <th ng-click="sort('manufacture')">Manufacture<span class="glyphicon sort-icon" ng-show="sortKey=='manufacture'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+                                <th ng-click="sort('description')">Description<span class="glyphicon sort-icon" ng-show="sortKey=='description'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+                                <th ng-click="sort('model_number')">Model Number<span class="glyphicon sort-icon" ng-show="sortKey=='model_number'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+                                <th ng-click="sort('owner_custodian')">Owner<span class="glyphicon sort-icon" ng-show="sortKey=='owner_custodian'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+                                <th ng-click="sort('quantity')">Quantity<span class="glyphicon sort-icon" ng-show="sortKey=='quantity'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+                                <th>Actions</th>
+                            </tr>
+   
+                            <tr dir-paginate="data in c.data.stockrooms|filter:search|orderBy:sortKey:reverse|itemsPerPage:pageSize" pagination-id="stockroomsDataPagination">
+                                <td class="ritm_number">{{data.name}}</td>
+                                <td class="ritm_cat_item">{{data.manufacture}}</td>
+                                <td class="ritm_cat_item">{{data.description}}</td>
+                                <td class="ritm_cat_item">{{data.model_number}}</td>
+                                <td class="ritm_cat_item">{{data.owner_custodian}}</td>
+                                <td class="ritm_cat_item">{{data.quantity}}</td>
+                                <td>
+                                    <md-button class="md-raised"  ng-href="?id=etrack_edit_stockroom"> View</md-button>
+                                </td>
+
+                            </tr>
+                        </table>
+                        <div>
+                            <table width="100%" border="0">
+                                <tr>
+                                    <td width="70%">
+                                        <dir-pagination-controls pagination-id="stockroomsDataPagination" direction-links="true" boundary-links="true"></dir-pagination-controls>
+                                    </td>
+                                    <td width="25%" align="right">
+                                        <label for="page-size">Items per page&#160;&#160;</label>
+                                    </td>
+                                    <td width="5%" align="right">
+                                        <select class="form-control" id="page-size" ng-model="pageSize" ng-init="pageSize='5'" style="width:80px;">
+                                            <option value="5">5</option>
+                                            <option value="10">10</option>
+                                            <option value="15">15</option>
+                                            <option value="20">20</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+     
+        </md-card-content>
+    </md-card>
+
+</div>]]></template>
     </sp_widget>
 </record_update>

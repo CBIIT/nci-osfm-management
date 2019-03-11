@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sp_page">
+    <sp_page action="INSERT_OR_UPDATE">
+        <category>custom</category>
+        <css/>
+        <draft>false</draft>
+        <dynamic_title_structure/>
+        <id>etrack_edit_stockroom</id>
+        <internal>false</internal>
+        <public>false</public>
+        <roles/>
+        <short_description/>
+        <sys_class_name>sp_page</sys_class_name>
+        <sys_created_by>abdullahz2@nih.gov</sys_created_by>
+        <sys_created_on>2019-03-06 17:22:00</sys_created_on>
+        <sys_customer_update>false</sys_customer_update>
+        <sys_id>85c94951db4c7f00b86770c08c96193a</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>etrack_edit_stockroom</sys_name>
+        <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
+        <sys_policy/>
+        <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
+        <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
+        <sys_update_name>sp_page_85c94951db4c7f00b86770c08c96193a</sys_update_name>
+        <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
+        <sys_updated_on>2019-03-06 17:22:00</sys_updated_on>
+        <title>Etrack Edit Stockroom</title>
+    </sp_page>
+</record_update>
