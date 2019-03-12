@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sp_angular_provider">
+    <sp_angular_provider action="INSERT_OR_UPDATE">
+        <name>checkLocation</name>
+        <script><![CDATA[function checkLocation($http){
+	this.locationExist = function(name){
+		return $http({
+				url: '/api/x_naci_e_tracking/etrack_rest_api/checkLocation',
+				method: 'GET',
+				beforeSend: function(xhr){xhr.setRequestHeader('X-UserToken', window.g_ck);},
+				headers: {'Content-Type': 'application/json'},
+				params: name
+			});
+	};
+	
+} ]]></script>
+        <sys_class_name>sp_angular_provider</sys_class_name>
+        <sys_created_by>zhoujim@nih.gov</sys_created_by>
+        <sys_created_on>2019-03-11 21:47:13</sys_created_on>
+        <sys_customer_update>false</sys_customer_update>
+        <sys_id>5965333edb44334054d8ff621f96191d</sys_id>
+        <sys_mod_count>7</sys_mod_count>
+        <sys_name>checkLocation</sys_name>
+        <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
+        <sys_policy/>
+        <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
+        <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
+        <sys_update_name>sp_angular_provider_5965333edb44334054d8ff621f96191d</sys_update_name>
+        <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
+        <sys_updated_on>2019-03-11 21:57:22</sys_updated_on>
+        <type>service</type>
+    </sp_angular_provider>
+</record_update>

@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sp_widget">
+    <sp_widget action="INSERT_OR_UPDATE">
+        <category>custom</category>
+        <client_script><![CDATA[function($stateParams, $log, $scope, $http, etrackingAddStockroom, $mdDialog) {
+	console.log($stateParams);
+	
+  /* widget controller */
+  var c = this;
+
+	
+	$("#ownerName").autocomplete({
+		delay: 300,
+		source: function(request, response) {
+			$('.ui-autocomplete').css('display', 'block');
+			var term = $('#ownerName').val();
+			response([]);
+			if (term.length < 4) {
+				return;
+			}
+			var temp = '';
+			if (term.indexOf(',') >= 0) {
+				temp = term.split(',');
+				var length = temp.length;
+				if (length > 1) {
+					term = temp[1].trim() + " " + temp[0].trim();
+				} else {
+					term = temp[0];
+				}
+			}
+			var req = {
+				method: 'GET',
+				url: '/api/x_naci_account_act/accountactivationscoped/fetchUserList',
+				beforeSend: function(xhr) {
+					xhr.setRequestHeader('X-UserToken', window.g_ck);
+				},
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				params: {
+					'term': term
+				}
+			};
+			$http(req).then(handleResponse, handleError);
+
+			function handleResponse(responseData) {
+				var result = responseData.data.result;
+				response(result);
+			}
+
+			function handleError(response) {
+				console.error(response);
+				alert('ERROR');
+			}
+		},
+		autoFocus: true,
+		select: function(event, ui) {
+
+
+			var sys_id = ui.item.id;
+			var name = ui.item.value;
+		
+			if (sys_id != null && sys_id.trim().length > 1) {
+
+				c.data.stockroom.owner = name;
+				c.data.stockroom.ownerId = sys_id;
+			} else {
+				c.data.stockroom.owner = "";
+				c.data.stockroom.ownerId = "";
+			}
+
+			//$('#content').css('height', '550px');
+			$scope.$apply();
+		}
+	});
+
+
+	$scope.enableEdit = false;
+	
+	$scope.toggleEdit = function(){
+		$scope.enableEdit = false;
+		$log.log($scope.enableEdit)
+	}
+	
+	$log.log("s : "+ c.data.stockroom);
+	
+	$scope.saveData = function(){
+		insertStockroom("update", "Stockroom has been updated successfully!")
+	}
+	
+	
+	function insertStockroom(method, msg){
+		c.data.stockroom.method = method;
+
+		etrackingAddStockroom.addStockroom(c.data.stockroom)
+			.then(function(res){
+
+			$mdDialog.show(
+				$mdDialog.alert()
+				.parent(angular.element(document.querySelector('#popupContainer')))
+				.clickOutsideToClose(true)
+				.title(msg)
+				.ok('OK')
+			);
+
+			$log.log(res);
+		}, function(err){
+			$log.log(err);
+			alert("ERROR");
+		});
+
+
+
+	}
+
+}]]></client_script>
+        <controller_as>c</controller_as>
+        <css>
+[disabled] md-input-container .md-input, md-input-container .md-input[disabled] {
+color: black;
+}
+
+md-select.md-default-theme[disabled] .md-select-value, md-select[disabled] .md-select-value {
+  color: black;
+}</css>
+        <data_table>sp_instance</data_table>
+        <demo_data/>
+        <description/>
+        <docs/>
+        <field_list/>
+        <has_preview>false</has_preview>
+        <id>etrack_display_stockroom</id>
+        <internal>false</internal>
+        <link/>
+        <name>Etrack Display Stockroom</name>
+        <option_schema/>
+        <public>false</public>
+        <roles/>
+        <script><![CDATA[(function() {
+ data.admin = gs.getUser().isMemberOf("Etrack_admin");
+	var id = "";
+	data.stockroom = {};
+	if (input && input.id) {
+		
+		id = input.id.toString();
+		var stockroom = new GlideRecord('x_naci_e_tracking_stock_room');
+		stockroom.addQuery("sys_id", id);
+		stockroom.query();
+		stockroom.next();
+		data.stockroom.id = stockroom.sys_id.toString();
+		data.stockroom.name = stockroom.name.toString();
+		data.stockroom.location = stockroom.location.sys_id.toString();
+		data.stockroom.description = stockroom.description.toString();
+		data.stockroom.owner = stockroom.owner.name.toString();
+		data.stockroom.type = stockroom.type.sys_id.toString();
+		data.stockroom.ownerId = stockroom.owner.sys_id.toString();
+	}
+	
+	data.types = [];
+	var stockroomTypes = new GlideRecord('x_naci_e_tracking_stockroom_type');
+	    stockroomTypes.orderBy("name");
+			stockroomTypes.query();
+	
+	while (stockroomTypes.next()){
+		var item = {};
+		item.id = stockroomTypes.sys_id.toString();
+		item.name = stockroomTypes.name.toString();
+		data.types.push(item)
+	}
+	
+	data.locations = [];
+	var locations = new GlideRecord('x_naci_e_tracking_location');
+			locations.orderBy('name');
+			locations.query();
+	while(locations.next()){
+		var item = {};
+		item.id = locations.sys_id.toString();
+		item.name = locations.name.toString();
+		data.locations.push(item);
+	}
+	
+	
+
+	
+})();]]></script>
+        <servicenow>false</servicenow>
+        <sys_class_name>sp_widget</sys_class_name>
+        <sys_created_by>abdullahz2@nih.gov</sys_created_by>
+        <sys_created_on>2019-03-12 18:36:51</sys_created_on>
+        <sys_customer_update>false</sys_customer_update>
+        <sys_id>3364dcdfdb44f340b86770c08c961905</sys_id>
+        <sys_mod_count>95</sys_mod_count>
+        <sys_name>Etrack Display Stockroom</sys_name>
+        <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
+        <sys_policy/>
+        <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
+        <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
+        <sys_update_name>sp_widget_3364dcdfdb44f340b86770c08c961905</sys_update_name>
+        <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
+        <sys_updated_on>2019-03-12 21:01:16</sys_updated_on>
+        <template><![CDATA[<div ng-controller="c" layout="column" ng-cloak>
+  <md-card>
+    <md-toolbar class="md-hue-2">
+      <div class="md-toolbar-tools">
+        <h2 flex md-truncate>Stockroom Details</h2>
+      </div>
+    </md-toolbar>
+    <md-card-content>
+
+      <form name="userForm">
+        <div layout="column">
+          <h4>
+            Stockroom information
+          </h4>
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>Name</label>
+            <input required name="name" ng-model="c.data.stockroom.name" ng-disabled="true" />
+          </md-input-container>
+          
+          
+          <md-input-container class="md-block">
+            <label>Description</label>
+            <textarea ng-model="c.data.stockroom.description" required md-maxlength="150" rows="1" md-select-on-focus  ng-disabled="!enableEdit"></textarea>
+          </md-input-container>
+
+
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>Location</label>
+            <md-select required ng-model="c.data.stockroom.location" ng-disabled="!enableEdit">
+              <md-option ng-repeat="location in c.data.locations" value="{{location.id}}">
+                {{location.name}}
+              </md-option>
+            </md-select >
+          </md-input-container>
+
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>Owner Custodian</label>
+            <input id="ownerName" required name="owner" ng-model="c.data.stockroom.owner"  ng-disabled="!enableEdit"/>
+          </md-input-container>
+
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>Type</label>
+            <md-select required ng-model="c.data.stockroom.type" ng-disabled="!enableEdit">
+              <md-option ng-repeat="type in c.data.types" value="{{type.id}}" >
+                {{type.name}}
+              </md-option>
+            </md-select >
+          </md-input-container>
+          
+           <div class="d-flex justify-content-center">
+            <md-button ng-show="c.data.admin == true && !enableEdit" class="md-raised md-primary" ng-click="enableEdit = true">Edit</md-button>
+            <md-button ng-show="c.data.admin == true && enableEdit" class="md-raised md-primary" ng-click="saveData()">Update</md-button>
+						<md-button ui-sref="stockrooms" class="md-raised md-primary">Close</md-button>
+
+
+
+          </div>
+
+        </div>
+      </form>
+
+
+
+
+        </md-card-content>
+      </md-card>
+
+
+	{{ c.data.stockroom | json }}
+
+
+
+    </div>]]></template>
+    </sp_widget>
+</record_update>

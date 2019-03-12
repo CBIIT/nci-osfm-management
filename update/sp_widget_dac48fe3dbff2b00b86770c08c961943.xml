@@ -6,24 +6,12 @@
   /* widget controller */
   var c = this;
 	
-	c.data.stockrooms = [];
-
-	
-	for(i = 0; i < 100; i++){
-		c.data.stockrooms.push(
-			{"name": "stockrooms " + i}
-		)
-
-	}
-	
-	
-	
 	$scope.sort = function(keyname){
 	   $scope.sortKey = keyname;
 	   $scope.reverse = !$scope.reverse;
 	};
 	
-	spUtil.recordWatch($scope, "", "", function(name, data) {  
+	spUtil.recordWatch($scope, "x_naci_e_tracking_stock_room", "", function(name, data) {  
 			spUtil.update($scope);
 	});
 
@@ -46,6 +34,20 @@
         <script><![CDATA[(function() {
 	
 	data.stockrooms = [];
+
+	var stockroom = new GlideRecord("x_naci_e_tracking_stock_room");
+			stockroom.orderBy("name");
+			stockroom.query();
+	
+	while(stockroom.next()){
+		var item = {};
+				item.id = stockroom.sys_id.toString();
+				item.name = stockroom.name.toString();
+				item.type = stockroom.type.name.toString();
+				item.location = stockroom.location.name.toString();
+				item.owner = stockroom.owner.name.toString();
+				data.stockrooms.push(item);
+	}
 })();]]></script>
         <servicenow>false</servicenow>
         <sys_class_name>sp_widget</sys_class_name>
@@ -53,7 +55,7 @@
         <sys_created_on>2019-03-01 15:50:07</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>dac48fe3dbff2b00b86770c08c961943</sys_id>
-        <sys_mod_count>16</sys_mod_count>
+        <sys_mod_count>40</sys_mod_count>
         <sys_name>Etrack Stockrooms</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
@@ -61,7 +63,7 @@
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sp_widget_dac48fe3dbff2b00b86770c08c961943</sys_update_name>
         <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-03-11 14:35:20</sys_updated_on>
+        <sys_updated_on>2019-03-12 19:03:56</sys_updated_on>
         <template><![CDATA[<div ng-controller="c" ng-cloak>
 
     <md-card>
@@ -78,21 +80,22 @@
                     <label>Name</label>
                     <input name="name" ng-model="search.name" />
                 </md-input-container>
-                
+                 <div flex="5" hide-xs hide-sm></div>
                 <md-input-container class="md-block" flex-gt-sm>
                     <label>Location</label>
                     <input name="location" ng-model="search.location" />
                 </md-input-container>
-              
+               <div flex="5" hide-xs hide-sm></div>
                 <md-input-container class="md-block" flex-gt-sm>
                     <label>Owner/Custodian</label>
                     <input name="owner" ng-model="search.owner" />
                 </md-input-container>
-          
+          			<div flex="5" hide-xs hide-sm></div>
                 
-                <div>
-                    <md-button ng-href="?id=etrack_add_stockroom" class="md-raised md-primary">Add Stockroom</md-button>
+                <div layout="row" layout-align="end center">
+                    <md-button ui-sref="add_stockrooms" class="md-raised md-primary">Add Stockroom</md-button>
                 </div>
+              	<br hide-md hide-lg>
             </div>
          
 
@@ -110,23 +113,20 @@
                         <table class="table table-bordered table-striped table-condensed">
                             <tr>
                                 <th ng-click="sort('name')">Name<span class="glyphicon sort-icon" ng-show="sortKey=='name'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
-                                <th ng-click="sort('manufacture')">Manufacture<span class="glyphicon sort-icon" ng-show="sortKey=='manufacture'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
-                                <th ng-click="sort('description')">Description<span class="glyphicon sort-icon" ng-show="sortKey=='description'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
-                                <th ng-click="sort('model_number')">Model Number<span class="glyphicon sort-icon" ng-show="sortKey=='model_number'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
-                                <th ng-click="sort('owner_custodian')">Owner<span class="glyphicon sort-icon" ng-show="sortKey=='owner_custodian'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
-                                <th ng-click="sort('quantity')">Quantity<span class="glyphicon sort-icon" ng-show="sortKey=='quantity'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+                                <th ng-click="sort('type')">Type<span class="glyphicon sort-icon" ng-show="sortKey=='manufacture'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+                                <th ng-click="sort('location')">Location<span class="glyphicon sort-icon" ng-show="sortKey=='description'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+                                <th ng-click="sort('owner')">Owner<span class="glyphicon sort-icon" ng-show="sortKey=='model_number'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+                        
                                 <th>Actions</th>
                             </tr>
    
                             <tr dir-paginate="data in c.data.stockrooms|filter:search|orderBy:sortKey:reverse|itemsPerPage:pageSize" pagination-id="stockroomsDataPagination">
                                 <td class="ritm_number">{{data.name}}</td>
-                                <td class="ritm_cat_item">{{data.manufacture}}</td>
-                                <td class="ritm_cat_item">{{data.description}}</td>
-                                <td class="ritm_cat_item">{{data.model_number}}</td>
-                                <td class="ritm_cat_item">{{data.owner_custodian}}</td>
-                                <td class="ritm_cat_item">{{data.quantity}}</td>
+                                <td class="ritm_cat_item">{{data.type}}</td>
+                                <td class="ritm_cat_item">{{data.location}}</td>
+                              <td class="ritm_cat_item">{{data.owner}}</td>
                                 <td>
-                                    <md-button class="md-raised"  ng-href="?id=etrack_edit_stockroom"> View</md-button>
+                                    <md-button class="md-raised"  ui-sref="display_stockroom({id: data.id})">View</md-button>
                                 </td>
 
                             </tr>

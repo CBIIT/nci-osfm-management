@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sys_ui_script">
+    <sys_ui_script action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <description>Contains routes for etracking</description>
+        <global>false</global>
+        <name>x_naci_e_tracking.etrack-routes.js</name>
+        <script><![CDATA[(function(angular) {
+	var app = angular.module('sn.$sp');
+	app.requires.push('ui.router');
+
+	// use hash-based routing
+	app.config(function($locationProvider) {
+		$locationProvider.html5Mode(false);
+		$locationProvider.hashPrefix('!');
+	});
+
+	app.config(function($uiRouterProvider, $stateProvider) {
+		// default to home state
+		var $urlService = $uiRouterProvider.urlService;
+		$urlService.rules.otherwise({ state: 'home' });		
+
+		var states = [
+			{
+				name: 'home',
+				url: '/home',
+				component: 'spWidget',
+				resolve: {
+					widget: getWidget('etrack_home')
+				},
+			},
+
+			{
+				name: 'assets',
+				url: '/assets',
+				component: 'spWidget',
+				resolve: {
+					widget: getWidget('etrack_assets')
+				}
+			},
+
+			{
+				name: 'add_assets',
+				url: '/add-assets',
+				component: 'spWidget',
+				resolve: {
+					widget: getWidget('etrack_add_assets')
+				},
+			},
+
+			{
+				name: 'stockrooms',
+				url: '/stockrooms',
+				component: 'spWidget',
+				resolve: {
+					widget: getWidget('etrack_stockrooms')
+				}
+			},
+
+			{
+				name: 'add_stockrooms',
+				url: '/add-stockrooms',
+				component: 'spWidget',
+				resolve: {
+					widget: getWidget('etrack_add_stockroom')
+				},
+			},
+
+			{
+				name: 'report',
+				url: '/report',
+				component: 'spWidget',
+				resolve: {
+					widget: getWidget('etrack_report'),
+				}
+			},
+			{
+				name: 'display_stockroom',
+				url: '/display-stockroom/:id',
+				component: 'spWidget',
+				resolve: {
+					widget: function(spUtil, $stateParams) {
+						return spUtil.get('etrack_display_stockroom', {
+							id: $stateParams.id
+						});
+					}
+				}
+			}
+
+
+		];
+
+		states.forEach(function(state) {
+			$stateProvider.state(state);
+		});
+
+		function getWidget(id) {
+			return function(spUtil) {
+				return spUtil.get(id);
+			};
+		}
+	});
+})(window.angular);]]></script>
+        <script_name>etrack-routes.js</script_name>
+        <sys_class_name>sys_ui_script</sys_class_name>
+        <sys_created_by>abdullahz2@nih.gov</sys_created_by>
+        <sys_created_on>2019-03-12 17:55:14</sys_created_on>
+        <sys_customer_update>false</sys_customer_update>
+        <sys_id>0e19c4d3db44f340b86770c08c96195b</sys_id>
+        <sys_mod_count>23</sys_mod_count>
+        <sys_name>x_naci_e_tracking.etrack-routes.js</sys_name>
+        <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
+        <sys_policy/>
+        <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
+        <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
+        <sys_update_name>sys_ui_script_0e19c4d3db44f340b86770c08c96195b</sys_update_name>
+        <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
+        <sys_updated_on>2019-03-12 19:22:54</sys_updated_on>
+        <use_scoped_format>false</use_scoped_format>
+    </sys_ui_script>
+</record_update>

@@ -5,7 +5,7 @@
         <element label="Country" max_length="100" name="country" type="string"/>
         <element label="Latitude" max_length="50" name="latitude" type="string"/>
         <element label="Longitude" max_length="50" name="longitude" type="string"/>
-        <element label="Name" max_length="100" name="name" type="string"/>
+        <element display="true" label="Name" max_length="100" name="name" type="string"/>
         <element label="Phone" max_length="50" name="phone" type="string"/>
         <element label="State" max_length="50" name="state" type="string"/>
         <element label="Street" max_length="300" name="street" type="string"/>

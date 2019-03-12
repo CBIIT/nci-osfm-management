@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sp_js_include">
+    <sp_js_include action="INSERT_OR_UPDATE">
+        <display_name>Etrack Jquery UI</display_name>
+        <source>local</source>
+        <sys_class_name>sp_js_include</sys_class_name>
+        <sys_created_by>abdullahz2@nih.gov</sys_created_by>
+        <sys_created_on>2019-03-11 21:16:15</sys_created_on>
+        <sys_customer_update>false</sys_customer_update>
+        <sys_id>803fef32db48b340b86770c08c96196e</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>Etrack Jquery UI</sys_name>
+        <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
+        <sys_policy/>
+        <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
+        <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
+        <sys_ui_script display_value="x_naci_e_tracking.ETracking JQuery UI">8d4e2fb6db44334054d8ff621f961914</sys_ui_script>
+        <sys_update_name>sp_js_include_803fef32db48b340b86770c08c96196e</sys_update_name>
+        <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
+        <sys_updated_on>2019-03-11 21:16:15</sys_updated_on>
+        <url/>
+    </sp_js_include>
+</record_update>

@@ -4,8 +4,11 @@
         <category>custom</category>
         <client_script><![CDATA[function($scope, $timeout, $location, spUtil) {
   var c = this;
-	
-	console.log($location)
+	$timeout(function() {
+			angular.element('#main-navigation')
+				.addClass('navbar-sticky')
+				.insertAfter('header');
+		});
 
 	$scope.$on('$locationChangeStart', function(e) {
 		c.loading = true;
@@ -54,17 +57,25 @@
 		data.pageLinks = [
 				{
 					title: 'Home',
-					id: 'etrack_home'
+					id: 'home'
 				},
 				{
 					title: 'Assets',
-					id: 'etrack_assets'
+					id: 'assets'
 				},
 				{
 					title: 'Stockroom',
-					id: 'etrack_stockrooms'
+					id: 'stockrooms'
 				}
 			];
+		
+		// admin user
+		if (true) {
+			data.pageLinks.push({
+				title: 'Report',
+				id: 'report'
+			})
+		}
 		
 	}
 	
@@ -79,7 +90,7 @@
         <sys_created_on>2019-02-25 15:39:29</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>67fbd61adbf36700b86770c08c96192b</sys_id>
-        <sys_mod_count>99</sys_mod_count>
+        <sys_mod_count>125</sys_mod_count>
         <sys_name>Etrack Navigation</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
@@ -87,16 +98,43 @@
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sp_widget_67fbd61adbf36700b86770c08c96192b</sys_update_name>
         <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-03-05 20:02:06</sys_updated_on>
-        <template><![CDATA[<nav class="navbar navbar-default shadow-sm">
+        <sys_updated_on>2019-03-12 18:10:58</sys_updated_on>
+        <template><![CDATA[<!-- Etrack Ribbon -->
+<div class="bg-primary flex-grow hidden-xs ribbon">
+  <h1 class="container py-2 my-0 h4" >
+    Emergency Equipment Tracking System
+  </h1>
+</div>
+
+<!-- Etrack Navbar -->
+<nav class="navbar navbar-default shadow-sm" id="main-navigation">
+  <!-- Mobile menu -->
+  <div class="d-flex align-items-center justify-content-between visible-xs bg-primary-dark text-light px-3">
+    
+    <!-- Mobile Brand Text -->
+    <a class="visible-xs h4 ml-2 text-light" 
+       ng-href="/{{ portal.url_suffix }}">
+      Emergency Equipment Tracking System
+    </a>
+    
+    <!-- Mobile Menu Dropdown Button -->
+    <md-button class="visible-xs md-raised md-primary"
+               data-toggle="collapse" 
+               data-target="#main-navbar" 
+               aria-expanded="false">
+      Menu
+    </md-button>    
+  </div>
+
+  <!-- Nav Links Container -->
   <div class="container">
-    <!-- Nav Links -->
-    <div class="collapse navbar-collapse px-sm-0" id="main-navbar">
-      <ul class="nav navbar-nav">
-        <li ng-repeat="link in c.data.pageLinks"
-            ng-class="{active: page.id == link.id}">
-          <a 
-             ng-href="?id={{link.id}}" 
+  <div class="collapse navbar-collapse px-sm-0" id="main-navbar">
+
+    <!-- Nav Links (Left Side) -->
+    <ul class="nav navbar-nav">
+       <li ng-repeat="link in c.data.pageLinks"
+           ui-sref-active="active">
+          <a ui-sref="{{link.id}}"
              class="nav-link">
             <span class="sr-only" 
                   ng-if="page.id == link.id">
@@ -105,44 +143,78 @@
             {{ link.title }}
           </a>
         </li>
-      </ul>
-      
-      <!-- Login User -->
-      <ul class="nav navbar-nav navbar-right">
-         <li class="dropdown" ng-if="c.data.isLoggedIn">
-          <a href="#" 
-             class="dropdown-toggle" 
-             data-toggle="dropdown" 
-             role="button" 
-             aria-haspopup="true" 
-             aria-expanded="false">
-            {{ c.data.userName }}
-            <span class="caret"></span>
-          </a>
-          <ul class="dropdown-menu px-3">
-            <li>
-             <a ng-if="c.data.isLoggedIn"
-                  ng-href="{{ portal.logoutUrl }}"
-                 class="nav-link">
-                Log Out
-              </a>
-            </li>
-          </ul>
-        </li>
-      </ul> 
-      <ul class="nav navbar-nav navbar-right">
-         <li ng-if="!c.data.isLoggedIn">
-           <a href="#" 
-             data-toggle="dropdown" 
-             role="button" 
-             aria-haspopup="true" 
-             aria-expanded="false">
-            Log In
-          </a>   
-        </li>
-      </ul> 
-    </div>
+    </ul>
+    <!-- End Nav Links (Left Side) -->
+
+    <!-- Nav Links (Right Side) -->
+    <ul class="nav navbar-nav navbar-right">
+
+      <!-- Login Dropdown -->
+      <li class="dropdown" ng-if="!c.data.isLoggedIn">
+        <a class="dropdown-toggle mr-0" 
+           data-toggle="dropdown" 
+           role="button" 
+           aria-haspopup="true" 
+           aria-expanded="false">
+          Log In
+          <span class="caret"></span>
+        </a>
+
+        <ul class="dropdown-menu px-3 shadow-md">
+          <li>
+            <a ng-if="!c.data.isLoggedIn"
+               ui-sref="external-login"
+               class="nav-link">
+              For Applicants
+            </a>
+          </li>
+          <li>
+            <a ng-if="!c.data.isLoggedIn"
+               ng-href="/nav_to.do?uri=/{{ portal.url_suffix }}&glide_sso_id={{c.data.defaultIDP}}"
+               class="nav-link">
+              For PIs
+            </a>
+          </li>
+        </ul>
+      </li>
+      <!-- End Login Dropdown -->
+
+      <!-- Profile/Logout Dropdown -->
+      <li class="dropdown" ng-if="c.data.isLoggedIn">
+        <a class="dropdown-toggle mr-0" 
+           data-toggle="dropdown" 
+           role="button" 
+           aria-haspopup="true" 
+           aria-expanded="false">
+          {{ c.data.userName }}
+          <span class="caret"></span>
+        </a>
+
+        <ul class="dropdown-menu px-3 shadow-md">
+          <li ng-if="c.data.userRole != 'applicant'">
+            <a ui-sref="preferences"
+               class="nav-link">
+              Preferences
+            </a>
+          </li>
+          <li>
+            <a ng-href="{{ portal.logoutUrl }}"
+               class="nav-link">
+              Log Out
+            </a>
+          </li>
+        </ul>
+      </li>
+      <!-- End Profile/Logout Dropdown -->
+
+    </ul>
+    <!-- End Nav Links (Right Side) -->
+
   </div>
+    
+  </div>
+  <!-- End Nav Links Container -->
+
 </nav>
 ]]></template>
     </sp_widget>

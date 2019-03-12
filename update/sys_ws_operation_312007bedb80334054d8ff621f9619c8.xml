@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sys_ws_operation">
+    <sys_ws_operation action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <consumes>application/json,application/xml,text/xml</consumes>
+        <consumes_customized>false</consumes_customized>
+        <default_operation_uri/>
+        <enforce_acl>cf9d01d3e73003009d6247e603f6a990</enforce_acl>
+        <http_method>POST</http_method>
+        <name>addStockRoom</name>
+        <operation_script><![CDATA[(function process(/*RESTAPIRequest*/ request, /*RESTAPIResponse*/ response) {
+	var data = request.body.data;
+	var id = '';
+	if(data.method.toString() == 'insert'){
+		var stockroom = new GlideRecord('x_naci_e_tracking_stock_room');
+			stockroom.initialize();
+			stockroom.description = data.description.toString();
+			stockroom.name = data.name.toString();
+			stockroom.location = data.location.toString();
+			stockroom.owner = data.ownerId.toString();
+			stockroom.type = data.type.toString();
+			id = stockroom.insert();
+	}else if(data.method.toString() == 'update'){
+		var stockroom1 = new GlideRecord('x_naci_e_tracking_stock_room');
+		    stockroom1.addQuery("name", data.name.toString());
+			stockroom1.query();
+		    stockroom1.next();
+		   	stockroom1.description = data.description.toString();
+			stockroom1.name = data.name.toString();
+			stockroom1.location = data.location.toString();
+			stockroom1.owner = data.ownerId.toString();
+			stockroom1.type = data.type.toString();
+		    id = stockroom1.update();
+	}else if(data.method.toString() == 'check'){
+		var stockroom2 = new GlideRecord('x_naci_e_tracking_stock_room');
+		    stockroom2.addQuery("name", data.name.toString());
+			stockroom2.query();
+		    var count = stockroom2.getRowCount();
+		if(count == 0){
+			id = "0";
+		}else{
+			id = "1";
+		}
+	}
+	
+	return id;
+   
+})(request, response);]]></operation_script>
+        <operation_uri>/api/x_naci_e_tracking/etrack_rest_api/addStockRoom</operation_uri>
+        <produces>application/json,application/xml,text/xml</produces>
+        <produces_customized>false</produces_customized>
+        <relative_path>/addStockRoom</relative_path>
+        <request_example/>
+        <requires_acl_authorization>true</requires_acl_authorization>
+        <requires_authentication>true</requires_authentication>
+        <short_description/>
+        <sys_class_name>sys_ws_operation</sys_class_name>
+        <sys_created_by>zhoujim@nih.gov</sys_created_by>
+        <sys_created_on>2019-03-11 17:50:22</sys_created_on>
+        <sys_customer_update>false</sys_customer_update>
+        <sys_id>312007bedb80334054d8ff621f9619c8</sys_id>
+        <sys_mod_count>7</sys_mod_count>
+        <sys_name>addStockRoom</sys_name>
+        <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
+        <sys_policy/>
+        <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
+        <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
+        <sys_update_name>sys_ws_operation_312007bedb80334054d8ff621f9619c8</sys_update_name>
+        <sys_updated_by>zhoujim@nih.gov</sys_updated_by>
+        <sys_updated_on>2019-03-12 15:19:24</sys_updated_on>
+        <web_service_definition display_value="ETrack REST API">ac0dd2b6db00334054d8ff621f96192b</web_service_definition>
+        <web_service_version/>
+    </sys_ws_operation>
+</record_update>

@@ -2,31 +2,158 @@
 <record_update table="sp_widget">
     <sp_widget action="INSERT_OR_UPDATE">
         <category>custom</category>
-        <client_script><![CDATA[function($scope) {
-    /* widget controller */
-    var c = this;
-    c.form = getFormValues();
-	
-		c.stockroom_types = ["Individual Locker", "Forwarding Stocking Location", "Main Supply Area"].map(function(type) {
-        return {name: type};
-      });
-	
-	
-		function updateFromValues(update_form){
-			return null;
-		}
+        <client_script><![CDATA[function($scope, $log, $http, etrackingAddStockroom, $mdDialog) {
+	/* widget controller */
+	var c = this;
+	var myUserId = c.data.info.my_sys_id;
+	$scope.form = {userId: ""};
 
-    function getFormValues() {
-        return {
-            name: null,
-            description: null,
-            location: null,
-            owner_custodian: null,
-            type: null,
-					 state: 'CA'
-        }
-    }
-	
+	$("#ownerName").autocomplete({
+		delay: 300,
+		source: function(request, response) {
+			$('.ui-autocomplete').css('display', 'block');
+			var term = $('#ownerName').val();
+			response([]);
+			if (term.length < 4) {
+				return;
+			}
+			var temp = '';
+			if (term.indexOf(',') >= 0) {
+				temp = term.split(',');
+				var length = temp.length;
+				if (length > 1) {
+					term = temp[1].trim() + " " + temp[0].trim();
+				} else {
+					term = temp[0];
+				}
+			}
+			var req = {
+				method: 'GET',
+				url: '/api/x_naci_account_act/accountactivationscoped/fetchUserList',
+				beforeSend: function(xhr) {
+					xhr.setRequestHeader('X-UserToken', window.g_ck);
+				},
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				params: {
+					'term': term
+				}
+			};
+			$http(req).then(handleResponse, handleError);
+
+			function handleResponse(responseData) {
+				var result = responseData.data.result;
+				response(result);
+			}
+
+			function handleError(response) {
+				console.error(response);
+				alert('ERROR');
+			}
+		},
+		autoFocus: true,
+		select: function(event, ui) {
+
+
+			var sys_id = ui.item.id;
+			var name = ui.item.value;
+			if (sys_id != null && sys_id.trim().length > 1) {
+				$scope.form.userId = sys_id;
+			} else {
+				$scope.form.userId = "";
+			}
+			if (sys_id != null && sys_id.trim().length > 1) {
+
+				c.form.owner_custodian = name;
+			} else {
+				c.form.owner_custodian = "";
+			}
+
+			//$('#content').css('height', '550px');
+			$scope.$apply();
+		}
+	});
+
+
+	c.form = getFormValues();
+
+	$scope.addStockroom = function(){
+		// check if stockrooom name exist 
+		c.form.method = "check";
+		etrackingAddStockroom.checkStockroom(c.form)
+			.then(function(res){
+			var id = res.data.result;
+			if (id == "0"){
+				insertStockroom("insert", "New stockroom has been created successfully");
+			}else if(id == "1"){			
+				var confirm = $mdDialog.confirm()
+				.title('Are you sure you want to update it? ')
+				.textContent('Stockroom already exists')
+				.ok('YES')
+				.cancel('NO');
+
+				$mdDialog.show(confirm).then(function() {
+					insertStockroom("update", "Stockroom has been updated successfully");
+				}, function() {
+
+
+				});
+
+
+
+			}
+
+		}, function(err){
+			$log.log(err);
+			alert("ERROR");
+		});
+
+	}
+
+	function insertStockroom(method, msg){
+		c.form.ownerId = $scope.form.userId;
+		c.form.method = method;
+
+		etrackingAddStockroom.addStockroom(c.form)
+			.then(function(res){
+
+			$mdDialog.show(
+				$mdDialog.alert()
+				.parent(angular.element(document.querySelector('#popupContainer')))
+				.clickOutsideToClose(true)
+				.title(msg)
+				.ok('OK')
+			);
+
+			$log.log(res);
+		}, function(err){
+			$log.log(err);
+			alert("ERROR");
+		});
+
+
+
+	}
+
+
+
+	function updateFromValues(update_form){
+		return null;
+	}
+
+	function getFormValues() {
+		return {
+			name: null,
+			description: null,
+			location: null,
+			owner: null,
+			type: null
+		}
+	}
+
+
+
 }]]></client_script>
         <controller_as>c</controller_as>
         <css/>
@@ -43,22 +170,57 @@
         <option_schema/>
         <public>false</public>
         <roles/>
-        <script><![CDATA[(function() {  /* populate the 'data' object */  /* e.g., data.table = $sp.getValue('table'); */})();]]></script>
+        <script><![CDATA[(function() {
+  
+	var my_sys_id = gs.getUserID();
+	
+	data.info = {
+	
+		my_sys_id: my_sys_id
+	}
+	
+	data.types = [];
+	var stockroomTypes = new GlideRecord('x_naci_e_tracking_stockroom_type');
+	    stockroomTypes.orderBy("name");
+			stockroomTypes.query();
+	
+	while (stockroomTypes.next()){
+		var item = {};
+		item.id = stockroomTypes.sys_id.toString();
+		item.name = stockroomTypes.name.toString();
+		data.types.push(item)
+	}
+	
+	data.locations = [];
+	var locations = new GlideRecord('x_naci_e_tracking_location');
+			locations.orderBy('name');
+			locations.query();
+	while(locations.next()){
+		var item = {};
+		item.id = locations.sys_id.toString();
+		item.name = locations.name.toString();
+		data.locations.push(item);
+	}
+	
+	
+	
+	
+})();]]></script>
         <servicenow>false</servicenow>
         <sys_class_name>sp_widget</sys_class_name>
         <sys_created_by>abdullahz2@nih.gov</sys_created_by>
         <sys_created_on>2019-03-06 16:54:24</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>b4734dd9db0c7f00b86770c08c9619d9</sys_id>
-        <sys_mod_count>36</sys_mod_count>
+        <sys_mod_count>103</sys_mod_count>
         <sys_name>Etrack Add Stockroom</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
         <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sp_widget_b4734dd9db0c7f00b86770c08c9619d9</sys_update_name>
-        <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-03-08 18:37:26</sys_updated_on>
+        <sys_updated_by>zhoujim@nih.gov</sys_updated_by>
+        <sys_updated_on>2019-03-12 17:15:21</sys_updated_on>
         <template><![CDATA[<div ng-controller="c" ng-cloak>
     <md-card>
         <md-toolbar>
@@ -81,23 +243,26 @@
                         <label>Description</label>
                         <textarea ng-model="c.form.description" required md-maxlength="150" rows="3" md-select-on-focus></textarea>
                     </md-input-container>
-                    <md-input-container class="md-block" flex-gt-sm>
-                        <label>Location</label>
-                        <input required name="location" ng-model="c.form.location" />
-                    </md-input-container>
+                   
                   
+                   <md-input-container class="md-block" flex-gt-sm>
+                      <label>Locations</label>
+                      <md-select required ng-model="c.form.location">
+                        <md-option ng-repeat="location in c.data.locations" value="{{location.id}}">
+                          {{location.name}}
+                        </md-option>
+                      </md-select >
+                    </md-input-container>
                   
                     <md-input-container class="md-block" flex-gt-sm>
                         <label>Owner Custodian</label>
-                        <input required name="owner_custodian" ng-model="c.form.owner_custodian" />
+                        <input id="ownerName" required name="owner" ng-model="c.form.owner" />
                     </md-input-container>
-                  
-                
-                  
+                 
                    <md-input-container class="md-block" flex-gt-sm>
                       <label>Type</label>
                       <md-select required ng-model="c.form.type">
-                        <md-option ng-repeat="type in c.stockroom_types" value="{{type.name}}">
+                        <md-option ng-repeat="type in c.data.types" value="{{type.id}}">
                           {{type.name}}
                         </md-option>
                       </md-select >
@@ -106,14 +271,14 @@
                 </div>
                 <br>
                 <div class="d-flex justify-content-center">
-                    <md-button ng-href="?id=etrack_stockrooms" class="md-raised md-primary">Submit</md-button>
+                    <md-button ng-click="addStockroom()" class="md-raised md-primary">Submit</md-button>
                 </div>
             </form>
 
 
         </md-card-content>
     </md-card>
-
+	{{ c.form | json }} {{form| json}}
 </div>]]></template>
     </sp_widget>
 </record_update>

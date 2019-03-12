@@ -29,7 +29,7 @@
         <sys_created_on>2019-02-22 21:18:15</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>25ac4ca9dbfba300b86770c08c9619c1</sys_id>
-        <sys_mod_count>67</sys_mod_count>
+        <sys_mod_count>68</sys_mod_count>
         <sys_name>NCI ETracking Header</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
@@ -37,7 +37,7 @@
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sp_header_footer_25ac4ca9dbfba300b86770c08c9619c1</sys_update_name>
         <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-02-25 21:19:54</sys_updated_on>
+        <sys_updated_on>2019-03-11 18:30:37</sys_updated_on>
         <template><![CDATA[<div class="d-none d-md-block py-4">
   <div class="container">
     <img ng-src="nci-logo-full.svg" 
@@ -45,14 +45,6 @@
          height="50" />
   </div>
 </div>
-<div class="d-none d-md-block py-2 bg-primary-dark text-light">
-  <div class="container">
-    <h4>
-      Emergency Equipment Tracking System
-    </h4>
-  </div>
-</div>
-
 <widget id="etrack_navigation"></widget>]]></template>
     </sp_header_footer>
 </record_update>
