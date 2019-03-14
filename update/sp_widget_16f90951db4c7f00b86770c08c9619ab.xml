@@ -2,7 +2,99 @@
 <record_update table="sp_widget">
     <sp_widget action="INSERT_OR_UPDATE">
         <category>custom</category>
-        <client_script><![CDATA[function() {  /* widget controller */  var c = this;}]]></client_script>
+        <client_script><![CDATA[function($stateParams, $log, $scope, $http, $mdDialog, etrackUpdateAsset) {
+  /* widget controller */
+  var c = this;
+	
+	$("#ownerName").autocomplete({
+		delay: 300,
+		source: function(request, response) {
+			$('.ui-autocomplete').css('display', 'block');
+			var term = $('#ownerName').val();
+			response([]);
+			if (term.length < 4) {
+				return;
+			}
+			var temp = '';
+			if (term.indexOf(',') >= 0) {
+				temp = term.split(',');
+				var length = temp.length;
+				if (length > 1) {
+					term = temp[1].trim() + " " + temp[0].trim();
+				} else {
+					term = temp[0];
+				}
+			}
+			var req = {
+				method: 'GET',
+				url: '/api/x_naci_account_act/accountactivationscoped/fetchUserList',
+				beforeSend: function(xhr) {
+					xhr.setRequestHeader('X-UserToken', window.g_ck);
+				},
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				params: {
+					'term': term
+				}
+			};
+			$http(req).then(handleResponse, handleError);
+
+			function handleResponse(responseData) {
+				var result = responseData.data.result;
+				response(result);
+			}
+
+			function handleError(response) {
+				console.error(response);
+				alert('ERROR');
+			}
+		},
+		autoFocus: true,
+		select: function(event, ui) {
+
+
+			var sys_id = ui.item.id;
+			var name = ui.item.value;
+		
+			if (sys_id != null && sys_id.trim().length > 1) {
+
+				c.data.asset.owner = name;
+				c.data.asset.ownerId = sys_id;
+			} else {
+				c.data.asset.owner = "";
+				c.data.asset.ownerId = "";
+			}
+
+			//$('#content').css('height', '550px');
+			$scope.$apply();
+		}
+	});
+
+
+	$scope.enableEdit = false;
+	
+	$scope.updateAsset = function(){
+		etrackUpdateAsset.updateAsset(c.data.asset).then(function(res){
+			$mdDialog.show(
+				$mdDialog.alert()
+				.parent(angular.element(document.querySelector('#popupContainer')))
+				.clickOutsideToClose(true)
+				.title("Asset has been updated successfully!")
+				.ok('OK')
+			);
+
+			$log.log(res);
+		}, function(err){
+			$log.log(err);
+			alert("ERROR");
+		});
+		
+	};
+	
+	
+	
+}]]></client_script>
         <controller_as>c</controller_as>
         <css/>
         <data_table>sp_instance</data_table>
@@ -18,14 +110,58 @@
         <option_schema/>
         <public>false</public>
         <roles/>
-        <script><![CDATA[(function() {  /* populate the 'data' object */  /* e.g., data.table = $sp.getValue('table'); */})();]]></script>
+        <script><![CDATA[(function() {
+
+	data.id = "";
+	data.asset = {};
+	data.model = {};
+	data.stockrooms = [];
+
+
+
+	if (input && input.id) {
+		data.id = input.id.toString();
+		var asset = new GlideRecord('x_naci_e_tracking_etrack_assets');
+		asset.addQuery("sys_id", data.id);
+		asset.query();
+		asset.next();
+		var item = {};
+		data.asset.id = asset.sys_id.toString();
+		data.asset.barcode = asset.barcode.toString();
+		data.asset.owner = asset.owner.name.toString();
+		data.asset.quantity = asset.quantity.toString();
+		data.asset.stockroom = asset.stockroom.sys_id.toString();
+		data.model.name = asset.model.name.toString();
+		data.model.manufacturer = asset.model.manufacture.name.toString();
+		data.model.description = asset.model.description.toString();
+		data.model.model_number= asset.model.model_number.toString();
+		data.model.unit_cost = asset.model.cost.toString();
+	}
+	
+	
+	
+	
+	var stockroom = new GlideRecord('x_naci_e_tracking_stock_room');
+	stockroom.orderBy("name");
+	stockroom.query();
+	while(stockroom.next()){
+		item = {};
+		item.id = stockroom.sys_id.toString();
+		item.name = stockroom.name.toString();
+		data.stockrooms.push(item);
+	}
+
+
+
+
+})();]]></script>
         <servicenow>false</servicenow>
         <sys_class_name>sp_widget</sys_class_name>
         <sys_created_by>abdullahz2@nih.gov</sys_created_by>
         <sys_created_on>2019-03-06 17:22:54</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>16f90951db4c7f00b86770c08c9619ab</sys_id>
-        <sys_mod_count>6</sys_mod_count>
+        <sys_mod_count>50</sys_mod_count>
         <sys_name>Etrack Edit Asset</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
@@ -33,32 +169,88 @@
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sp_widget_16f90951db4c7f00b86770c08c9619ab</sys_update_name>
         <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-03-11 14:30:00</sys_updated_on>
+        <sys_updated_on>2019-03-14 17:16:44</sys_updated_on>
         <template><![CDATA[<div ng-controller="c" ng-cloak>
-    <md-card>
-        <md-toolbar>
-            <div class="md-toolbar-tools">
-                <h2 flex md-truncate>Edit Asset</h2>
-            </div>
-        </md-toolbar>
-        <md-card-content>
-            <form name="userForm">
-                <div layout="column">
-                    <md-input-container class="md-block" flex-gt-sm>
-                        <label>TEMP</label>
-                        <input required name="TEMP" ng-model="c.form.TEMP" />
-                    </md-input-container>
+  <md-card>
+    <md-toolbar>
+      <div class="md-toolbar-tools">
+        <h2 flex md-truncate>Edit Asset</h2>
+      </div>
+    </md-toolbar>
+    <md-card-content>
+      {{c.data.asset | json }}
+
+      <form name="userForm">
+        <div layout="column">
+          <h4>
+            Model Information
+          </h4>
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>Name</label>
+            <input required name="name" ng-model="c.data.model.name" />
+          </md-input-container>
+          
+           <md-input-container class="md-block" flex-gt-sm>
+            <label>Manufacture</label>
+            <input required name="name" ng-model="c.data.model.manufacturer" />
+          </md-input-container>
+          
+
+
+          <md-input-container class="md-block">
+            <label>Description</label>
+            <textarea ng-model="c.data.model.description" md-select-on-focus></textarea>
+          </md-input-container>
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>Model Number</label>
+            <input required name="model_number" ng-model="c.data.model.model_number" />
+          </md-input-container>
+
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>Unit Cost</label>
+            <input required name="unit_cost" ng-model="c.data.model.unit_cost" />
+          </md-input-container>
+
+          <h4>
+            Asset Information
+          </h4>
+
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>Owner</label>
+            <input id="ownerName" required name="owner" ng-model="c.data.asset.owner" />
+          </md-input-container>
+          
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>Quantity</label>
+            <input required name="quantity" ng-model="c.data.asset.quantity" />
+          </md-input-container>
+
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>Barcode</label>
+            <input id="barcode" required name="barcode" ng-model="c.data.asset.barcode" />
+          </md-input-container>
+
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>Stockroom</label>
+            <md-select required ng-model="c.data.asset.stockroom">
+              <md-option ng-repeat="stockroom in c.data.stockrooms" value="{{stockroom.id}}">
+                {{stockroom.name}}
+              </md-option>
+            </md-select >
+          </md-input-container>
                     
-                </div>
-                <br>
-                <div class="d-flex justify-content-center">
-                    <md-button ng-href="?id=etrack_asset_details" class="md-raised md-primary">Submit</md-button>
-                </div>
-            </form>
+          
 
 
-        </md-card-content>
-    </md-card>
+        </div>
+        <br>
+        <div class="d-flex justify-content-center">
+          <md-button ng-click="updateAsset()" class="md-raised md-primary">Submit</md-button>
+        </div>
+      </form>
+
+    </md-card-content>
+  </md-card>
 
 </div>]]></template>
     </sp_widget>

@@ -2,6 +2,7 @@
 <database>
     <element label="Assdets Transfer" max_length="40" name="x_naci_e_tracking_assdets_transfer" type="collection">
         <element label="Asset" max_length="32" name="asset" reference="x_naci_e_tracking_etrack_assets" type="reference"/>
+        <element label="Comments" max_length="2000" name="comments" type="string"/>
         <element label="current user" max_length="32" name="current_user" reference="sys_user" type="reference"/>
         <element label="from" max_length="32" name="from" reference="x_naci_e_tracking_stock_room" type="reference"/>
         <element label="id" max_length="100" name="id" type="string"/>

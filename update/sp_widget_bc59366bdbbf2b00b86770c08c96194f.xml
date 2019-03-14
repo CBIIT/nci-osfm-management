@@ -2,7 +2,102 @@
 <record_update table="sp_widget">
     <sp_widget action="INSERT_OR_UPDATE">
         <category>custom</category>
-        <client_script><![CDATA[function() {  /* widget controller */  var c = this;}]]></client_script>
+        <client_script><![CDATA[function($stateParams, $log, $scope, $http, $mdDialog, spUtil, etrackCheckoutAsset) {
+	/* widget controller */
+	var c = this;
+
+	$("#ownerName").autocomplete({
+		delay: 300,
+		source: function(request, response) {
+			$('.ui-autocomplete').css('display', 'block');
+			var term = $('#ownerName').val();
+			response([]);
+			if (term.length < 4) {
+				return;
+			}
+			var temp = '';
+			if (term.indexOf(',') >= 0) {
+				temp = term.split(',');
+				var length = temp.length;
+				if (length > 1) {
+					term = temp[1].trim() + " " + temp[0].trim();
+				} else {
+					term = temp[0];
+				}
+			}
+			var req = {
+				method: 'GET',
+				url: '/api/x_naci_account_act/accountactivationscoped/fetchUserList',
+				beforeSend: function(xhr) {
+					xhr.setRequestHeader('X-UserToken', window.g_ck);
+				},
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				params: {
+					'term': term
+				}
+			};
+			$http(req).then(handleResponse, handleError);
+
+			function handleResponse(responseData) {
+				var result = responseData.data.result;
+				response(result);
+			}
+
+			function handleError(response) {
+				console.error(response);
+				alert('ERROR');
+			}
+		},
+		autoFocus: true,
+		select: function(event, ui) {
+
+
+			var sys_id = ui.item.id;
+			var name = ui.item.value;
+
+			if (sys_id != null && sys_id.trim().length > 1) {
+
+				c.data.asset.owner = name;
+				c.data.asset.ownerId = sys_id;
+			} else {
+				c.data.asset.owner = "";
+				c.data.asset.ownerId = "";
+			}
+
+			//$('#content').css('height', '550px');
+			$scope.$apply();
+		}
+	});
+
+
+	$scope.enableEdit = false;
+
+	$scope.checkoutAsset = function(){
+		etrackCheckoutAsset.checkoutAsset(c.data.asset).then(function(res){
+			$mdDialog.show(
+				$mdDialog.alert()
+				.parent(angular.element(document.querySelector('#popupContainer')))
+				.clickOutsideToClose(true)
+				.title("Asset has been checked out successfully!")
+				.ok('OK')
+			);
+
+			$log.log(res);
+		}, function(err){
+			$log.log(err);
+			alert("ERROR");
+		});
+
+	};
+
+	spUtil.recordWatch($scope, "x_naci_e_tracking_etrack_assets", "", function(name, data) { 
+		spUtil.update($scope);
+	});
+
+
+}]]></client_script>
         <controller_as>c</controller_as>
         <css/>
         <data_table>sp_instance</data_table>
@@ -18,14 +113,42 @@
         <option_schema/>
         <public>false</public>
         <roles/>
-        <script><![CDATA[(function() {  /* populate the 'data' object */  /* e.g., data.table = $sp.getValue('table'); */})();]]></script>
+        <script><![CDATA[(function() {
+
+	data.id = "";
+	data.asset = {};
+	var mysys_name = gs.getUserDisplayName();
+	var mysys_id = gs.getUserID();
+	data.info = {checkOutUser: mysys_name};
+	
+
+
+	if (input && input.id) {
+		data.id = input.id.toString();
+		var asset = new GlideRecord('x_naci_e_tracking_etrack_assets');
+		asset.addQuery("sys_id", data.id);
+		asset.query();
+		asset.next();
+		var item = {};
+		data.asset.id = asset.sys_id.toString();
+		data.asset.barcode = asset.barcode.toString();
+		data.asset.owner = asset.owner.name.toString();
+		data.asset.quantity = asset.quantity.toString();
+		data.asset.stockroom = asset.stockroom.name.toString();
+		data.asset.checkOutUserID = mysys_id;
+	}
+	
+
+
+
+})();]]></script>
         <servicenow>false</servicenow>
         <sys_class_name>sp_widget</sys_class_name>
         <sys_created_by>abdullahz2@nih.gov</sys_created_by>
         <sys_created_on>2019-03-01 15:00:03</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>bc59366bdbbf2b00b86770c08c96194f</sys_id>
-        <sys_mod_count>2</sys_mod_count>
+        <sys_mod_count>19</sys_mod_count>
         <sys_name>Etrack Asset Check Out</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
@@ -33,8 +156,10 @@
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sp_widget_bc59366bdbbf2b00b86770c08c96194f</sys_update_name>
         <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-03-06 16:08:00</sys_updated_on>
+        <sys_updated_on>2019-03-14 18:08:42</sys_updated_on>
         <template><![CDATA[<div ng-controller="c" ng-cloak>
+  
+  {{c.data.asset | json }}
     <md-card>
         <md-toolbar>
             <div class="md-toolbar-tools">
@@ -43,6 +168,49 @@
         </md-toolbar>
        <md-subheader class="md-primary">Sub Header</md-subheader>
         <md-card-content>
+          
+          
+          <form name="userForm">
+        <div layout="column">
+        
+       
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>Owner</label>
+            <input id="ownerName" required name="owner" ng-model="c.data.asset.owner" />
+          </md-input-container>
+          
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>Available quantity</label>
+            <input required name="quantity" ng-model="c.data.asset.quantity" />
+          </md-input-container>
+          
+            <md-input-container class="md-block" flex-gt-sm>
+            <label>Location</label>
+            <input required name="quantity" ng-model="c.data.asset.stockroom" />
+          </md-input-container>
+          
+             <md-input-container class="md-block" flex-gt-sm>
+            <label>Checked out by</label>
+            <input id="ownerName" required name="owner" ng-model="c.data.info.checkOutUser" />
+          </md-input-container>
+          
+           <md-input-container class="md-block" flex-gt-sm>
+            <label>Check out quantity</label>
+            <input required name="quantity" ng-model="c.data.asset.quantityCheckedout" />
+          </md-input-container>
+          
+           <md-input-container class="md-block" flex-gt-sm>
+            <label>Comments</label>
+            <input required name="quantity" ng-model="c.data.asset.comments" />
+          </md-input-container>
+
+
+        </div>
+        <br>
+        <div class="d-flex justify-content-center">
+          <md-button ng-click="checkoutAsset()" class="md-raised md-primary">Submit</md-button>
+        </div>
+      </form>
       
         </md-card-content>
     </md-card>

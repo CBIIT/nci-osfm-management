@@ -81,7 +81,7 @@
 		});
 
 		/**
-     * Search for barcodes
+     * Search for model names
      */
 		function querySearch(query) {
 			var results = query ? c.data.existingModels.filter(createFilterFor(query)) : c.data.existingModels,
@@ -110,13 +110,15 @@
      * Build `models` list of key/value pairs
      */
 		function loadAllModels() {
-			var test_data = '23423, 21345234, 123ed312ed23, bodsf34, qweew34, zzzzzrs, 3421efcwef431, dfdsqfreqr23';
-			return test_data.split(/, +/g).map(function(barcode) {
-				return {
-					value: barcode.toLowerCase(),
-					display: barcode
-				};
+			temp = [];
+			c.data.models.forEach(function(item){
+				temp.push({
+					value: item.name.toLowerCase(),
+					display: item.name,
+					data: item
+				})
 			});
+			return temp;
 		}
 
 		/**
@@ -141,14 +143,15 @@
 
 		function getFormValues() {
 			return {
-				name: null,
-				manufacture: null,
-				description: null,
-				model_number: null,
-				unit_cost: null,
-				owner_custodian: null,
-				quantity: null,
-				stockroom: null
+				name: "",
+				manufacture: "",
+				description: "",
+				model_number: "",
+				unit_cost: "",
+				owner_custodian: "",
+				quantity: "",
+				stockroom: "",
+				barcode: ""
 			}
 		}
 	
@@ -223,27 +226,42 @@
         <public>false</public>
         <roles/>
         <script><![CDATA[(function() {
-  var user = gs.getUser();
+	var user = gs.getUser();
 
 	data.isLoggedIn = gs.getSession().isLoggedIn();
-	
+	data.models = [];
 	data.manufactures = [];
+	data.stockrooms = [];
 	
+
+
+	var model = new GlideRecord("x_naci_e_tracking_model");
+	model.orderBy("name");
+	model.query();
+	while(model.next()){
+		data.models.push({
+			id: model.sys_id.toString(),
+			name:  model.name.toString(),
+			manufacture:model.manufacture.name.toString(),
+			description: model.description.toString(),
+			modelNumber:  model.model_number.toString()
+		});
+	}
+
+
 	var manufacture = new GlideRecord('x_naci_e_tracking_manufacture');
-			manufacture.orderBy("name");
-			manufacture.query();
+	manufacture.orderBy("name");
+	manufacture.query();
 	while(manufacture.next()){
 		item = {};
 		item.id = manufacture.sys_id.toString();
 		item.name = manufacture.name.toString();
 		data.manufactures.push(item);
 	}
-	
-	data.stockrooms = [];
-	
+
 	var stockroom = new GlideRecord('x_naci_e_tracking_stock_room');
-			stockroom.orderBy("name");
-			stockroom.query();
+	stockroom.orderBy("name");
+	stockroom.query();
 	while(stockroom.next()){
 		item = {};
 		item.id = stockroom.sys_id.toString();
@@ -258,7 +276,7 @@
         <sys_created_on>2019-02-27 15:57:17</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>3b333443dbf3e700b86770c08c96199a</sys_id>
-        <sys_mod_count>211</sys_mod_count>
+        <sys_mod_count>231</sys_mod_count>
         <sys_name>Etrack Add Assets</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
@@ -266,7 +284,7 @@
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sp_widget_3b333443dbf3e700b86770c08c96199a</sys_update_name>
         <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-03-12 22:23:02</sys_updated_on>
+        <sys_updated_on>2019-03-14 15:08:59</sys_updated_on>
         <template><![CDATA[<div ng-controller="c" ng-cloak>
   <md-card>
     <md-toolbar>
@@ -276,6 +294,7 @@
     </md-toolbar>
     <md-subheader class="md-primary">If the Model exist, please select one. Otherwise a new model will be created for this asset.</md-subheader>
     <md-card-content>
+      {{ c.data.models || json }}
       <form name="userForm">
         <div layout="column">
           <label>Search existing Model</label>
@@ -340,6 +359,11 @@
           <md-input-container class="md-block" flex-gt-sm>
             <label>Quantity</label>
             <input required name="quantity" ng-model="c.form.quantity" />
+          </md-input-container>
+          
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>Barcode</label>
+            <input id="barcode" required name="barcode" ng-model="c.form.barcode" />
           </md-input-container>
 
           <md-input-container class="md-block" flex-gt-sm>

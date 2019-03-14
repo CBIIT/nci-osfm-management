@@ -5,6 +5,7 @@
         <element label="checkin by" max_length="32" name="checkin_by" reference="sys_user" type="reference"/>
         <element label="checkin time" max_length="40" name="checkin_time" type="glide_date_time"/>
         <element label="checkout time" max_length="40" name="checkout_time" type="glide_date_time"/>
+        <element label="Comments" max_length="2000" name="comments" type="string"/>
         <element label="Current User" max_length="32" name="current_user" reference="sys_user" type="reference"/>
         <element label="quantity" max_length="40" name="quantity" type="integer"/>
         <index name="index">

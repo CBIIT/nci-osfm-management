@@ -21,6 +21,7 @@
 			model1.model_number = data.model_number.toString();
 		    model1.name = data.name.toString();
 			id = model1.insert();
+		    id = checkAssets(id);
 	}else if(method == 'update'){
 		//model exist and update model
 		var model2 = new GlideRecord('x_naci_e_tracking_model');
@@ -32,6 +33,7 @@
 		    model2.manufacture = data.manufacture.toString();
 		    model2.name = data.name.toString();
 		    id = model2.update();
+		    id = checkAssets(id);
 	}else if(method == 'check'){
 		//check model exist
 		var model = new GlideRecord('x_naci_e_tracking_model');
@@ -47,8 +49,55 @@
     
 	return id;
 	
-	function insertAssets(){
+	function checkAssets(model_id){
+		var asset_id = '';
+		//determine assets exist or not. If yes, update total. or insert a new record in assets table.
+		var asset = new GlideRecord('x_naci_e_tracking_etrack_assets');
+		    asset.addQuery('model.sys_id', model_id);
+		    asset.addQuery('stockroom.sys_id', data.stockroom);
+		asset.query();
+		var count1 = asset.getRowCount();
+		if(count1 == 0){
+			//add new asset
+			asset_id = addAssets(model_id);
+		}else{
+			//assets exist, add amount to total of assets 
+			asset_id = updateAssets(model_id);
+		}
 		
+		return asset_id;
+	}
+	
+	function addAssets(model_id){
+		var asset1 = new GlideRecord('x_naci_e_tracking_etrack_assets'); 
+			asset1.initialize();
+			asset1.barcode = data.barcode.toString();
+			asset1.model = model_id;
+		    asset1.owner = data.ownerId;
+		    asset1.quantity = data.quantity;
+			asset1.stockroom = data.stockroom;
+			var asset_id = asset1.insert();
+		return asset_id;
+	}
+	
+	function updateAssets(model_id){
+		var asset2 = new GlideRecord('x_naci_e_tracking_etrack_assets');
+			asset2.addQuery('model.sys_id', model_id);
+		    asset2.addQuery('stockroom.sys_id', data.stockroom);
+			asset2.query();
+			asset2.next();
+		    var quantity = asset2.quantity.toString();
+			if(data.quatity === null || data.quantity.toString().trim().length == 0){
+				data.quantity = "0";
+			}
+		    var quantityNum = parseInt(quantity) + parseInt(data.quantity.toString());
+			asset2.quantity = quantityNum;
+			asset2.barcode = data.barcode.toString();
+			asset2.model = model_id;
+		    asset2.owner = data.ownerId;
+			asset2.stockroom = data.stockroom;
+		    var asset_id = asset2.update();
+		 return asset_id;
 	}
 	
 })(request, response);
@@ -67,7 +116,7 @@
         <sys_created_on>2019-03-12 17:33:23</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>e7150c97db40734054d8ff621f96198f</sys_id>
-        <sys_mod_count>9</sys_mod_count>
+        <sys_mod_count>36</sys_mod_count>
         <sys_name>addAsset</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
@@ -75,7 +124,7 @@
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sys_ws_operation_e7150c97db40734054d8ff621f96198f</sys_update_name>
         <sys_updated_by>zhoujim@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-03-12 22:30:47</sys_updated_on>
+        <sys_updated_on>2019-03-13 15:12:49</sys_updated_on>
         <web_service_definition display_value="ETrack REST API">ac0dd2b6db00334054d8ff621f96192b</web_service_definition>
         <web_service_version/>
     </sys_ws_operation>
