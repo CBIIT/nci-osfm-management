@@ -23,6 +23,10 @@
 		});
 		
 	}
+	
+	$scope.doTheBack = function() {
+		window.history.back();
+	};
 }]]></client_script>
         <controller_as>c</controller_as>
         <css/>
@@ -73,7 +77,7 @@
         <sys_created_on>2019-03-01 14:59:39</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>8b39b62fdbbf2b00b86770c08c961976</sys_id>
-        <sys_mod_count>33</sys_mod_count>
+        <sys_mod_count>50</sys_mod_count>
         <sys_name>Etrack Asset Check In</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
@@ -81,53 +85,50 @@
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sp_widget_8b39b62fdbbf2b00b86770c08c961976</sys_update_name>
         <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-03-14 19:47:41</sys_updated_on>
+        <sys_updated_on>2019-03-18 18:39:41</sys_updated_on>
         <template><![CDATA[<div ng-controller="c" ng-cloak>
-    <md-card>
-        <md-toolbar>
-            <div class="md-toolbar-tools">
-                <h2 flex md-truncate>Asstets Check In</h2>
-            </div>
-        </md-toolbar>
-        <md-card-content>
-          {{c.data.checkoutAsset | json }}
-          <div class="panel-body">
-             <div class="row">
-                    <div class=" col-md-12 col-lg-12 ">
-                        <table class="table">
-                            <tbody>
-                                <tr>
-                                    <td style="border-top: none !important;">Owner name</td>
-                                    <td style="border-top: none !important;">{{c.data.testData.owner}}</td>
-                                </tr>
-                                <tr>
-                                    <td>Location</td>
-                                    <td>{{c.data.testData.location}}</td>
-                                </tr>
-                              <tr>
-                                    <td>Stockroom</td>
-                                    <td>{{c.data.testData.location}}</td>
-                                </tr>
-                                <tr>
-                                    <td>Quantity checked out</td>
-                                    <td>{{c.data.testData.quantity_checked_out}}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-             <form name="userForm">
-                
-       
-                <div class="d-flex justify-content-center">
-                    <md-button ng-click="checkIn()" class="md-raised md-primary">Check In</md-button>
-                </div>
-            </form>
-            
-            </div>
-          
-        </md-card-content>
-    </md-card>
+  <md-card>
+    <md-toolbar>
+      <div class="md-toolbar-tools">
+        <h2 flex md-truncate>Asstet Check In</h2>
+      </div>
+    </md-toolbar>
+    <md-card-content>      
+      <form name="form" class="disabledForm">
+
+        <div layout="column">
+
+
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>Owner</label>
+            <input id="ownerName" name="assignTo" ng-model="c.data.checkoutAsset.owner" disabled/>
+          </md-input-container>
+
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>Location</label>
+            <input id="location" name="location" ng-model="c.data.checkoutAsset.location" disabled/>
+          </md-input-container>
+
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>Stockroom</label>
+            <input id="stockroom" name="stockroom" ng-model="c.data.checkoutAsset.stockroom" disabled/>
+          </md-input-container>
+
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>Quantity checked out</label>
+            <input id="quantityCheckedOut" name="quantityCheckedOut" ng-model="c.data.checkoutAsset.quantityCheckedOut" disabled/>
+          </md-input-container>
+         
+        </div>
+      </form>
+
+ <div class="d-flex justify-content-center">
+            <md-button ng-click="checkIn()" class="md-raised md-primary">Check In</md-button>
+            <md-button ng-click="doTheBack()"class="md-raised">Back</md-button>
+          </div>
+
+    </md-card-content>
+  </md-card>
 </div>]]></template>
     </sp_widget>
 </record_update>

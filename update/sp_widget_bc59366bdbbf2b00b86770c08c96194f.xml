@@ -96,6 +96,10 @@
 		spUtil.update($scope);
 	});
 
+	$scope.doTheBack = function() {
+		window.history.back();
+	};
+
 
 }]]></client_script>
         <controller_as>c</controller_as>
@@ -148,7 +152,7 @@
         <sys_created_on>2019-03-01 15:00:03</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>bc59366bdbbf2b00b86770c08c96194f</sys_id>
-        <sys_mod_count>19</sys_mod_count>
+        <sys_mod_count>34</sys_mod_count>
         <sys_name>Etrack Asset Check Out</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
@@ -156,50 +160,53 @@
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sp_widget_bc59366bdbbf2b00b86770c08c96194f</sys_update_name>
         <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-03-14 18:08:42</sys_updated_on>
+        <sys_updated_on>2019-03-18 18:38:44</sys_updated_on>
         <template><![CDATA[<div ng-controller="c" ng-cloak>
-  
-  {{c.data.asset | json }}
-    <md-card>
-        <md-toolbar>
-            <div class="md-toolbar-tools">
-                <h2 flex md-truncate>Check out Asset</h2>
-            </div>
-        </md-toolbar>
-       <md-subheader class="md-primary">Sub Header</md-subheader>
-        <md-card-content>
-          
-          
-          <form name="userForm">
-        <div layout="column">
-        
-       
+  <md-card>
+    <md-toolbar>
+      <div class="md-toolbar-tools">
+        <h2 flex md-truncate>Check out Asset</h2>
+      </div>
+    </md-toolbar>
+    <md-card-content>
+
+      <form name="userForm">
+        <div layout="column" class="disabledForm">
+
+
           <md-input-container class="md-block" flex-gt-sm>
             <label>Owner</label>
-            <input id="ownerName" required name="owner" ng-model="c.data.asset.owner" />
+            <input id="ownerName" name="owner" ng-model="c.data.asset.owner" disabled />
           </md-input-container>
-          
+
           <md-input-container class="md-block" flex-gt-sm>
             <label>Available quantity</label>
-            <input required name="quantity" ng-model="c.data.asset.quantity" />
+            <input name="quantity" ng-model="c.data.asset.quantity" disabled />
           </md-input-container>
-          
-            <md-input-container class="md-block" flex-gt-sm>
+
+          <md-input-container class="md-block" flex-gt-sm>
             <label>Location</label>
-            <input required name="quantity" ng-model="c.data.asset.stockroom" />
+            <input name="quantity" ng-model="c.data.asset.stockroom" disabled/>
           </md-input-container>
-          
-             <md-input-container class="md-block" flex-gt-sm>
+
+          <md-input-container class="md-block" flex-gt-sm>
             <label>Checked out by</label>
-            <input id="ownerName" required name="owner" ng-model="c.data.info.checkOutUser" />
+            <input id="ownerName" name="owner" ng-model="c.data.info.checkOutUser" disabled/>
           </md-input-container>
-          
-           <md-input-container class="md-block" flex-gt-sm>
+
+        </div>
+       
+      </form>
+
+
+      <form name="userForm">
+        <div layout="column">
+          <md-input-container class="md-block" flex-gt-sm>
             <label>Check out quantity</label>
             <input required name="quantity" ng-model="c.data.asset.quantityCheckedout" />
           </md-input-container>
-          
-           <md-input-container class="md-block" flex-gt-sm>
+
+          <md-input-container class="md-block" flex-gt-sm>
             <label>Comments</label>
             <input required name="quantity" ng-model="c.data.asset.comments" />
           </md-input-container>
@@ -209,11 +216,13 @@
         <br>
         <div class="d-flex justify-content-center">
           <md-button ng-click="checkoutAsset()" class="md-raised md-primary">Submit</md-button>
+                      <md-button ng-click="doTheBack()"class="md-raised">Back</md-button>
+          
         </div>
       </form>
-      
-        </md-card-content>
-    </md-card>
+
+    </md-card-content>
+  </md-card>
 
 </div>]]></template>
     </sp_widget>

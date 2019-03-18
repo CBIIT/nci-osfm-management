@@ -5,7 +5,7 @@
         <client_script><![CDATA[function($stateParams, $log, $scope, $http, $mdDialog, etrackTransferAsset) {
 	/* widget controller */
 	var c = this;
-	
+
 	$scope.trasnferComplete = function(){
 		etrackTransferAsset.completeTrasnfer(c.data.transferAsset).then(function(res){
 			$mdDialog.show(
@@ -21,11 +21,13 @@
 			$log.log(err);
 			alert("ERROR");
 		});
-		
 
-		
 	}
-			
+
+	$scope.doTheBack = function() {
+		window.history.back();
+	};
+
 }]]></client_script>
         <controller_as>c</controller_as>
         <css/>
@@ -74,7 +76,7 @@
         <sys_created_on>2019-03-01 15:49:41</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>00b44fe3dbff2b00b86770c08c9619de</sys_id>
-        <sys_mod_count>17</sys_mod_count>
+        <sys_mod_count>43</sys_mod_count>
         <sys_name>Etrack Asset In Transfer Complete</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
@@ -82,23 +84,45 @@
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sp_widget_00b44fe3dbff2b00b86770c08c9619de</sys_update_name>
         <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-03-14 21:31:54</sys_updated_on>
+        <sys_updated_on>2019-03-18 20:41:31</sys_updated_on>
         <template><![CDATA[<div ng-controller="c" ng-cloak>
   <md-card>
     <md-toolbar>
       <div class="md-toolbar-tools">
+
         <h2 flex md-truncate>Asset in Trasnfer Complete</h2>
       </div>
     </md-toolbar>
-    <md-subheader class="md-primary">Sub Header </md-subheader>
     <md-card-content>
 
- {{c.data.transferAsset | json }}
+      <form name="form" class="disabledForm">
+        <div layout="column">
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>Owner</label>
+            <input id="ownerName" name="assignTo" ng-model="c.data.transferAsset.owner" disabled/>
+          </md-input-container>
 
+
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>Stockroom From</label>
+            <input id="stockroomFrom" name="stockroomFrom" ng-model="c.data.transferAsset.from" disabled/>
+          </md-input-container>
+
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>Stockroom To</label>
+            <input id="stockroomTo" name="stockroomTo" ng-model="c.data.transferAsset.to" disabled/>
+          </md-input-container>
+
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>Quantity</label>
+            <input id="quantityCheckedOut" name="quantityCheckedOut" ng-model="c.data.transferAsset.quantity" disabled/>
+          </md-input-container>
+        </div>
+      </form>
       <div class="d-flex justify-content-center">
         <md-button ng-click="trasnferComplete()" class="md-raised md-primary">Trasnfer Complete</md-button>
+        <md-button ng-click="doTheBack()"class="md-raised">Back</md-button>
       </div>
-
     </md-card-content>
   </md-card>
 

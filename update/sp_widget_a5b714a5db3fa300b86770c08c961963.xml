@@ -112,7 +112,7 @@
         <sys_created_on>2019-02-22 22:06:06</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>a5b714a5db3fa300b86770c08c961963</sys_id>
-        <sys_mod_count>540</sys_mod_count>
+        <sys_mod_count>545</sys_mod_count>
         <sys_name>Etrack Assets</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
@@ -120,7 +120,7 @@
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sp_widget_a5b714a5db3fa300b86770c08c961963</sys_update_name>
         <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-03-14 21:17:11</sys_updated_on>
+        <sys_updated_on>2019-03-18 19:38:56</sys_updated_on>
         <template><![CDATA[<div ng-controller="c" ng-cloak>
   <md-card>
     <md-toolbar>
@@ -197,7 +197,7 @@
               </tr>
             </table>
             <div>
-              <table width="100%" border="0">
+              <table ng-if="c.data.assets.length > 4" width="100%" border="0">
                 <tr>
                   <td width="70%">
                     <dir-pagination-controls pagination-id="assetsDataPagination" direction-links="true" boundary-links="true"></dir-pagination-controls>
@@ -251,13 +251,13 @@
                 <td>
                   <!-- <md-button class="md-raised" ng-click="view(data.id);">View</md-button> --> 
                   <!--   <md-button class="md-raised" ng-click="view(data.id);">Check in</md-button> -->
-                  <md-button class="md-raised" ng-href="?id=etrack_assets_checked_out_details">View</md-button> 
+                  <md-button class="md-raised" ui-sref="checkin_asset({id: data.id})">View</md-button> 
                   <md-button class="md-raised" ui-sref="checkin_asset({id: data.id})">Check in</md-button> 
                 </td>
               </tr>
             </table>
             <div>
-              <table width="100%" border="0">
+              <table ng-if="c.data.assets.length > 4" width="100%" border="0">
                 <tr>
                   <td width="70%">
                     <dir-pagination-controls pagination-id="checkedOutAssetsDataPagination" direction-links="true" boundary-links="true"></dir-pagination-controls>
@@ -315,13 +315,13 @@
 
                 <td>
 
-                  <md-button class="md-raised" ng-href="?id=etrack_assets_checked_out_details">View</md-button> 
-                  <md-button class="md-raised" ui-sref="complete_asset_transfer({id: data.id})">Check in</md-button> 
+                  <md-button class="md-raised" ui-sref="complete_asset_transfer({id: data.id})">View</md-button> 
+                  <md-button class="md-raised" ui-sref="complete_asset_transfer({id: data.id})">Complete</md-button> 
                 </td>
               </tr>
             </table>
             <div>
-              <table width="100%" border="0">
+              <table ng-if="c.data.assets.length > 4" width="100%" border="0">
                 <tr>
                   <td width="70%">
                     <dir-pagination-controls pagination-id="assetsInTransferDataPagination" direction-links="true" boundary-links="true"></dir-pagination-controls>

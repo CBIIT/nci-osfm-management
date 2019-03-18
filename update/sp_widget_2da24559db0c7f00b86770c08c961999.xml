@@ -5,9 +5,9 @@
         <client_script><![CDATA[function($stateParams, $log, $scope, $http, $mdDialog, spUtil, etrackTransferAsset) {
 	/* widget controller */
 	var c = this;
-	
-	
-	
+
+
+
 	$("#ownerName").autocomplete({
 		delay: 300,
 		source: function(request, response) {
@@ -58,7 +58,7 @@
 
 			var sys_id = ui.item.id;
 			var name = ui.item.value;
-		
+
 			if (sys_id != null && sys_id.trim().length > 1) {
 
 				c.data.transferAsset.assignTo = name;
@@ -73,7 +73,7 @@
 		}
 	});
 
-	
+
 
 
 
@@ -100,6 +100,11 @@
 	});
 
 */
+
+
+	$scope.doTheBack = function() {
+		window.history.back();
+	};
 }]]></client_script>
         <controller_as>c</controller_as>
         <css/>
@@ -164,7 +169,7 @@
         <sys_created_on>2019-03-06 16:50:55</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>2da24559db0c7f00b86770c08c961999</sys_id>
-        <sys_mod_count>36</sys_mod_count>
+        <sys_mod_count>83</sys_mod_count>
         <sys_name>Etrack Transfer Asset</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
@@ -172,7 +177,7 @@
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sp_widget_2da24559db0c7f00b86770c08c961999</sys_update_name>
         <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-03-14 20:50:25</sys_updated_on>
+        <sys_updated_on>2019-03-18 19:18:32</sys_updated_on>
         <template><![CDATA[<div ng-controller="c" ng-cloak>
   <md-card>
     <md-toolbar>
@@ -180,59 +185,75 @@
         <h2 flex md-truncate>Transfer Asset</h2>
       </div>
     </md-toolbar>
-    <md-subheader class="md-primary">Sub Header</md-subheader>
     <md-card-content>
-		
-      Asset Owner - {{c.data.asset.owner }}
-      <br>
-      Location - {{c.data.asset.stockroom}}
-      
-      
-      
-       <form name="userForm">
+
+      <!-- Asset details -->
+      <form name="assetDetials" class="disabledForm">
         <div layout="column">
-          
-  
+          <h4>
+            Asset Information
+          </h4>
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>Owner</label>
+            <input ng-model="c.data.asset.owner" ng-disabled="true" />
+          </md-input-container>
+
+
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>Location</label>
+            <input ng-model="c.data.asset.stockroom"  ng-disabled="true"/>
+          </md-input-container>
+        </div>
+      </form>
+
+
+
+      <form name="userForm">
+        <div layout="column">
+
+          <h4>
+            Transfer Form
+          </h4>
+
+
 
           <md-input-container class="md-block" flex-gt-sm>
             <label>Assign to</label>
             <input id="ownerName" required name="assignTo" ng-model="c.data.transferAsset.assignTo" />
           </md-input-container>
-          
+
           <md-input-container class="md-block" flex-gt-sm>
             <label>Quantity</label>
             <input required name="quantity" ng-model="c.data.transferAsset.quantity" />
           </md-input-container>
 
-  
+
           <md-input-container class="md-block" flex-gt-sm>
             <label>Stockroom</label>
             <md-select required ng-model="c.data.transferAsset.stockroomTo">
-              <md-option ng-repeat="stockroom in c.data.stockrooms" value="{{stockroom.id}}">
+              <md-option ng-repeat="stockroom in c.data.stockrooms" value="{{stockroom.id}}" ng-disabled="stockroom.id == c.data.transferAsset.stockroomId" >
                 {{stockroom.name}}
               </md-option>
             </md-select >
           </md-input-container>
-          
-          
-           <md-input-container class="md-block" flex-gt-sm>
+
+
+          <md-input-container class="md-block" flex-gt-sm>
             <label>Comments</label>
-            <input required name="comments" ng-model="c.data.transferAsset.comments" />
+
+            <textarea   name="comments" ng-model="c.data.transferAsset.comments" required md-maxlength="150" rows="3" md-select-on-focus></textarea>
+
+
           </md-input-container>
-                    
-          
-{{c.data.transferAsset | json }}
+
 
         </div>
         <br>
         <div class="d-flex justify-content-center">
           <md-button ng-click="transferAsset()" class="md-raised md-primary">Submit</md-button>
+          <md-button ng-click="doTheBack()"class="md-raised">Back</md-button>
         </div>
       </form>
-      
-      
-			
-
 
 
 

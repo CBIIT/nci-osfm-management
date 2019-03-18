@@ -152,6 +152,11 @@
 		}
 	}
 
+	$scope.doTheBack = function() {
+		window.history.back();
+	};
+
+
 
 
 }]]></client_script>
@@ -212,7 +217,7 @@
         <sys_created_on>2019-03-06 16:54:24</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>b4734dd9db0c7f00b86770c08c9619d9</sys_id>
-        <sys_mod_count>104</sys_mod_count>
+        <sys_mod_count>108</sys_mod_count>
         <sys_name>Etrack Add Stockroom</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
@@ -220,65 +225,65 @@
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sp_widget_b4734dd9db0c7f00b86770c08c9619d9</sys_update_name>
         <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-03-13 14:43:37</sys_updated_on>
+        <sys_updated_on>2019-03-18 18:35:07</sys_updated_on>
         <template><![CDATA[<div ng-controller="c" ng-cloak>
-    <md-card>
-        <md-toolbar>
-            <div class="md-toolbar-tools">
-                <h2 flex md-truncate>Add Stockroom</h2>
-            </div>
-        </md-toolbar>
-        <md-subheader class="md-primary">Please make sure the stockroom does not already exist before creating a new one.</md-subheader>
-        <md-card-content>
-            <form name="userForm">
-                <div layout="column">
-                    <h4>
-                        Stockroom information
-                    </h4>
-                    <md-input-container class="md-block" flex-gt-sm>
-                        <label>Name</label>
-                        <input required name="name" ng-model="c.form.name" />
-                    </md-input-container>
-                  <md-input-container class="md-block">
-                        <label>Description</label>
-                        <textarea ng-model="c.form.description" required md-maxlength="150" rows="3" md-select-on-focus></textarea>
-                    </md-input-container>
-                   
-                  
-                   <md-input-container class="md-block" flex-gt-sm>
-                      <label>Locations</label>
-                      <md-select required ng-model="c.form.location">
-                        <md-option ng-repeat="location in c.data.locations" value="{{location.id}}">
-                          {{location.name}}
-                        </md-option>
-                      </md-select >
-                    </md-input-container>
-                  
-                    <md-input-container class="md-block" flex-gt-sm>
-                        <label>Owner Custodian</label>
-                        <input id="ownerName" required name="owner" ng-model="c.form.owner" />
-                    </md-input-container>
-                 
-                   <md-input-container class="md-block" flex-gt-sm>
-                      <label>Type</label>
-                      <md-select required ng-model="c.form.type">
-                        <md-option ng-repeat="type in c.data.types" value="{{type.id}}">
-                          {{type.name}}
-                        </md-option>
-                      </md-select >
-                    </md-input-container>
-
-                </div>
-                <br>
-                <div class="d-flex justify-content-center">
-                    <md-button ng-click="addStockroom()" class="md-raised md-primary">Submit</md-button>
-                </div>
-            </form>
+  <md-card>
+    <md-toolbar>
+      <div class="md-toolbar-tools">
+        <h2 flex md-truncate>Add Stockroom</h2>
+      </div>
+    </md-toolbar>
+    <md-subheader class="md-primary">Please make sure the stockroom does not already exist before creating a new one.</md-subheader>
+    <md-card-content>
+      <form name="userForm">
+        <div layout="column">
+          <h4>
+            Stockroom information
+          </h4>
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>Name</label>
+            <input required name="name" ng-model="c.form.name" />
+          </md-input-container>
+          <md-input-container class="md-block">
+            <label>Description</label>
+            <textarea ng-model="c.form.description" required md-maxlength="150" rows="3" md-select-on-focus></textarea>
+          </md-input-container>
 
 
-        </md-card-content>
-    </md-card>
-	{{ c.form | json }} {{form| json}}
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>Locations</label>
+            <md-select required ng-model="c.form.location">
+              <md-option ng-repeat="location in c.data.locations" value="{{location.id}}">
+                {{location.name}}
+              </md-option>
+            </md-select >
+          </md-input-container>
+
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>Owner Custodian</label>
+            <input id="ownerName" required name="owner" ng-model="c.form.owner" />
+          </md-input-container>
+
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>Type</label>
+            <md-select required ng-model="c.form.type">
+              <md-option ng-repeat="type in c.data.types" value="{{type.id}}">
+                {{type.name}}
+              </md-option>
+            </md-select >
+          </md-input-container>
+
+        </div>
+        <br>
+        <div class="d-flex justify-content-center">
+          <md-button ng-click="addStockroom()" class="md-raised md-primary">Submit</md-button>
+          <md-button ng-click="doTheBack()"class="md-raised">Back</md-button>
+        </div>
+      </form>
+
+
+    </md-card-content>
+  </md-card>
 </div>]]></template>
     </sp_widget>
 </record_update>

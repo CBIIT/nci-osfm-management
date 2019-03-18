@@ -12,7 +12,7 @@
         <short_description/>
         <size>md</size>
         <sp_column display_value="1">b5c94951db4c7f00b86770c08c961940</sp_column>
-        <sp_widget display_value="Etrack Edit Stockroom">e3550b27dbff2b00b86770c08c961976</sp_widget>
+        <sp_widget/>
         <sys_class_name>sp_instance</sys_class_name>
         <sys_created_by>abdullahz2@nih.gov</sys_created_by>
         <sys_created_on>2019-03-06 17:22:09</sys_created_on>

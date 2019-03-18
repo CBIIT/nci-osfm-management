@@ -112,17 +112,14 @@
 
 
 	}
+	
+	$scope.doTheBack = function() {
+		window.history.back();
+	};
 
 }]]></client_script>
         <controller_as>c</controller_as>
-        <css>
-[disabled] md-input-container .md-input, md-input-container .md-input[disabled] {
-color: black;
-}
-
-md-select.md-default-theme[disabled] .md-select-value, md-select[disabled] .md-select-value {
-  color: black;
-}</css>
+        <css/>
         <data_table>sp_instance</data_table>
         <demo_data/>
         <description/>
@@ -189,7 +186,7 @@ md-select.md-default-theme[disabled] .md-select-value, md-select[disabled] .md-s
         <sys_created_on>2019-03-12 18:36:51</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>3364dcdfdb44f340b86770c08c961905</sys_id>
-        <sys_mod_count>95</sys_mod_count>
+        <sys_mod_count>100</sys_mod_count>
         <sys_name>Etrack Display Stockroom</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
@@ -197,7 +194,7 @@ md-select.md-default-theme[disabled] .md-select-value, md-select[disabled] .md-s
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sp_widget_3364dcdfdb44f340b86770c08c961905</sys_update_name>
         <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-03-12 21:01:16</sys_updated_on>
+        <sys_updated_on>2019-03-18 18:46:00</sys_updated_on>
         <template><![CDATA[<div ng-controller="c" layout="column" ng-cloak>
   <md-card>
     <md-toolbar class="md-hue-2">
@@ -216,8 +213,8 @@ md-select.md-default-theme[disabled] .md-select-value, md-select[disabled] .md-s
             <label>Name</label>
             <input required name="name" ng-model="c.data.stockroom.name" ng-disabled="true" />
           </md-input-container>
-          
-          
+
+
           <md-input-container class="md-block">
             <label>Description</label>
             <textarea ng-model="c.data.stockroom.description" required md-maxlength="150" rows="1" md-select-on-focus  ng-disabled="!enableEdit"></textarea>
@@ -246,30 +243,24 @@ md-select.md-default-theme[disabled] .md-select-value, md-select[disabled] .md-s
               </md-option>
             </md-select >
           </md-input-container>
-          
-           <div class="d-flex justify-content-center">
-            <md-button ng-show="c.data.admin == true && !enableEdit" class="md-raised md-primary" ng-click="enableEdit = true">Edit</md-button>
-            <md-button ng-show="c.data.admin == true && enableEdit" class="md-raised md-primary" ng-click="saveData()">Update</md-button>
-						<md-button ui-sref="stockrooms" class="md-raised md-primary">Close</md-button>
 
 
-
-          </div>
 
         </div>
       </form>
+      <div class="d-flex justify-content-center">
+        <md-button ng-show="c.data.admin == true && !enableEdit" class="md-raised md-primary" ng-click="enableEdit = true">Edit</md-button>
+        <md-button ng-show="c.data.admin == true && enableEdit" class="md-raised md-primary" ng-click="saveData()">Update</md-button>
+         <md-button ng-click="doTheBack()"class="md-raised">Back</md-button>
+      </div>
 
 
 
-
-        </md-card-content>
-      </md-card>
-
-
-	{{ c.data.stockroom | json }}
+    </md-card-content>
+  </md-card>
 
 
 
-    </div>]]></template>
+</div>]]></template>
     </sp_widget>
 </record_update>

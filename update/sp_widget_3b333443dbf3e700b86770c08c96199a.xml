@@ -10,156 +10,155 @@
 	c.data.existingModels = loadAllModels();
 	c.querySearch = querySearch;
 	c.selectedItemChange = selectedItemChange;
+	c.selectedItem = null;
 
-		$("#ownerName").autocomplete({
-			delay: 300,
-			source: function(request, response) {
-				$('.ui-autocomplete').css('display', 'block');
-				var term = $('#ownerName').val();
-				response([]);
-				if (term.length < 4) {
-					return;
-				}
-				var temp = '';
-				if (term.indexOf(',') >= 0) {
-					temp = term.split(',');
-					var length = temp.length;
-					if (length > 1) {
-						term = temp[1].trim() + " " + temp[0].trim();
-					} else {
-						term = temp[0];
-					}
-				}
-				var req = {
-					method: 'GET',
-					url: '/api/x_naci_account_act/accountactivationscoped/fetchUserList',
-					beforeSend: function(xhr) {
-						xhr.setRequestHeader('X-UserToken', window.g_ck);
-					},
-					headers: {
-						'Content-Type': 'application/json'
-					},
-					params: {
-						'term': term
-					}
-				};
-				$http(req).then(handleResponse, handleError);
-
-				function handleResponse(responseData) {
-					var result = responseData.data.result;
-					response(result);
-				}
-
-				function handleError(response) {
-					console.error(response);
-					alert('ERROR');
-				}
-			},
-			autoFocus: true,
-			select: function(event, ui) {
-
-
-				var sys_id = ui.item.id;
-				var name = ui.item.value;
-				if (sys_id != null && sys_id.trim().length > 1) {
-					$scope.form.userId = sys_id;
-				} else {
-					$scope.form.userId = "";
-				}
-				if (sys_id != null && sys_id.trim().length > 1) {
-
-					c.form.owner = name;
-					c.form.ownerId = sys_id;
-				} else {
-					c.form.owner = "";
-					c.form.ownerId = "";
-				}
-
-				//$('#content').css('height', '550px');
-				$scope.$apply();
+	$("#ownerName").autocomplete({
+		delay: 300,
+		source: function(request, response) {
+			$('.ui-autocomplete').css('display', 'block');
+			var term = $('#ownerName').val();
+			response([]);
+			if (term.length < 4) {
+				return;
 			}
-		});
+			var temp = '';
+			if (term.indexOf(',') >= 0) {
+				temp = term.split(',');
+				var length = temp.length;
+				if (length > 1) {
+					term = temp[1].trim() + " " + temp[0].trim();
+				} else {
+					term = temp[0];
+				}
+			}
+			var req = {
+				method: 'GET',
+				url: '/api/x_naci_account_act/accountactivationscoped/fetchUserList',
+				beforeSend: function(xhr) {
+					xhr.setRequestHeader('X-UserToken', window.g_ck);
+				},
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				params: {
+					'term': term
+				}
+			};
+			$http(req).then(handleResponse, handleError);
 
-		/**
+			function handleResponse(responseData) {
+				var result = responseData.data.result;
+				response(result);
+			}
+
+			function handleError(response) {
+				console.error(response);
+				alert('ERROR');
+			}
+		},
+		autoFocus: true,
+		select: function(event, ui) {
+
+
+			var sys_id = ui.item.id;
+			var name = ui.item.value;
+			if (sys_id != null && sys_id.trim().length > 1) {
+				$scope.form.userId = sys_id;
+			} else {
+				$scope.form.userId = "";
+			}
+			if (sys_id != null && sys_id.trim().length > 1) {
+
+				c.form.owner = name;
+				c.form.ownerId = sys_id;
+			} else {
+				c.form.owner = "";
+				c.form.ownerId = "";
+			}
+
+			//$('#content').css('height', '550px');
+			$scope.$apply();
+		}
+	});
+
+	/**
      * Search for model names
      */
-		function querySearch(query) {
-			var results = query ? c.data.existingModels.filter(createFilterFor(query)) : c.data.existingModels,
-					deferred;
-			if (c.simulateQuery) {
-				deferred = $q.defer();
-				$timeout(function() {
-					deferred.resolve(results);
-				}, Math.random() * 1000, false);
-				return deferred.promise;
-			} else {
-				return results;
-			}
+	function querySearch(query) {
+		var results = query ? c.data.existingModels.filter(createFilterFor(query)) : c.data.existingModels,
+				deferred;
+		if (c.simulateQuery) {
+			deferred = $q.defer();
+			$timeout(function() {
+				deferred.resolve(results);
+			}, Math.random() * 1000, false);
+			return deferred.promise;
+		} else {
+			return results;
 		}
+	}
 
-		function selectedItemChange(item) {
-			updateFromValues({
-				"name": "test Name",
-				"manufacture": "test manufacture",
-				"model_number": "test model_number",
-				"description": "test description"
-			});
-		}	
+	function selectedItemChange(item) {
+		updateFromValues(item.data);
+	}	
 
-		/**
+	/**
      * Build `models` list of key/value pairs
      */
-		function loadAllModels() {
-			temp = [];
-			c.data.models.forEach(function(item){
-				temp.push({
-					value: item.name.toLowerCase(),
-					display: item.name,
-					data: item
-				})
-			});
-			return temp;
-		}
+	function loadAllModels() {
+		temp = [];
+		c.data.models.forEach(function(item){
+			temp.push({
+				value: item.name.toLowerCase(),
+				display: item.name,
+				data: item
+			})
+		});
+		return temp;
+	}
 
-		/**
+	/**
      * Create filter function for a query string
      */
-		function createFilterFor(query) {
-			var lowercaseQuery = query.toLowerCase();
-			return function filterFn(barcode) {
-				return (barcode.value.indexOf(lowercaseQuery) === 0);
-			};
+	function createFilterFor(query) {
+		var lowercaseQuery = query.toLowerCase();
+		return function filterFn(barcode) {
+			return (barcode.value.indexOf(lowercaseQuery) === 0);
+		};
 
 
+	}
+
+	function updateFromValues(updateForm){
+		Object.assign(c.form,{
+			name: updateForm.name,
+			manufacture: updateForm.manufactureID,
+			description:updateForm.description,
+			model_number:updateForm.modelNumber,
+			unit_cost: updateForm.unitCost
+			
+		});
+	}
+
+	function getFormValues() {
+		return {
+			name: "",
+			manufacture: "",
+			description: "",
+			model_number: "",
+			unit_cost: "",
+			owner_custodian: "",
+			quantity: "",
+			stockroom: "",
+			barcode: ""
 		}
+	}
 
-		function updateFromValues(update_form){
-			Object.assign(c.form, {"name": "test Name",
-														 "manufacture": "test manufacture",
-														 "model_number": "test model_number",
-														 "description": "test description"})
 
-		}
-
-		function getFormValues() {
-			return {
-				name: "",
-				manufacture: "",
-				description: "",
-				model_number: "",
-				unit_cost: "",
-				owner_custodian: "",
-				quantity: "",
-				stockroom: "",
-				barcode: ""
-			}
-		}
-	
-	
 	$scope.addAsset = function(){
 		c.form.method = "check";
 		etrackAddAssets.proccessModel(c.form).then(function(res){
-			
+
 			if (res.data.result == "0"){
 				insertModel("insert", "Assest(s) have been created successfully!");
 			}else{
@@ -174,17 +173,17 @@
 
 
 				});
-				
-				
+
+
 			}
 			$log.log(res);
 		}, function(err){
 			$log.log(err);
 			alert("ERROR");
 		});
-		
+
 	}
-	
+
 	function insertModel(method, msg){
 		c.form.method = method;
 		etrackAddAssets.proccessModel(c.form).then(function(res){
@@ -201,11 +200,15 @@
 			$log.log(err);
 			alert("ERROR");
 		});
-		
-		
+
+
 	}
-	
-	
+
+	$scope.doTheBack = function() {
+		window.history.back();
+	};
+
+
 
 
 }]]></client_script>
@@ -243,8 +246,10 @@
 			id: model.sys_id.toString(),
 			name:  model.name.toString(),
 			manufacture:model.manufacture.name.toString(),
+			manufactureID:model.manufacture.sys_id.toString(),
 			description: model.description.toString(),
-			modelNumber:  model.model_number.toString()
+			modelNumber:  model.model_number.toString(),
+			unitCost: model.cost.toString()
 		});
 	}
 
@@ -276,7 +281,7 @@
         <sys_created_on>2019-02-27 15:57:17</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>3b333443dbf3e700b86770c08c96199a</sys_id>
-        <sys_mod_count>231</sys_mod_count>
+        <sys_mod_count>260</sys_mod_count>
         <sys_name>Etrack Add Assets</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
@@ -284,7 +289,7 @@
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sp_widget_3b333443dbf3e700b86770c08c96199a</sys_update_name>
         <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-03-14 15:08:59</sys_updated_on>
+        <sys_updated_on>2019-03-18 19:54:02</sys_updated_on>
         <template><![CDATA[<div ng-controller="c" ng-cloak>
   <md-card>
     <md-toolbar>
@@ -294,9 +299,9 @@
     </md-toolbar>
     <md-subheader class="md-primary">If the Model exist, please select one. Otherwise a new model will be created for this asset.</md-subheader>
     <md-card-content>
-      {{ c.data.models || json }}
       <form name="userForm">
         <div layout="column">
+
           <label>Search existing Model</label>
           <md-autocomplete 
                            md-selected-item="c.selectedItem"
@@ -305,16 +310,17 @@
                            md-items="item in c.querySearch(c.searchText)" 
                            md-item-text="item.display"
                            md-min-length="0" 
-                           placeholder="Enter Barcode" 
+                           placeholder="Enter model name" 
                            input-aria-labelledby="favoriteStateLabel" 
                            input-aria-describedby="autocompleteDetailedDescription">
             <md-item-template>
               <span md-highlight-text="c.searchText" md-highlight-flags="^i">{{item.display}}</span>
             </md-item-template>
             <md-not-found>
-              No assets matching " {{c.searchText}} " were found.
+              No assets name matching "'{{c.searchText}}'" were found.
             </md-not-found>
           </md-autocomplete>
+
           <br>
           <h4>
             Model Information
@@ -336,7 +342,7 @@
 
           <md-input-container class="md-block">
             <label>Description</label>
-            <textarea ng-model="c.form.description" required md-maxlength="150" rows="3" md-select-on-focus></textarea>
+            <textarea ng-model="c.form.description" required md-select-on-focus></textarea>
           </md-input-container>
           <md-input-container class="md-block" flex-gt-sm>
             <label>Model Number</label>
@@ -360,7 +366,7 @@
             <label>Quantity</label>
             <input required name="quantity" ng-model="c.form.quantity" />
           </md-input-container>
-          
+
           <md-input-container class="md-block" flex-gt-sm>
             <label>Barcode</label>
             <input id="barcode" required name="barcode" ng-model="c.form.barcode" />
@@ -380,13 +386,14 @@
         <br>
         <div class="d-flex justify-content-center">
           <md-button ng-click="addAsset()" class="md-raised md-primary">Submit</md-button>
+          <md-button ng-click="doTheBack()"class="md-raised">Back</md-button>
+
         </div>
       </form>
 
 
     </md-card-content>
   </md-card>
-  {{ c.form | json }} {{ form | json }}
 </div>]]></template>
     </sp_widget>
 </record_update>
