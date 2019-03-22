@@ -2,7 +2,7 @@
 <record_update table="sp_widget">
     <sp_widget action="INSERT_OR_UPDATE">
         <category>custom</category>
-        <client_script><![CDATA[function($scope, $q, $timeout, $log, $http, etrackAddAssets, $mdDialog) {
+        <client_script><![CDATA[function($scope, $q, $timeout, $log, $http, etrackAddAssets, $mdDialog, $state) {
 	/* widget controller */
 	var c = this;
 	$scope.form = {userId: ""};
@@ -11,12 +11,17 @@
 	c.querySearch = querySearch;
 	c.selectedItemChange = selectedItemChange;
 	c.selectedItem = null;
+	
+	
+
+	/*--------- Type header -----------*/
 
 	$("#ownerName").autocomplete({
 		delay: 300,
 		source: function(request, response) {
 			$('.ui-autocomplete').css('display', 'block');
 			var term = $('#ownerName').val();
+			c.form.ownerId = "";
 			response([]);
 			if (term.length < 4) {
 				return;
@@ -81,6 +86,11 @@
 		}
 	});
 
+
+	/*--------------------*/
+
+	/*---------Search Model Name-----------*/
+
 	/**
      * Search for model names
      */
@@ -129,14 +139,16 @@
 
 	}
 
+
+	/*---------Form-----------*/
+
 	function updateFromValues(updateForm){
 		Object.assign(c.form,{
 			name: updateForm.name,
 			manufacture: updateForm.manufactureID,
 			description:updateForm.description,
 			model_number:updateForm.modelNumber,
-			unit_cost: updateForm.unitCost
-			
+			unit_cost: parseInt(updateForm.unitCost)
 		});
 	}
 
@@ -153,27 +165,45 @@
 			barcode: ""
 		}
 	}
+	
+	
+	/*--------- clear barcode if quantity is greater then 1 ----------- */
+	$scope.$watch('c.form.quantity', function(){
+		if(c.form.quantity > 1){
+			c.form.barcode = "";
+		}
+	});
+	
+	$scope.$watch('c.form.owner', function(){
+		if(c.form.ownerId == "" || c.form.ownerId == null){
+			c.form.owner = "";
+		}
+	});
+	
 
-
+	/*--------- POST add asset-----------*/
 	$scope.addAsset = function(){
+		if(c.form.ownerId == "" || c.form.ownerId == null){
+			c.form.owner = "";
+			return;
+		}
 		c.form.method = "check";
 		etrackAddAssets.proccessModel(c.form).then(function(res){
 
 			if (res.data.result == "0"){
 				insertModel("insert", "Assest(s) have been created successfully!");
+				$state.go("assets")
 			}else{
 				var confirm = $mdDialog.confirm()
 				.title('Are you sure you want to update it? ')
-				.textContent('Porduct model already exists, if you choose to update, the model name and manufacturer will be updated')
+				.htmlContent("<strong>" + c.form.name + " </strong>already exists, if you choose to update, the model number and manufacturer will be updated")
 				.ok('YES')
 				.cancel('NO');
 				$mdDialog.show(confirm).then(function() {
-					insertModel("update", "Assest(s) have been created successfully!");
+					insertModel("update", c.form.name + ' has been updated successfully!');
+					$state.go("assets")
 				}, function() {
-
-
 				});
-
 
 			}
 			$log.log(res);
@@ -200,16 +230,7 @@
 			$log.log(err);
 			alert("ERROR");
 		});
-
-
 	}
-
-	$scope.doTheBack = function() {
-		window.history.back();
-	};
-
-
-
 
 }]]></client_script>
         <controller_as>c</controller_as>
@@ -281,7 +302,7 @@
         <sys_created_on>2019-02-27 15:57:17</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>3b333443dbf3e700b86770c08c96199a</sys_id>
-        <sys_mod_count>260</sys_mod_count>
+        <sys_mod_count>348</sys_mod_count>
         <sys_name>Etrack Add Assets</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
@@ -289,7 +310,7 @@
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sp_widget_3b333443dbf3e700b86770c08c96199a</sys_update_name>
         <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-03-18 19:54:02</sys_updated_on>
+        <sys_updated_on>2019-03-21 19:37:52</sys_updated_on>
         <template><![CDATA[<div ng-controller="c" ng-cloak>
   <md-card>
     <md-toolbar>
@@ -299,9 +320,8 @@
     </md-toolbar>
     <md-subheader class="md-primary">If the Model exist, please select one. Otherwise a new model will be created for this asset.</md-subheader>
     <md-card-content>
-      <form name="userForm">
+      <form name="userForm" autocomplete="off">
         <div layout="column">
-
           <label>Search existing Model</label>
           <md-autocomplete 
                            md-selected-item="c.selectedItem"
@@ -327,12 +347,12 @@
           </h4>
           <md-input-container class="md-block" flex-gt-sm>
             <label>Name</label>
-            <input required name="name" ng-model="c.form.name" />
+            <input ng-required="true" name="name" ng-model="c.form.name" />
           </md-input-container>
 
           <md-input-container class="md-block" flex-gt-sm>
             <label>Manufacture</label>
-            <md-select required ng-model="c.form.manufacture">
+            <md-select ng-required="true" ng-model="c.form.manufacture">
               <md-option ng-repeat="manufacture in c.data.manufactures" value="{{manufacture.id}}">
                 {{manufacture.name}}
               </md-option>
@@ -342,39 +362,55 @@
 
           <md-input-container class="md-block">
             <label>Description</label>
-            <textarea ng-model="c.form.description" required md-select-on-focus></textarea>
+            <textarea ng-model="c.form.description" ng-required="true" md-select-on-focus></textarea>
           </md-input-container>
+
           <md-input-container class="md-block" flex-gt-sm>
             <label>Model Number</label>
-            <input required name="model_number" ng-model="c.form.model_number" />
+            <input name="model_number" ng-model="c.form.model_number" />
           </md-input-container>
 
           <md-input-container class="md-block" flex-gt-sm>
             <label>Unit Cost</label>
-            <input required name="unit_cost" ng-model="c.form.unit_cost" />
+            <input type="number" step="any" ng-required="true" name="unit_cost" ng-model="c.form.unit_cost" />
           </md-input-container>
 
           <h4>
             Asset Information
           </h4>
 
+
           <md-input-container class="md-block" flex-gt-sm>
             <label>Owner</label>
-            <input id="ownerName" required name="owner" ng-model="c.form.owner" />
+            <input id="ownerName" ng-required="true" name="stopAC" ng-model="c.form.owner"  ng-model-options="{ updateOn: 'blur' }" />
+            <div ng-messages="userForm.stopAC.$error">
+              <div ng-message="required">
+                Please select a valid owner
+              </div>
+            </div>
           </md-input-container>
+
           <md-input-container class="md-block" flex-gt-sm>
             <label>Quantity</label>
-            <input required name="quantity" ng-model="c.form.quantity" />
+            <input type="number" step="any" ng-required="true" name="quantity" ng-model="c.form.quantity" min="1" ng-model-options="{ updateOn: 'blur' }"/>
+            <div ng-messages="userForm.quantity.$error">
+              <div ng-message="min">
+                Must be greater then 1
+              </div>
+            </div>
           </md-input-container>
-
-          <md-input-container class="md-block" flex-gt-sm>
+					
+          <div ng-show="c.form.quantity == 1">
+             <md-input-container class="md-block" flex-gt-sm>
             <label>Barcode</label>
-            <input id="barcode" required name="barcode" ng-model="c.form.barcode" />
+            <input id="barcode" name="barcode" ng-model="c.form.barcode" ng-disabled="c.form.quantity > 1"/>
           </md-input-container>
 
+          </div>
+         
           <md-input-container class="md-block" flex-gt-sm>
             <label>Stockroom</label>
-            <md-select required ng-model="c.form.stockroom">
+            <md-select ng-required="true" ng-model="c.form.stockroom">
               <md-option ng-repeat="stockroom in c.data.stockrooms" value="{{stockroom.id}}">
                 {{stockroom.name}}
               </md-option>
@@ -385,13 +421,15 @@
         </div>
         <br>
         <div class="d-flex justify-content-center">
-          <md-button ng-click="addAsset()" class="md-raised md-primary">Submit</md-button>
-          <md-button ng-click="doTheBack()"class="md-raised">Back</md-button>
+          
+          <md-button
+                     type="submit" 
+                     ng-disabled="userForm.$invalid" 
+                     ng-click="userForm.$valid && addAsset()" 
+                     class="md-raised md-primary">Submit</md-button>
 
         </div>
       </form>
-
-
     </md-card-content>
   </md-card>
 </div>]]></template>

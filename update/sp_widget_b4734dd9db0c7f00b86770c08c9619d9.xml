@@ -2,17 +2,19 @@
 <record_update table="sp_widget">
     <sp_widget action="INSERT_OR_UPDATE">
         <category>custom</category>
-        <client_script><![CDATA[function($scope, $log, $http, etrackingAddStockroom, $mdDialog) {
+        <client_script><![CDATA[function($scope, $log, $http, etrackingAddStockroom, $mdDialog, $state) {
 	/* widget controller */
 	var c = this;
 	var myUserId = c.data.info.my_sys_id;
 	$scope.form = {userId: ""};
+	c.form = getFormValues();
 
 	$("#ownerName").autocomplete({
 		delay: 300,
 		source: function(request, response) {
 			$('.ui-autocomplete').css('display', 'block');
 			var term = $('#ownerName').val();
+			c.form.ownerId = "";
 			response([]);
 			if (term.length < 4) {
 				return;
@@ -54,8 +56,6 @@
 		},
 		autoFocus: true,
 		select: function(event, ui) {
-
-
 			var sys_id = ui.item.id;
 			var name = ui.item.value;
 			if (sys_id != null && sys_id.trim().length > 1) {
@@ -64,10 +64,11 @@
 				$scope.form.userId = "";
 			}
 			if (sys_id != null && sys_id.trim().length > 1) {
-
-				c.form.owner_custodian = name;
+				c.form.owner = name;
+				c.form.ownerId = sys_id;
 			} else {
-				c.form.owner_custodian = "";
+				c.form.owner = "";
+				c.form.ownerId = "";
 			}
 
 			//$('#content').css('height', '550px');
@@ -76,9 +77,23 @@
 	});
 
 
-	c.form = getFormValues();
 
+
+
+	/*--------- ----------- */
+
+	$scope.$watch('c.form.owner', function(){
+		if(c.form.ownerId == "" || c.form.ownerId == null){
+			c.form.owner = "";
+		}
+	});
+
+	/*--------- ----------- */
 	$scope.addStockroom = function(){
+		if(c.form.ownerId == "" || c.form.ownerId == null){
+			c.form.owner = "";
+			return;
+		}
 		// check if stockrooom name exist 
 		c.form.method = "check";
 		etrackingAddStockroom.checkStockroom(c.form)
@@ -86,21 +101,18 @@
 			var id = res.data.result;
 			if (id == "0"){
 				insertStockroom("insert", "New stockroom has been created successfully");
+				$state.go("stockrooms")
 			}else if(id == "1"){			
 				var confirm = $mdDialog.confirm()
 				.title('Are you sure you want to update it? ')
 				.textContent('Stockroom already exists')
 				.ok('YES')
 				.cancel('NO');
-
 				$mdDialog.show(confirm).then(function() {
 					insertStockroom("update", "Stockroom has been updated successfully");
+					$state.go("stockrooms")
 				}, function() {
-
-
 				});
-
-
 
 			}
 
@@ -131,16 +143,8 @@
 			$log.log(err);
 			alert("ERROR");
 		});
-
-
-
 	}
 
-
-
-	function updateFromValues(update_form){
-		return null;
-	}
 
 	function getFormValues() {
 		return {
@@ -151,14 +155,6 @@
 			type: ""
 		}
 	}
-
-	$scope.doTheBack = function() {
-		window.history.back();
-	};
-
-
-
-
 }]]></client_script>
         <controller_as>c</controller_as>
         <css/>
@@ -217,7 +213,7 @@
         <sys_created_on>2019-03-06 16:54:24</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>b4734dd9db0c7f00b86770c08c9619d9</sys_id>
-        <sys_mod_count>108</sys_mod_count>
+        <sys_mod_count>138</sys_mod_count>
         <sys_name>Etrack Add Stockroom</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
@@ -225,7 +221,7 @@
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sp_widget_b4734dd9db0c7f00b86770c08c9619d9</sys_update_name>
         <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-03-18 18:35:07</sys_updated_on>
+        <sys_updated_on>2019-03-21 20:33:45</sys_updated_on>
         <template><![CDATA[<div ng-controller="c" ng-cloak>
   <md-card>
     <md-toolbar>
@@ -241,32 +237,38 @@
             Stockroom information
           </h4>
           <md-input-container class="md-block" flex-gt-sm>
-            <label>Name</label>
-            <input required name="name" ng-model="c.form.name" />
+            <label> Stockroom name</label>
+            <input  ng-required="true" name="stockroomName" ng-model="c.form.name" />
           </md-input-container>
+          
           <md-input-container class="md-block">
             <label>Description</label>
-            <textarea ng-model="c.form.description" required md-maxlength="150" rows="3" md-select-on-focus></textarea>
+            <textarea ng-model="c.form.description"  name="stopACDesc"  ng-required="true" md-select-on-focus></textarea>
           </md-input-container>
 
 
           <md-input-container class="md-block" flex-gt-sm>
-            <label>Locations</label>
-            <md-select required ng-model="c.form.location">
+            <label>Location</label>
+            <md-select  ng-required="true" ng-model="c.form.location">
               <md-option ng-repeat="location in c.data.locations" value="{{location.id}}">
                 {{location.name}}
               </md-option>
             </md-select >
           </md-input-container>
-
+          
           <md-input-container class="md-block" flex-gt-sm>
-            <label>Owner Custodian</label>
-            <input id="ownerName" required name="owner" ng-model="c.form.owner" />
+            <label>Owner</label>
+            <input id="ownerName"  ng-required="true" name="stopAC" ng-model="c.form.owner"  ng-model-options="{ updateOn: 'blur' }" />
+            <div ng-messages="userForm.stopAC.$error">
+              <div ng-message="required">
+                Please select a valid owner
+              </div>
+            </div>
           </md-input-container>
-
+          
           <md-input-container class="md-block" flex-gt-sm>
             <label>Type</label>
-            <md-select required ng-model="c.form.type">
+            <md-select ng-required="true" ng-model="c.form.type">
               <md-option ng-repeat="type in c.data.types" value="{{type.id}}">
                 {{type.name}}
               </md-option>
@@ -276,12 +278,14 @@
         </div>
         <br>
         <div class="d-flex justify-content-center">
-          <md-button ng-click="addStockroom()" class="md-raised md-primary">Submit</md-button>
-          <md-button ng-click="doTheBack()"class="md-raised">Back</md-button>
+           <md-button
+                     type="submit" 
+                     ng-disabled="userForm.$invalid" 
+                     ng-click="userForm.$valid && addStockroom()" 
+                     class="md-raised md-primary">Submit</md-button>
+          
         </div>
       </form>
-
-
     </md-card-content>
   </md-card>
 </div>]]></template>
