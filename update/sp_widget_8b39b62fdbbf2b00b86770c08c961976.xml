@@ -2,30 +2,36 @@
 <record_update table="sp_widget">
     <sp_widget action="INSERT_OR_UPDATE">
         <category>custom</category>
-        <client_script><![CDATA[function($stateParams, $log, $scope, $http, $mdDialog, spUtil, etrackCheckinAsset) {
+        <client_script><![CDATA[function($stateParams, $log, $scope, $http, $mdDialog, spUtil, etrackCheckinAsset, $state) {
 	/* widget controller */
 	var c = this;
-	
-	$scope.checkIn = function(){
-		etrackCheckinAsset.checkinAsset(c.data.checkoutAsset).then(function(res){
-			$mdDialog.show(
-				$mdDialog.alert()
-				.parent(angular.element(document.querySelector('#popupContainer')))
-				.clickOutsideToClose(true)
-				.title("Asset has been checked in successfully!")
-				.ok('OK')
-			);
 
-			$log.log(res);
-		}, function(err){
-			$log.log(err);
-			alert("ERROR");
+	$scope.checkIn = function(){
+
+		var confirm = $mdDialog.confirm()
+		.title('Are you sure you check in these Assets?')
+		.ok('YES')
+		.cancel('NO');
+		$mdDialog.show(confirm).then(function() {
+			etrackCheckinAsset.checkinAsset(c.data.checkoutAsset).then(function(res){
+				$mdDialog.show(
+					$mdDialog.alert()
+					.parent(angular.element(document.querySelector('#popupContainer')))
+					.clickOutsideToClose(true)
+					.title("Asset has been checked in successfully!")
+					.ok('OK')
+				);
+				$state.go("assets");
+				$log.log(res);
+			}, function(err){
+				$log.log(err);
+				alert("ERROR");
+			});
+		}, function() {
 		});
-		
 	}
-	
 	$scope.doTheBack = function() {
-		window.history.back();
+		$state.go("assets");
 	};
 }]]></client_script>
         <controller_as>c</controller_as>
@@ -50,7 +56,9 @@
 	var mysys_name = gs.getUserDisplayName();
 	var mysys_id = gs.getUserID();
 	data.info = {checkOutUser: mysys_name};
-	
+	data.admin = gs.getUser().isMemberOf("ETracking_Admin")
+
+
 
 
 	if (input && input.id) {
@@ -66,7 +74,7 @@
 		data.checkoutAsset.quantityCheckedOut = checkedOutAsset.quantity.toString();
 		data.checkoutAsset.user_id = mysys_id;
 	}
-	
+
 
 
 
@@ -77,7 +85,7 @@
         <sys_created_on>2019-03-01 14:59:39</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>8b39b62fdbbf2b00b86770c08c961976</sys_id>
-        <sys_mod_count>50</sys_mod_count>
+        <sys_mod_count>54</sys_mod_count>
         <sys_name>Etrack Asset Check In</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
@@ -85,8 +93,8 @@
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sp_widget_8b39b62fdbbf2b00b86770c08c961976</sys_update_name>
         <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-03-18 18:39:41</sys_updated_on>
-        <template><![CDATA[<div ng-controller="c" ng-cloak>
+        <sys_updated_on>2019-03-25 15:12:41</sys_updated_on>
+        <template><![CDATA[<div ng-controller="c" ng-cloak ng-show="c.data.admin">
   <md-card>
     <md-toolbar>
       <div class="md-toolbar-tools">

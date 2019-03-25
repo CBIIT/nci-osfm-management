@@ -71,26 +71,31 @@
 		}
 	});
 
-
 	$scope.checkoutAsset = function(){
-		etrackCheckoutAsset.checkoutAsset(c.data.asset).then(function(res){
-			$mdDialog.show(
-				$mdDialog.alert()
-				.parent(angular.element(document.querySelector('#popupContainer')))
-				.clickOutsideToClose(true)
-				.title("Asset has been checked out successfully!")
-				.ok('OK')
-			);
-			$state.go("assets")
-			$log.log(res);
-		}, function(err){
-			$log.log(err);
-			alert("ERROR");
+		var confirm = $mdDialog.confirm()
+		.title('Are you sure you check out these Assets?')
+		.ok('YES')
+		.cancel('NO');
+		$mdDialog.show(confirm).then(function() {
+			etrackCheckoutAsset.checkoutAsset(c.data.asset).then(function(res){
+				$mdDialog.show(
+					$mdDialog.alert()
+					.parent(angular.element(document.querySelector('#popupContainer')))
+					.clickOutsideToClose(true)
+					.title("Asset has been checked out successfully!")
+					.ok('OK')
+				);
+				$state.go("assets");
+				$log.log(res);
+			}, function(err){
+				$log.log(err);
+				alert("ERROR");
+			});
+		}, function() {
 		});
-
-	};
-
-}]]></client_script>
+	}
+}
+]]></client_script>
         <controller_as>c</controller_as>
         <css/>
         <data_table>sp_instance</data_table>
@@ -113,7 +118,8 @@
 	var mysys_name = gs.getUserDisplayName();
 	var mysys_id = gs.getUserID();
 	data.info = {checkOutUser: mysys_name};
-	
+	data.admin = gs.getUser().isMemberOf("ETracking_Admin")
+
 
 
 	if (input && input.id) {
@@ -130,7 +136,7 @@
 		data.asset.stockroom = asset.stockroom.name.toString();
 		data.asset.checkOutUserID = mysys_id;
 	}
-	
+
 
 
 
@@ -141,7 +147,7 @@
         <sys_created_on>2019-03-01 15:00:03</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>bc59366bdbbf2b00b86770c08c96194f</sys_id>
-        <sys_mod_count>60</sys_mod_count>
+        <sys_mod_count>64</sys_mod_count>
         <sys_name>Etrack Asset Check Out</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
@@ -149,8 +155,8 @@
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sp_widget_bc59366bdbbf2b00b86770c08c96194f</sys_update_name>
         <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-03-21 18:00:11</sys_updated_on>
-        <template><![CDATA[<div ng-controller="c" ng-cloak>
+        <sys_updated_on>2019-03-25 15:37:05</sys_updated_on>
+        <template><![CDATA[<div ng-controller="c" ng-cloak ng-show="c.data.admin">
   <md-card>
     <md-toolbar>
       <div class="md-toolbar-tools">
@@ -222,9 +228,6 @@
 
     </md-card-content>
   </md-card>
-
-  {{c.data | json }}
-
 </div>]]></template>
     </sp_widget>
 </record_update>

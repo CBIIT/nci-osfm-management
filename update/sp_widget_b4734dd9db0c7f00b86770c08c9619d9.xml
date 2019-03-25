@@ -172,40 +172,37 @@
         <public>false</public>
         <roles/>
         <script><![CDATA[(function() {
-  
+
 	var my_sys_id = gs.getUserID();
-	
-	data.info = {
-	
-		my_sys_id: my_sys_id
-	}
-	
+	data.admin = gs.getUser().isMemberOf("ETracking_Admin")
+	data.info = {my_sys_id: my_sys_id}
+
 	data.types = [];
 	var stockroomTypes = new GlideRecord('x_naci_e_tracking_stockroom_type');
-	    stockroomTypes.orderBy("name");
-			stockroomTypes.query();
-	
+	stockroomTypes.orderBy("name");
+	stockroomTypes.query();
+
 	while (stockroomTypes.next()){
 		var item = {};
 		item.id = stockroomTypes.sys_id.toString();
 		item.name = stockroomTypes.name.toString();
 		data.types.push(item)
 	}
-	
+
 	data.locations = [];
 	var locations = new GlideRecord('x_naci_e_tracking_location');
-			locations.orderBy('name');
-			locations.query();
+	locations.orderBy('name');
+	locations.query();
 	while(locations.next()){
 		var item = {};
 		item.id = locations.sys_id.toString();
 		item.name = locations.name.toString();
 		data.locations.push(item);
 	}
-	
-	
-	
-	
+
+
+
+
 })();]]></script>
         <servicenow>false</servicenow>
         <sys_class_name>sp_widget</sys_class_name>
@@ -213,7 +210,7 @@
         <sys_created_on>2019-03-06 16:54:24</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>b4734dd9db0c7f00b86770c08c9619d9</sys_id>
-        <sys_mod_count>138</sys_mod_count>
+        <sys_mod_count>140</sys_mod_count>
         <sys_name>Etrack Add Stockroom</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
@@ -221,8 +218,8 @@
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sp_widget_b4734dd9db0c7f00b86770c08c9619d9</sys_update_name>
         <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-03-21 20:33:45</sys_updated_on>
-        <template><![CDATA[<div ng-controller="c" ng-cloak>
+        <sys_updated_on>2019-03-22 17:59:34</sys_updated_on>
+        <template><![CDATA[<div ng-controller="c" ng-cloak ng-show="c.data.admin">
   <md-card>
     <md-toolbar>
       <div class="md-toolbar-tools">

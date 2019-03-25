@@ -34,6 +34,7 @@
         <script><![CDATA[(function() {
 	
 	data.stockrooms = [];
+	data.admin = gs.getUser().isMemberOf("ETracking_Admin");
 
 	var stockroom = new GlideRecord("x_naci_e_tracking_stock_room");
 			stockroom.orderBy("name");
@@ -55,7 +56,7 @@
         <sys_created_on>2019-03-01 15:50:07</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>dac48fe3dbff2b00b86770c08c961943</sys_id>
-        <sys_mod_count>40</sys_mod_count>
+        <sys_mod_count>42</sys_mod_count>
         <sys_name>Etrack Stockrooms</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
@@ -63,7 +64,7 @@
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sp_widget_dac48fe3dbff2b00b86770c08c961943</sys_update_name>
         <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-03-12 19:03:56</sys_updated_on>
+        <sys_updated_on>2019-03-22 18:02:40</sys_updated_on>
         <template><![CDATA[<div ng-controller="c" ng-cloak>
 
     <md-card>
@@ -93,7 +94,7 @@
           			<div flex="5" hide-xs hide-sm></div>
                 
                 <div layout="row" layout-align="end center">
-                    <md-button ui-sref="add_stockrooms" class="md-raised md-primary">Add Stockroom</md-button>
+                    <md-button ng-show="c.data.admin" ui-sref="add_stockrooms" class="md-raised md-primary">Add Stockroom</md-button>
                 </div>
               	<br hide-md hide-lg>
             </div>

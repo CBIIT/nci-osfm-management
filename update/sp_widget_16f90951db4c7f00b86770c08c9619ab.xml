@@ -3,10 +3,10 @@
     <sp_widget action="INSERT_OR_UPDATE">
         <category>custom</category>
         <client_script><![CDATA[function($stateParams, $log, $scope, $http, $mdDialog, etrackUpdateAsset, $state) {
-  /* widget controller */
-  var c = this;
+	/* widget controller */
+	var c = this;
 	c.data.asset.quantity = parseInt(c.data.asset.quantity);
-	
+
 	$("#ownerName").autocomplete({
 		delay: 300,
 		source: function(request, response) {
@@ -58,7 +58,7 @@
 
 			var sys_id = ui.item.id;
 			var name = ui.item.value;
-		
+
 			if (sys_id != null && sys_id.trim().length > 1) {
 
 				c.data.asset.owner = name;
@@ -80,28 +80,34 @@
 			c.data.asset.ownerId = c.data.reset.ownerId;
 		}
 	});
-	
+
 	$scope.updateAsset = function(){
-		etrackUpdateAsset.updateAsset(c.data.asset).then(function(res){
-			$mdDialog.show(
-				$mdDialog.alert()
-				.parent(angular.element(document.querySelector('#popupContainer')))
-				.clickOutsideToClose(true)
-				.title("Asset has been updated successfully!")
-				.ok('OK')
-			);
-			$state.go("display_asset", {id: c.data.model.modelID});
-			$log.log(res);
-		}, function(err){
-			$log.log(err);
-			alert("ERROR");
+		var confirm = $mdDialog.confirm()
+		.title('Are you sure you edit the Asset information?')
+		.ok('YES')
+		.cancel('NO');
+		$mdDialog.show(confirm).then(function() {
+			etrackUpdateAsset.updateAsset(c.data.asset).then(function(res){
+				$mdDialog.show(
+					$mdDialog.alert()
+					.parent(angular.element(document.querySelector('#popupContainer')))
+					.clickOutsideToClose(true)
+					.title("Asset has been updated successfully!")
+					.ok('OK')
+				);
+				$state.go("display_asset", {id: c.data.model.modelID});
+				$log.log(res);
+			}, function(err){
+				$log.log(err);
+				alert("ERROR");
+			});
+		}, function() {
 		});
-		
 	};
-	
-	
-	
-}]]></client_script>
+
+}
+
+]]></client_script>
         <controller_as>c</controller_as>
         <css/>
         <data_table>sp_instance</data_table>
@@ -124,6 +130,7 @@
 	data.model = {};
 	data.reset = {};
 	data.stockrooms = [];
+	data.admin = gs.getUser().isMemberOf("ETracking_Admin")
 
 
 
@@ -173,7 +180,7 @@
         <sys_created_on>2019-03-06 17:22:54</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>16f90951db4c7f00b86770c08c9619ab</sys_id>
-        <sys_mod_count>90</sys_mod_count>
+        <sys_mod_count>98</sys_mod_count>
         <sys_name>Etrack Edit Asset</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
@@ -181,8 +188,8 @@
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sp_widget_16f90951db4c7f00b86770c08c9619ab</sys_update_name>
         <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-03-21 19:08:35</sys_updated_on>
-        <template><![CDATA[<div ng-controller="c" ng-cloak>
+        <sys_updated_on>2019-03-25 15:39:03</sys_updated_on>
+        <template><![CDATA[<div ng-controller="c" ng-cloak ng-show="c.data.admin">
   <md-card>
     <md-toolbar>
       <div class="md-toolbar-tools">
@@ -241,7 +248,7 @@
 
           <md-input-container class="md-block" flex-gt-sm>
             <label>Quantity</label>
-            <input type="number" step="any" ng-required="true" name="quantity" ng-model="c.data.asset.quantity" min="1" ng-model-options="{ updateOn: 'blur' }"/>
+            <input type="number" step="any" ng-required="true" name="quantity" ng-model="c.data.asset.quantity" min="0" ng-model-options="{ updateOn: 'blur' }"/>
             <div ng-messages="userForm.quantity.$error">
               <div ng-message="min">
                 Must be greater then 1
@@ -265,8 +272,6 @@
               </md-option>
             </md-select >
           </md-input-container>
-
-
         </div>
         <br>
         <div class="d-flex justify-content-center">

@@ -89,15 +89,15 @@
         <sys_created_on>2019-02-25 15:39:29</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>67fbd61adbf36700b86770c08c96192b</sys_id>
-        <sys_mod_count>126</sys_mod_count>
+        <sys_mod_count>128</sys_mod_count>
         <sys_name>Etrack Navigation</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
         <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sp_widget_67fbd61adbf36700b86770c08c96192b</sys_update_name>
-        <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-03-20 14:22:03</sys_updated_on>
+        <sys_updated_by>zhoujim@nih.gov</sys_updated_by>
+        <sys_updated_on>2019-03-22 19:54:52</sys_updated_on>
         <template><![CDATA[<!-- Etrack Ribbon -->
 <div class="bg-primary flex-grow hidden-xs ribbon">
   <h1 class="container py-2 my-0 h4" >
@@ -190,14 +190,14 @@
         </a>
 
         <ul class="dropdown-menu px-3 shadow-md">
-          <li ng-if="c.data.userRole != 'applicant'">
+          <!--li ng-if="c.data.userRole != 'applicant'">
             <a ui-sref="preferences"
                class="nav-link">
               Preferences
             </a>
-          </li>
+          </li-->
           <li>
-            <a ng-href="{{ portal.logoutUrl }}"
+            <a ng-href="/logout.do"
                class="nav-link">
               Log Out
             </a>

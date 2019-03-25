@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sp_widget">
+    <sp_widget action="INSERT_OR_UPDATE">
+        <category>custom</category>
+        <client_script><![CDATA[function() {
+  /* widget controller */
+  var c = this;
+}]]></client_script>
+        <controller_as>c</controller_as>
+        <css/>
+        <data_table>sp_instance</data_table>
+        <demo_data/>
+        <description/>
+        <docs/>
+        <field_list/>
+        <has_preview>false</has_preview>
+        <id>etrack_view_asset_details</id>
+        <internal>false</internal>
+        <link/>
+        <name>Etrack View Asset Details</name>
+        <option_schema/>
+        <public>false</public>
+        <roles/>
+        <script><![CDATA[(function() {
+
+	data.id = "";
+	data.asset = {};
+	data.model = {};
+
+	if (input && input.id) {
+		data.id = input.id.toString();
+		var asset = new GlideRecord('x_naci_e_tracking_etrack_assets');
+		asset.addQuery("sys_id", data.id);
+		asset.query();
+		asset.next();
+		var item = {};
+		data.asset.id = asset.sys_id.toString();
+		data.asset.barcode = asset.barcode.toString();
+		data.asset.owner = asset.owner.name.toString();
+		data.asset.quantity = asset.quantity.toString();
+		data.asset.stockroom = asset.stockroom.name.toString();
+		data.model.name = asset.model.name.toString();
+		data.model.manufacturer = asset.model.manufacture.name.toString();
+		data.model.description = asset.model.description.toString();
+		data.model.model_number = asset.model.model_number.toString();
+		data.model.unit_cost = asset.model.cost.toString();
+	}
+})();]]></script>
+        <servicenow>false</servicenow>
+        <sys_class_name>sp_widget</sys_class_name>
+        <sys_created_by>abdullahz2@nih.gov</sys_created_by>
+        <sys_created_on>2019-03-22 16:31:11</sys_created_on>
+        <sys_customer_update>false</sys_customer_update>
+        <sys_id>f0979f52db10370054d8ff621f9619c6</sys_id>
+        <sys_mod_count>11</sys_mod_count>
+        <sys_name>Etrack View Asset Details</sys_name>
+        <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
+        <sys_policy/>
+        <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
+        <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
+        <sys_update_name>sp_widget_f0979f52db10370054d8ff621f9619c6</sys_update_name>
+        <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
+        <sys_updated_on>2019-03-22 16:39:41</sys_updated_on>
+        <template><![CDATA[<div ng-controller="c" ng-cloak>
+  <md-card>
+    <md-toolbar>
+      <div class="md-toolbar-tools">
+        <h2 flex md-truncate>{{ c.data.model.name }}</h2>
+      </div>
+    </md-toolbar>
+    <md-card-content>
+      <h4>
+        Model Information
+      </h4>
+      <form name="userForm">
+        <div layout="column" class="disabledForm">
+
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>Name</label>
+            <input name="name" ng-model="c.data.model.name" disabled/>
+          </md-input-container>
+
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>Manufacture</label>
+            <input name="name" ng-model="c.data.model.manufacturer" disabled/>
+          </md-input-container>
+          <md-input-container class="md-block">
+            <label>Description</label>
+            <textarea ng-model="c.data.model.description" md-select-on-focus disabled></textarea>
+          </md-input-container>
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>Model Number</label>
+            <input name="model_number" ng-model="c.data.model.model_number" disabled/>
+          </md-input-container>
+
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>Unit Cost</label>
+            <input name="unit_cost" ng-model="c.data.model.unit_cost" disabled/>
+          </md-input-container>
+
+        </div>
+      </form>
+
+
+      <h4>
+        Asset Information
+      </h4>
+
+
+      <form name="userForm">
+        <div layout="column" class="disabledForm">
+
+
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>Owner</label>
+            <input ng-model="c.data.asset.owner" disabled>
+          </md-input-container>
+
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>Quantity</label>
+            <input disabled ng-model="c.data.asset.quantity"/>
+          </md-input-container>
+
+          <div ng-show="c.data.asset.barcode.length > 0">
+            <md-input-container class="md-block" flex-gt-sm>
+              <label>Barcode</label>
+              <input id="barcode" name="barcode" ng-model="c.data.asset.barcode" disabled/>
+            </md-input-container>
+          </div>
+
+          <div>
+            <md-input-container class="md-block" flex-gt-sm>
+              <label>Stockroom</label>
+              <input id="barcode" name="barcode" ng-model="c.data.asset.stockroom" disabled/>
+            </md-input-container>
+          </div>
+        </div>
+        <br>
+        <div class="d-flex justify-content-center">
+          <md-button class="md-raised md-primary">Temp</md-button>
+        </div>
+      </form>
+
+    </md-card-content>
+  </md-card>
+</div>]]></template>
+    </sp_widget>
+</record_update>

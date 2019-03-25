@@ -11,8 +11,9 @@
 	c.querySearch = querySearch;
 	c.selectedItemChange = selectedItemChange;
 	c.selectedItem = null;
-	
-	
+	c.curModel = null;
+
+
 
 	/*--------- Type header -----------*/
 
@@ -110,6 +111,7 @@
 
 	function selectedItemChange(item) {
 		updateFromValues(item.data);
+		c.curModel = item.data;
 	}	
 
 	/**
@@ -165,21 +167,34 @@
 			barcode: ""
 		}
 	}
-	
-	
+
+
 	/*--------- clear barcode if quantity is greater then 1 ----------- */
 	$scope.$watch('c.form.quantity', function(){
 		if(c.form.quantity > 1){
 			c.form.barcode = "";
 		}
 	});
-	
+
 	$scope.$watch('c.form.owner', function(){
 		if(c.form.ownerId == "" || c.form.ownerId == null){
 			c.form.owner = "";
 		}
 	});
-	
+
+	/**
+	* Check if model is being updated
+	*/
+
+	function modelUpdated(){
+		if( c.form.manufacture != c.curModel.manufactureID || 
+			 c.form.unit_cost != c.curModel.unitCost || 
+			 c.form.description != c.curModel.description || 
+			 c.form.model_number != c.curModel.modelNumber){
+			return true
+		}
+		return false;
+	}
 
 	/*--------- POST add asset-----------*/
 	$scope.addAsset = function(){
@@ -189,21 +204,43 @@
 		}
 		c.form.method = "check";
 		etrackAddAssets.proccessModel(c.form).then(function(res){
-
 			if (res.data.result == "0"){
-				insertModel("insert", "Assest(s) have been created successfully!");
-				$state.go("assets")
-			}else{
 				var confirm = $mdDialog.confirm()
-				.title('Are you sure you want to update it? ')
-				.htmlContent("<strong>" + c.form.name + " </strong>already exists, if you choose to update, the model number and manufacturer will be updated")
-				.ok('YES')
-				.cancel('NO');
-				$mdDialog.show(confirm).then(function() {
-					insertModel("update", c.form.name + ' has been updated successfully!');
-					$state.go("assets")
-				}, function() {
-				});
+					.title('Are you sure you want to add these Assets?')
+					.ok('YES')
+					.cancel('NO');
+					$mdDialog.show(confirm).then(function() {
+						insertModel("insert", c.form.name + ' has been updated successfully!');
+						$state.go("assets")
+					}, function() {
+					});
+				
+				//insertModel("insert", "Assest(s) have been created successfully!");
+				//$state.go("assets")
+			}else{
+				if(modelUpdated()){
+					var confirm = $mdDialog.confirm()
+					.title('Are you sure you want to update it? ')
+					.htmlContent("<strong>" + c.form.name + " </strong>already exists, if you choose to update, the model number and manufacturer will be updated")
+					.ok('YES')
+					.cancel('NO');
+					$mdDialog.show(confirm).then(function() {
+						insertModel("update", c.form.name + ' has been updated successfully!');
+						$state.go("assets")
+					}, function() {
+					});
+				}else{
+					var confirm = $mdDialog.confirm()
+					.title('Are you sure you want to add these Assets?')
+					.ok('YES')
+					.cancel('NO');
+					$mdDialog.show(confirm).then(function() {
+						insertModel("update", c.form.name + ' has been updated successfully!');
+						$state.go("assets")
+					}, function() {
+					});
+				}
+
 
 			}
 			$log.log(res);
@@ -256,6 +293,8 @@
 	data.models = [];
 	data.manufactures = [];
 	data.stockrooms = [];
+	data.admin = gs.getUser().isMemberOf("ETracking_Admin")
+
 	
 
 
@@ -272,6 +311,7 @@
 			modelNumber:  model.model_number.toString(),
 			unitCost: model.cost.toString()
 		});
+		
 	}
 
 
@@ -302,7 +342,7 @@
         <sys_created_on>2019-02-27 15:57:17</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>3b333443dbf3e700b86770c08c96199a</sys_id>
-        <sys_mod_count>348</sys_mod_count>
+        <sys_mod_count>362</sys_mod_count>
         <sys_name>Etrack Add Assets</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
@@ -310,8 +350,8 @@
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sp_widget_3b333443dbf3e700b86770c08c96199a</sys_update_name>
         <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-03-21 19:37:52</sys_updated_on>
-        <template><![CDATA[<div ng-controller="c" ng-cloak>
+        <sys_updated_on>2019-03-25 15:04:35</sys_updated_on>
+        <template><![CDATA[<div ng-controller="c" ng-cloak ng-show="c.data.admin">
   <md-card>
     <md-toolbar>
       <div class="md-toolbar-tools">
@@ -432,6 +472,12 @@
       </form>
     </md-card-content>
   </md-card>
+  
+  {{c.curModel}}
+  <br>
+ 	{{c.form}}
+  
+  
 </div>]]></template>
     </sp_widget>
 </record_update>

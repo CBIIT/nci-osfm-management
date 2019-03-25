@@ -2,26 +2,36 @@
 <record_update table="sp_widget">
     <sp_widget action="INSERT_OR_UPDATE">
         <category>custom</category>
-        <client_script><![CDATA[function($stateParams, $log, $scope, $http, $mdDialog, etrackTransferAsset) {
+        <client_script><![CDATA[function($stateParams, $log, $scope, $http, $mdDialog, etrackTransferAsset, $state) {
 	/* widget controller */
 	var c = this;
 
 	$scope.trasnferComplete = function(){
-		etrackTransferAsset.completeTrasnfer(c.data.transferAsset).then(function(res){
-			$mdDialog.show(
-				$mdDialog.alert()
-				.parent(angular.element(document.querySelector('#popupContainer')))
-				.clickOutsideToClose(true)
-				.title("Asset has been successfully transfered!")
-				.ok('OK')
-			);
-
-			$log.log(res);
-		}, function(err){
-			$log.log(err);
-			alert("ERROR");
+		var confirm = $mdDialog.confirm()
+		.title('Are you sure you complete the trasnfer?')
+		.ok('YES')
+		.cancel('NO');
+		$mdDialog.show(confirm).then(function() {
+			etrackTransferAsset.completeTrasnfer(c.data.transferAsset).then(function(res){
+				$mdDialog.show(
+					$mdDialog.alert()
+					.parent(angular.element(document.querySelector('#popupContainer')))
+					.clickOutsideToClose(true)
+					.title("Asset has been trasnfered successfully!")
+					.ok('OK')
+				);
+				$state.go("assets");
+				$log.log(res);
+			}, function(err){
+				$log.log(err);
+				alert("ERROR");
+			});
+		}, function() {
 		});
 	}
+	$scope.doTheBack = function() {
+		$state.go("assets");
+	};
 }]]></client_script>
         <controller_as>c</controller_as>
         <css/>
@@ -45,7 +55,8 @@
 	var mysys_name = gs.getUserDisplayName();
 	var mysys_id = gs.getUserID();
 	data.info = {checkOutUser: mysys_name};
-	
+	data.admin = gs.getUser().isMemberOf("ETracking_Admin")
+
 
 
 	if (input && input.id) {
@@ -59,7 +70,7 @@
 		data.transferAsset.quantity = transferAsset.quantity.toString();
 		data.transferAsset.user_id = mysys_id;
 	}
-	
+
 
 
 
@@ -70,7 +81,7 @@
         <sys_created_on>2019-03-01 15:49:41</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>00b44fe3dbff2b00b86770c08c9619de</sys_id>
-        <sys_mod_count>56</sys_mod_count>
+        <sys_mod_count>65</sys_mod_count>
         <sys_name>Etrack Asset In Transfer Complete</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
@@ -78,8 +89,8 @@
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sp_widget_00b44fe3dbff2b00b86770c08c9619de</sys_update_name>
         <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-03-20 20:05:00</sys_updated_on>
-        <template><![CDATA[<div ng-controller="c" ng-cloak>
+        <sys_updated_on>2019-03-25 15:23:37</sys_updated_on>
+        <template><![CDATA[<div ng-controller="c" ng-cloak ng-show="c.data.admin">
   <md-card>
     <md-toolbar>
       <div class="md-toolbar-tools">
@@ -114,7 +125,7 @@
         </div>
       </form>
       <div class="d-flex justify-content-center">
-        <md-button ng-click="trasnferComplete()" ui-sref="assets" class="md-raised md-primary">Trasnfer Complete</md-button>
+        <md-button ng-click="trasnferComplete()" class="md-raised md-primary">Trasnfer Complete</md-button>
       </div>
     </md-card-content>
   </md-card>
