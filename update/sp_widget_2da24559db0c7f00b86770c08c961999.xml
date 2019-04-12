@@ -72,13 +72,19 @@
 			$scope.$apply();
 		}
 	});
-	
-	
+
+
 	$scope.$watch('c.data.transferAsset.assignTo', function(){
 		if(c.data.transferAsset.assignToId == "" || c.data.transferAsset.assignToId == null){
 			c.data.transferAsset.assignTo = "";
 		}
 	});
+
+	function getStockroomName(){
+		var name = "";
+		c.data.stockrooms.map(function(item){ if(item.id == c.data.transferAsset.stockroomTo){name = item.name}});
+		return name;
+	}
 
 	$scope.transferAsset = function(){
 		if(c.data.transferAsset.assignToId == "" || c.data.transferAsset.assignToId == null){
@@ -100,28 +106,31 @@
 			$log.log(err);
 			alert("ERROR");
 		});*/
-		
+
 		var confirm = $mdDialog.confirm()
-		.title('Are you sure you want to trasnfer these Assets?')
+		.htmlContent('<h4>Are you sure you want to trasnfer <b>'+c.data.transferAsset.quantity+'</b> assets of <b>'+c.data.asset.name+'</b> to <b>'+ getStockroomName() +'</b>?</h4>')
 		.ok('YES')
 		.cancel('NO');
 		$mdDialog.show(confirm).then(function() {
 			etrackTransferAsset.transfer(c.data.transferAsset).then(function(res){
-				$mdDialog.show(
+				/**$mdDialog.show(
 					$mdDialog.alert()
 					.parent(angular.element(document.querySelector('#popupContainer')))
 					.clickOutsideToClose(true)
-					.title("Asset trasnfer details have been updated successfully!")
+					.htmlContent('<h4><b>'+c.data.asset.name+'</b> is in trasnfer!</h4>')
 					.ok('OK')
-				);
+				);*/
 				$state.go("assets");
-				$log.log(res);
 			}, function(err){
 				$log.log(err);
 				alert("ERROR");
 			});
 		}, function() {
 		});
+	};
+
+	$scope.doTheBack = function() {
+		window.history.back();
 	};
 }
 ]]></client_script>
@@ -149,7 +158,7 @@
 	data.info = {checkOutUser: mysys_name};
 	data.transferAsset = {};
 	data.admin = gs.getUser().isMemberOf("ETracking_Admin");
-	
+
 	if (input && input.id) {
 		var id = input.id.toString();
 		var asset = new GlideRecord('x_naci_e_tracking_etrack_assets');
@@ -157,13 +166,15 @@
 		asset.query();
 		asset.next();
 		data.asset.owner = asset.owner.name.toString();
+		data.asset.name = asset.model.name.toString();
+
 		data.asset.stockroom = asset.stockroom.name.toString();
 		data.asset.inStock = asset.quantity.toString();
 		data.transferAsset.stockroomId = asset.stockroom.sys_id.toString();
 		data.transferAsset.assetId = id;
 	}
-	
-	
+
+
 	var stockroom = new GlideRecord('x_naci_e_tracking_stock_room');
 	stockroom.orderBy("name");
 	stockroom.query();
@@ -186,7 +197,7 @@
         <sys_created_on>2019-03-06 16:50:55</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>2da24559db0c7f00b86770c08c961999</sys_id>
-        <sys_mod_count>184</sys_mod_count>
+        <sys_mod_count>197</sys_mod_count>
         <sys_name>Etrack Transfer Asset</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
@@ -194,7 +205,7 @@
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sp_widget_2da24559db0c7f00b86770c08c961999</sys_update_name>
         <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-03-25 15:28:55</sys_updated_on>
+        <sys_updated_on>2019-04-12 19:29:11</sys_updated_on>
         <template><![CDATA[<div ng-controller="c" ng-cloak ng-show="c.data.admin">
   <md-card>
     <md-toolbar>
@@ -215,6 +226,11 @@
             <label>Owner</label>
             <input ng-model="c.data.asset.owner" ng-disabled="true" />
           </md-input-container>
+          
+           <md-input-container class="md-block" flex-gt-sm>
+            <label>Name</label>
+            <input ng-model="c.data.asset.name" ng-disabled="true" />
+          </md-input-container>
 
 
           <md-input-container class="md-block" flex-gt-sm>
@@ -227,8 +243,8 @@
           </md-input-container>
         </div>
       </form>
-      
-      
+
+
       <form name="userForm">
         <div layout="column">
 
@@ -266,10 +282,10 @@
                 {{stockroom.name}}
               </md-option>
             </md-select >
-            
+
             <div ng-messages="userForm.stockroomTo.$error">
               <div ng-message="required">
-               	Must select a stockroom destination
+                Must select a stockroom destination
               </div>
             </div>                     	
           </md-input-container>
@@ -287,8 +303,10 @@
                      ng-disabled="userForm.$invalid" 
                      ng-click="userForm.$valid && transferAsset()" 
                      class="md-raised md-primary">Submit</md-button>
+          <md-button ng-click="doTheBack()" class="md-raised">Cancel</md-button>
+
         </div>
-        
+
       </form>
 
 

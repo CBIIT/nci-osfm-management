@@ -12,94 +12,146 @@
 	var data = request.body.data;
 	var method = data.method.toString();
 	var id = '';
+
 	if(method == 'insert'){
-		var model1 = new GlideRecord('x_naci_e_tracking_model');
-		    model1.initialize();
-		    model1.cost = data.unit_cost.toString();
-		    model1.description = data.description.toString();
-		    model1.manufacture = data.manufacture.toString();
+		var checkModel = new GlideRecord('x_naci_e_tracking_model');
+		checkModel.addQuery('name', data.name.toString());
+		checkModel.query();
+		var count = checkModel.getRowCount();
+		if(count == 0){
+			var model1 = new GlideRecord('x_naci_e_tracking_model');
+			model1.initialize();
+			model1.cost = data.unit_cost.toString();
+			model1.description = data.description.toString();
+			model1.manufacture = data.manufacture.toString();
 			model1.model_number = data.model_number.toString();
-		    model1.name = data.name.toString();
+			model1.name = data.name.toString();
 			id = model1.insert();
-		    id = checkAssets(id);
+		}else{
+			checkModel.next();
+			id = checkModel.sys_id.toString();
+		}
+		id = checkAssets(id);
 	}else if(method == 'update'){
 		//model exist and update model
 		var model2 = new GlideRecord('x_naci_e_tracking_model');
-		    model2.addQuery('model_number', data.model_number.toString());
-		    model2.query();
-		    model2.next();
-			model2.cost = data.unit_cost.toString();
-		    model2.description = data.description.toString();
-		    model2.manufacture = data.manufacture.toString();
-		    model2.model_number = data.model_number.toString();
-		    id = model2.update();
-		    id = checkAssets(id);
+		model2.addQuery('model_number', data.model_number.toString());
+		model2.query();
+		model2.next();
+		model2.cost = data.unit_cost.toString();
+		model2.description = data.description.toString();
+		model2.manufacture = data.manufacture.toString();
+		model2.model_number = data.model_number.toString();
+		id = model2.update();
+		id = checkAssets(id);
 	}else if(method == 'check'){
 		//check model exist
 		var model = new GlideRecord('x_naci_e_tracking_model');
-		    model.addQuery('name', data.name.toString());
-		    model.query();
+		model.addQuery('name', data.name.toString());
+		model.query();
 		var count = model.getRowCount();
 		if(count == 0){
 			id = '0';
 		}else{
 			id = '1';
 		}
+	}else if(method == 'checkAsset'){
+		//check if asset exist in stockroom
+		var asset = new GlideRecord('x_naci_e_tracking_etrack_assets');
+		asset.addQuery('model.name', data.name.toString());
+		asset.addQuery('stockroom.sys_id', data.stockroom.toString());
+		asset.addQuery('asset_type', data.asset_type.toString());
+		if(data.stockroom.trim().length > 0){
+			asset.addQuery('barcode', data.barcode.toString());
+		}
+		asset.query();
+		var count = asset.getRowCount();
+		if(count == 0){
+			id = '0';
+		}else{
+			asset.next();
+			id = asset.sys_id.toString();
+		}
+	}else if(method == "checkBarcode"){
+		var barcode = data.barcode.toString();  
+
+		if(barcode.trim().length == 0){
+			id = "0";
+		}else{
+			var asset = new GlideRecord('x_naci_e_tracking_etrack_assets');
+			asset.addQuery('barcode', barcode);
+			asset.query();
+			var count1 = asset.getRowCount();
+			if(count1 == 0){
+				id = '0';
+			}else{
+				id = '1';
+			}
+		}
+	}else if(method == "addManufacturer"){
+		var manufacture = new GlideRecord('x_naci_e_tracking_manufacture');
+		manufacture.initialize();
+		manufacture.name = data.manufactureToAdd.toString();
+		manufacture.description = "";
+		id = manufacture.insert();
 	}
-    
 	return id;
-	
+
+
 	function checkAssets(model_id){
 		var asset_id = '';
 		//determine assets exist or not. If yes, update total. or insert a new record in assets table.
 		var asset = new GlideRecord('x_naci_e_tracking_etrack_assets');
-		    asset.addQuery('model.sys_id', model_id);
-		    asset.addQuery('stockroom.sys_id', data.stockroom);
+		asset.addQuery('model.sys_id', model_id);
+		asset.addQuery('stockroom.sys_id', data.stockroom);
+		asset.addQuery('asset_type', data.asset_type);
 		asset.query();
 		var count1 = asset.getRowCount();
-		if(count1 == 0){
+		if(count1 == 0 || (data.quantity == "1" && data.barcode.length > 0) ){
 			//add new asset
 			asset_id = addAssets(model_id);
 		}else{
 			//assets exist, add amount to total of assets 
 			asset_id = updateAssets(model_id);
 		}
-		
+
 		return asset_id;
 	}
-	
+
 	function addAssets(model_id){
 		var asset1 = new GlideRecord('x_naci_e_tracking_etrack_assets'); 
-			asset1.initialize();
-			asset1.barcode = data.barcode.toString();
-			asset1.model = model_id;
-		    asset1.owner = data.ownerId;
-		    asset1.quantity = data.quantity;
-			asset1.stockroom = data.stockroom;
-			var asset_id = asset1.insert();
+		asset1.initialize();
+		asset1.barcode = data.barcode.toString();
+		asset1.model = model_id;
+		asset1.owner = data.ownerId;
+		asset1.quantity = data.quantity;
+		asset1.stockroom = data.stockroom;
+		asset1.asset_type = data.asset_type;
+		var asset_id = asset1.insert();
 		return asset_id;
 	}
-	
+
 	function updateAssets(model_id){
 		var asset2 = new GlideRecord('x_naci_e_tracking_etrack_assets');
-			asset2.addQuery('model.sys_id', model_id);
-		    asset2.addQuery('stockroom.sys_id', data.stockroom);
-			asset2.query();
-			asset2.next();
-		    var quantity = asset2.quantity.toString();
-			if(data.quatity === null || data.quantity.toString().trim().length == 0){
-				data.quantity = "0";
-			}
-		    var quantityNum = parseInt(quantity) + parseInt(data.quantity.toString());
-			asset2.quantity = quantityNum;
-			asset2.barcode = data.barcode.toString();
-			asset2.model = model_id;
-		    asset2.owner = data.ownerId;
-			asset2.stockroom = data.stockroom;
-		    var asset_id = asset2.update();
-		 return asset_id;
+		asset2.addQuery('model.sys_id', model_id);
+		asset2.addQuery('stockroom.sys_id', data.stockroom);
+		asset2.query();
+		asset2.next();
+		var quantity = asset2.quantity.toString();
+		if(data.quantity === null || data.quantity.toString().trim().length == 0){
+			data.quantity = "0";
+		}
+		var quantityNum = parseInt(quantity) + parseInt(data.quantity.toString());
+		asset2.quantity = quantityNum;
+		asset2.barcode = data.barcode.toString();
+		asset2.model = model_id;
+		asset2.owner = data.ownerId;
+		asset2.stockroom = data.stockroom;
+		asset2.asset_type = data.asset_type;
+		var asset_id = asset2.update();
+		return asset_id;
 	}
-	
+
 })(request, response);
 
 ]]></operation_script>
@@ -116,7 +168,7 @@
         <sys_created_on>2019-03-12 17:33:23</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>e7150c97db40734054d8ff621f96198f</sys_id>
-        <sys_mod_count>37</sys_mod_count>
+        <sys_mod_count>87</sys_mod_count>
         <sys_name>addAsset</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
@@ -124,7 +176,7 @@
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sys_ws_operation_e7150c97db40734054d8ff621f96198f</sys_update_name>
         <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-03-21 15:11:35</sys_updated_on>
+        <sys_updated_on>2019-04-09 14:58:38</sys_updated_on>
         <web_service_definition display_value="ETrack REST API">ac0dd2b6db00334054d8ff621f96192b</web_service_definition>
         <web_service_version/>
     </sys_ws_operation>

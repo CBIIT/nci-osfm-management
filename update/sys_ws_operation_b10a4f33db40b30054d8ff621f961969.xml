@@ -11,22 +11,56 @@
         <operation_script><![CDATA[(function process(/*RESTAPIRequest*/ request, /*RESTAPIResponse*/ response) {
 	var data = request.body.data;
 	var quantity = '';
-	var asset_id = '';
-	
+	var asset_model_id = '';
+	var asset_type = '';
+	var stockroom_to_id = '';
+	var id = '';
+
 	var transfer = new GlideRecord('x_naci_e_tracking_assdets_transfer');
-	    transfer.get(data.id.toString());
-	    quantity = transfer.quantity.toString();
-	    asset_id = transfer.asset.sys_id.toString();
-		transfer.receive_by = data.user_id.toString();
-		transfer.transfer_complete_time = new GlideDateTime();
-		transfer.update();
-	
+	transfer.get(data.id.toString());
+	quantity = transfer.quantity.toString();
+	asset_model_id = transfer.asset.model.sys_id.toString();
+	asset_type = transfer.asset.asset_type.toString();
+	stockroom_to_id = transfer.to.sys_id.toString();
+	transfer.receive_by = data.user_id.toString();
+	transfer.transfer_complete_time = new GlideDateTime();
+	transfer.update();
+
 	var asset = new GlideRecord('x_naci_e_tracking_etrack_assets');
-	    asset.get(asset_id);
-	    asset.quantity = parseInt(asset.quantity.toString()) + parseInt(quantity);
-	    var id = asset.update();
-    
+	asset.addQuery('model.sys_id', asset_model_id);
+	asset.addQuery('stockroom.sys_id', stockroom_to_id);
+	asset.addQuery('asset_type', asset_type);
+	asset.query();
+	asset.next();
+	var count = asset.getRowCount();
+	if(count == 0){
+		//add new asset
+		id = addAssets();
+	}
+	else{
+		//assets exist, add amount to total of assets
+		var test1 = parseInt(asset.quantity.toString());		
+		var test2 = parseInt(quantity);
+		asset.quantity = test1  + test2;
+		id = asset.update();
+	}
+
+	function addAssets(){
+		var asset1 = new GlideRecord('x_naci_e_tracking_etrack_assets'); 
+		asset1.initialize();
+		asset1.barcode = transfer.asset.barcode.toString();
+		asset1.model = asset_model_id;
+		asset1.owner = transfer.asset.owner.sys_id.toString();
+		asset1.quantity = quantity;
+		asset1.stockroom = stockroom_to_id;
+		asset1.asset_type = asset_type;
+		var asset_id = asset1.insert();
+		return asset_id;
+	}
+	
 	return id;
+
+
 })(request, response);]]></operation_script>
         <operation_uri>/api/x_naci_e_tracking/etrack_rest_api/completeTransfer</operation_uri>
         <produces>application/json,application/xml,text/xml</produces>
@@ -41,15 +75,15 @@
         <sys_created_on>2019-03-14 21:16:03</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>b10a4f33db40b30054d8ff621f961969</sys_id>
-        <sys_mod_count>1</sys_mod_count>
+        <sys_mod_count>20</sys_mod_count>
         <sys_name>completeTransfer</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
         <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sys_ws_operation_b10a4f33db40b30054d8ff621f961969</sys_update_name>
-        <sys_updated_by>zhoujim@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-03-14 21:32:26</sys_updated_on>
+        <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
+        <sys_updated_on>2019-04-09 16:10:29</sys_updated_on>
         <web_service_definition display_value="ETrack REST API">ac0dd2b6db00334054d8ff621f96192b</web_service_definition>
         <web_service_version/>
     </sys_ws_operation>

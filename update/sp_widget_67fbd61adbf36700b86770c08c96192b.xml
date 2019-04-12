@@ -2,8 +2,9 @@
 <record_update table="sp_widget">
     <sp_widget action="INSERT_OR_UPDATE">
         <category>custom</category>
-        <client_script><![CDATA[function($scope, $timeout, $location, spUtil) {
+        <client_script><![CDATA[function($scope, $timeout, $location, spUtil, ETrackingUtil) {
   var c = this;
+	c.data.pageLinks = ETrackingUtil.getLinks(c.data.isLoggedIn, c.data.isAdmin);
 	$timeout(function() {
 			angular.element('#main-navigation')
 				.addClass('navbar-sticky')
@@ -45,41 +46,10 @@
         <script><![CDATA[(function() {
 	var user = gs.getUser();
 	
-	
+	data.pageLinks = [];
 	data.isLoggedIn = gs.getSession().isLoggedIn();
 	data.userName = user.getDisplayName();
-	
-	if (!data.isLoggedIn) {
-		
-	} else {
-		
-		data.pageLinks = [
-				{
-					title: 'Home',
-					id: 'home'
-				},
-				{
-					title: 'Assets',
-					id: 'assets'
-				},
-				{
-					title: 'Stockroom',
-					id: 'stockrooms'
-				}
-			];
-		
-		// admin user
-		if (true) {
-			data.pageLinks.push({
-				title: 'Report',
-				id: 'report'
-			})
-		}
-		
-	}
-	
-	
-	
+	data.isAdmin = gs.getUser().isMemberOf("ETracking_Admin");
 	
 	
 })();]]></script>
@@ -89,7 +59,7 @@
         <sys_created_on>2019-02-25 15:39:29</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>67fbd61adbf36700b86770c08c96192b</sys_id>
-        <sys_mod_count>128</sys_mod_count>
+        <sys_mod_count>132</sys_mod_count>
         <sys_name>Etrack Navigation</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
@@ -97,7 +67,7 @@
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sp_widget_67fbd61adbf36700b86770c08c96192b</sys_update_name>
         <sys_updated_by>zhoujim@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-03-22 19:54:52</sys_updated_on>
+        <sys_updated_on>2019-04-02 18:13:53</sys_updated_on>
         <template><![CDATA[<!-- Etrack Ribbon -->
 <div class="bg-primary flex-grow hidden-xs ribbon">
   <h1 class="container py-2 my-0 h4" >

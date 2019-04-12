@@ -2,9 +2,14 @@
 <record_update table="sp_widget">
     <sp_widget action="INSERT_OR_UPDATE">
         <category>custom</category>
-        <client_script><![CDATA[function() {
+        <client_script><![CDATA[function($scope) {
 	/* widget controller */
 	var c = this;
+
+	$scope.doTheBack = function() {
+		window.history.back();
+	};
+
 }]]></client_script>
         <controller_as>c</controller_as>
         <css/>
@@ -28,19 +33,21 @@
 	var mysys_name = gs.getUserDisplayName();
 	var mysys_id = gs.getUserID();
 	data.info = {checkOutUser: mysys_name};
-	
+
 	if (input && input.id) {
 		data.id = input.id.toString();
 		var transferAsset = new GlideRecord('x_naci_e_tracking_assdets_transfer');
 		transferAsset.get(data.id)
 		data.transferAsset.id = transferAsset.sys_id.toString();
 		data.transferAsset.owner = transferAsset.asset.owner.name.toString();
+		data.transferAsset.name = transferAsset.asset.model.name.toString();
+		data.transferAsset.type = transferAsset.asset.asset_type.toString();
 		data.transferAsset.from = transferAsset.from.name.toString();
 		data.transferAsset.to = transferAsset.to.name.toString();
 		data.transferAsset.quantity = transferAsset.quantity.toString();
 		data.transferAsset.user_id = mysys_id;
 	}
-	
+
 
 
 
@@ -51,7 +58,7 @@
         <sys_created_on>2019-03-06 16:50:19</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>bc82c9d9db0c7f00b86770c08c961918</sys_id>
-        <sys_mod_count>5</sys_mod_count>
+        <sys_mod_count>11</sys_mod_count>
         <sys_name>Etrack Asset In Transfer Details</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
@@ -59,7 +66,7 @@
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sp_widget_bc82c9d9db0c7f00b86770c08c961918</sys_update_name>
         <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-03-22 16:18:51</sys_updated_on>
+        <sys_updated_on>2019-04-09 22:10:36</sys_updated_on>
         <template><![CDATA[<div ng-controller="c" ng-cloak>
   <md-card>
     <md-toolbar>
@@ -74,28 +81,40 @@
         <div layout="column">
           <md-input-container class="md-block" flex-gt-sm>
             <label>Owner</label>
-            <input id="ownerName" name="assignTo" ng-model="c.data.transferAsset.owner" disabled/>
+            <input ng-model="c.data.transferAsset.owner" disabled/>
+          </md-input-container>
+
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>Name</label>
+            <input ng-model="c.data.transferAsset.name" disabled/>
           </md-input-container>
 
 
           <md-input-container class="md-block" flex-gt-sm>
             <label>Stockroom From</label>
-            <input id="stockroomFrom" name="stockroomFrom" ng-model="c.data.transferAsset.from" disabled/>
+            <input ng-model="c.data.transferAsset.from" disabled/>
           </md-input-container>
 
           <md-input-container class="md-block" flex-gt-sm>
             <label>Stockroom To</label>
-            <input id="stockroomTo" name="stockroomTo" ng-model="c.data.transferAsset.to" disabled/>
+            <input ng-model="c.data.transferAsset.to" disabled/>
+          </md-input-container>
+
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>Type</label>
+            <input ng-model="c.data.transferAsset.type" disabled/>
           </md-input-container>
 
           <md-input-container class="md-block" flex-gt-sm>
             <label>Quantity</label>
-            <input id="quantityCheckedOut" name="quantityCheckedOut" ng-model="c.data.transferAsset.quantity" disabled/>
+            <input ng-model="c.data.transferAsset.quantity" disabled/>
           </md-input-container>
         </div>
       </form>
-     <div class="d-flex justify-content-center">
-        <md-button ui-sref="assets" class="md-raised md-primary">Assets</md-button>
+      <div class="d-flex justify-content-center">
+        <!--md-button ui-sref="assets" class="md-raised md-primary">Assets</md-button-->
+        <md-button ng-click="doTheBack()" class="md-raised">Back</md-button>
+
       </div>
     </md-card-content>
   </md-card>

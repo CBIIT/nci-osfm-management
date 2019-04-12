@@ -8,22 +8,20 @@
 
 	$scope.trasnferComplete = function(){
 		var confirm = $mdDialog.confirm()
-		.title('Are you sure you complete the trasnfer?')
+		.title('Are you sure you want to complete this transfer?')
 		.ok('YES')
 		.cancel('NO');
 		$mdDialog.show(confirm).then(function() {
 			etrackTransferAsset.completeTrasnfer(c.data.transferAsset).then(function(res){
-				$mdDialog.show(
+				/**$mdDialog.show(
 					$mdDialog.alert()
 					.parent(angular.element(document.querySelector('#popupContainer')))
 					.clickOutsideToClose(true)
-					.title("Asset has been trasnfered successfully!")
+					.htmlContent("<h4><b>"+c.data.transferAsset.assetName +"</b> has been transferred to <b>"+c.data.transferAsset.to +"</b> successfully!</h4>")
 					.ok('OK')
-				);
+				);*/
 				$state.go("assets");
-				$log.log(res);
 			}, function(err){
-				$log.log(err);
 				alert("ERROR");
 			});
 		}, function() {
@@ -56,8 +54,7 @@
 	var mysys_id = gs.getUserID();
 	data.info = {checkOutUser: mysys_name};
 	data.admin = gs.getUser().isMemberOf("ETracking_Admin")
-
-
+	data.test = null;
 
 	if (input && input.id) {
 		data.id = input.id.toString();
@@ -68,11 +65,11 @@
 		data.transferAsset.from = transferAsset.from.name.toString();
 		data.transferAsset.to = transferAsset.to.name.toString();
 		data.transferAsset.quantity = transferAsset.quantity.toString();
+		data.transferAsset.assetName = transferAsset.asset.model.name.toString();
+		data.transferAsset.type = transferAsset.asset.asset_type.toString();
 		data.transferAsset.user_id = mysys_id;
+		data.test = transferAsset.to.sys_id.toString();
 	}
-
-
-
 
 })();]]></script>
         <servicenow>false</servicenow>
@@ -81,7 +78,7 @@
         <sys_created_on>2019-03-01 15:49:41</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>00b44fe3dbff2b00b86770c08c9619de</sys_id>
-        <sys_mod_count>65</sys_mod_count>
+        <sys_mod_count>91</sys_mod_count>
         <sys_name>Etrack Asset In Transfer Complete</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
@@ -89,7 +86,7 @@
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sp_widget_00b44fe3dbff2b00b86770c08c9619de</sys_update_name>
         <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-03-25 15:23:37</sys_updated_on>
+        <sys_updated_on>2019-04-12 19:25:11</sys_updated_on>
         <template><![CDATA[<div ng-controller="c" ng-cloak ng-show="c.data.admin">
   <md-card>
     <md-toolbar>
@@ -103,29 +100,42 @@
       <form name="form" class="disabledForm">
         <div layout="column">
           <md-input-container class="md-block" flex-gt-sm>
+            <label>Asset</label>
+            <input ng-model="c.data.transferAsset.assetName" disabled/>
+          </md-input-container>
+
+
+          <md-input-container class="md-block" flex-gt-sm>
             <label>Owner</label>
-            <input id="ownerName" name="assignTo" ng-model="c.data.transferAsset.owner" disabled/>
+            <input ng-model="c.data.transferAsset.owner" disabled/>
           </md-input-container>
 
 
           <md-input-container class="md-block" flex-gt-sm>
             <label>Stockroom From</label>
-            <input id="stockroomFrom" name="stockroomFrom" ng-model="c.data.transferAsset.from" disabled/>
+            <input ng-model="c.data.transferAsset.from" disabled/>
           </md-input-container>
 
           <md-input-container class="md-block" flex-gt-sm>
             <label>Stockroom To</label>
-            <input id="stockroomTo" name="stockroomTo" ng-model="c.data.transferAsset.to" disabled/>
+            <input ng-model="c.data.transferAsset.to" disabled/>
+          </md-input-container>
+
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>Type</label>
+            <input ng-model="c.data.transferAsset.type" disabled/>
           </md-input-container>
 
           <md-input-container class="md-block" flex-gt-sm>
             <label>Quantity</label>
-            <input id="quantityCheckedOut" name="quantityCheckedOut" ng-model="c.data.transferAsset.quantity" disabled/>
+            <input ng-model="c.data.transferAsset.quantity" disabled/>
           </md-input-container>
         </div>
       </form>
       <div class="d-flex justify-content-center">
         <md-button ng-click="trasnferComplete()" class="md-raised md-primary">Trasnfer Complete</md-button>
+        <md-button ng-click="doTheBack()" class="md-raised">Back</md-button>
+
       </div>
     </md-card-content>
   </md-card>

@@ -2,26 +2,188 @@
 <record_update table="sp_widget">
     <sp_widget action="INSERT_OR_UPDATE">
         <category>custom</category>
-        <client_script><![CDATA[function($scope, spUtil, $log) {
-  /* widget controller */
-  var c = this;
-	
-	
-	c.reportType = "Assets transfer/ed";
-	c.startDate = ""
-	c.endDate = ""
-	
-	c.reportTypeOptions = ["Assets transfer/ed", "Assets checked in/out"]
-		 
+        <client_script><![CDATA[function($scope, spUtil, $log, $location, $window, $http) {
+	var c = this;
+
+	c.reportTypeOptions = ["Transfer", "Checkout"]
+	c.reportType = "Transfer";
+	c.data.transferData = loadData(c.data.transfer);
+	c.data.checkOutData = loadData(c.data.checkOut);
+	c.tableData = null;
+	c.startDate = "";
+	c.endDate = "";
+	c.data.temp = null;
+
+	function getStartDate(){
+		return (c.startDate != "") ?  moment(c.startDate): false;
+	}
+
+	function getEndDate(){
+		return (c.endDate != "") ?  moment(c.endDate): false;
+	}
+
+	function loadData(table){
+		return table.map(function(item) { 
+			item.start = moment(item.start);
+			item.end = moment(item.end);
+			return item;
+		});
+	}
+
+	$scope.clearFilter = function(){
+		c.startDate = "";
+		c.endDate = "";
+	}
+
+	$scope.filterData = function(table){
+		c.tableData = table.filter(function(item){
+			checkDate = true;
+			if( getStartDate() && getEndDate()){
+				checkDate = (item.start.unix() >= moment(c.startDate).unix()) && (item.end.unix() <= moment(c.endDate).unix());
+			}else if( getStartDate() && !getEndDate() ){
+				checkDate = item.start.unix() >= moment(c.startDate).unix();
+			}else if( !getStartDate() && getEndDate()){
+				checkDate = item.end.unix() <= moment(c.endDate).unix();
+			}
+			if(checkDate){
+				return item
+			}
+		});
+		return c.tableData;
+	}
+
+	/**
+	* Generate Report
+	*/
+
+	$scope.downloadReport = function(){	
+		var clean = function(elem){
+			var cur = elem === null ? '' : elem;
+			if (cur instanceof moment){	
+				cur = cur.format('YYYY/MM/DD; h:mm:ss a').replace("Invalid date", "");
+			}
+			cur.replace(/"/g, '""');
+			if (cur.search(/("|,|\n)/g) >= 0){
+				cur = '"' + cur + '"';
+			}
+			return cur;
+		}
+		/* generate a worksheet */
+		var ws = XLSX.utils.json_to_sheet(c.tableData.map(function(item){
+			if(c.reportType == "Transfer"){
+				return {
+					"Asset name": clean(item.assetName),
+					"Assigned to": clean(item.assignTo) ,
+					"From stockroom": clean(item.from), 
+					"To stockroom": clean(item.to), 
+					"Quantity": clean(item.quantity), 
+					"Received by": clean(item.receivedBy), 
+					"Trasnfer start time": clean(item.start), 
+					"Trasnfer end time": clean(item.end),
+					"Comments": clean(item.comments)				
+				}
+			}else{
+				return {
+					"Asset name": clean(item.assetName),
+					"Checked out by": clean(item.checkOutBy),
+					"Checked in by":clean(item.checkInBy),
+					"Quantity":clean(item.quantity),
+					"Checked out time":clean(item.start),
+					"Checked in time":clean(item.end),
+					"Comments":clean(item.comments)
+				}
+			}
+		}));
+
+		/* add to workbook */
+		var wb = XLSX.utils.book_new();
+		XLSX.utils.book_append_sheet(wb, ws, "sheet1");
+		XLSX.writeFile(wb, "etrack_"+c.reportType.toLowerCase()+"_report_"+moment().format()+".xlsx");
+	}
+
 	$scope.sort = function(keyname){
-	   $scope.sortKey = keyname;
-	   $scope.reverse = !$scope.reverse;
+		$scope.sortKey = keyname;
+		$scope.reverse = !$scope.reverse;
 	};
-	
-	spUtil.recordWatch($scope, "", "", function(name, data) {  
-			spUtil.update($scope);
+
+	spUtil.recordWatch($scope, "x_naci_e_tracking_assdets_transfer", "", function(name, data) {  
+		spUtil.update($scope);
 	});
-	
+
+	spUtil.recordWatch($scope, "x_naci_e_tracking_assets_check_out", "", function(name, data) {  
+		spUtil.update($scope);
+	});	
+
+	/**  CSV download
+		var trasnferHeader = [
+			"Asset name", "Assigned to", "From stockroom", 
+			"To stockroom", "Quantity", "Received by", 
+			"Trasnfer start time", "Trasnfer end time", "Comments"
+		];
+		var checkoutHeader = [
+			"Asset name", "Checked out by", "Checked in by", 
+			"Quantity", "Checked out time", "Checked in time", 
+			"Comments"
+		];
+
+		var proccessTransferRow = function(row) {
+			var cur = '';
+			cur += clean(row.assetName);
+			cur += clean(row.assignTo);
+			cur += clean(row.from);
+			cur += clean(row.to);
+			cur += clean(row.quantity);
+			cur += clean(row.receivedBy);
+			cur += clean(row.start);
+			cur += clean(row.end);
+			cur += clean(row.comments).slice(0, -1);
+			cur += "\n";
+			return cur
+		}
+
+		var proccessCheckoutRow = function(row) {
+			var cur = '';
+			cur += clean(row.assetName);
+			cur += clean(row.checkOutBy);
+			cur += clean(row.checkInBy);
+			cur += clean(row.quantity);
+			cur += clean(row.start);
+			cur += clean(row.end);
+			cur += clean(row.comments).slice(0, -1);
+			cur += "\n";
+			return cur
+		}
+
+		var csvData = "";
+		if(c.reportType == "Transfer"){
+			csvData = trasnferHeader.join(",") + '\n';
+			for (var i = 0; i < c.tableData.length; i++) {
+				csvData += proccessTransferRow(c.tableData[i]);
+			}
+		} else {
+			 csvData = checkoutHeader.join(",") + '\n';
+			for (var i = 0; i < c.tableData.length; i++) {
+				csvData += proccessCheckoutRow(c.tableData[i]);
+			}
+		}
+
+		var blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+		if (navigator.msSaveBlob) { // IE 10+
+			navigator.msSaveBlob(blob, c.reportName);
+		} else {
+			var link = document.createElement("a");
+			if (link.download !== undefined) { // feature detection
+				// Browsers that support HTML5 download attribute
+				var url = URL.createObjectURL(blob);
+				link.setAttribute("href", url);
+				link.setAttribute("download", c.reportName);
+				link.style.visibility = 'hidden';
+				document.body.appendChild(link);
+				link.click();
+				document.body.removeChild(link);
+			}
+		}
+		*/
 
 }]]></client_script>
         <controller_as>c</controller_as>
@@ -46,7 +208,7 @@
 	
 	
 	var transfer = new GlideRecord('x_naci_e_tracking_assdets_transfer');
- 	transfer.orderByDesc('transfer_start_time');
+ 	transfer.orderByDesc('tmoransfer_start_time');
 	transfer.query();
 	while(transfer.next()){
 		var item = {};
@@ -86,7 +248,7 @@
         <sys_created_on>2019-03-11 16:03:02</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>cda7623edb04b340b86770c08c96191a</sys_id>
-        <sys_mod_count>122</sys_mod_count>
+        <sys_mod_count>534</sys_mod_count>
         <sys_name>Etrack Report</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
@@ -94,9 +256,8 @@
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sp_widget_cda7623edb04b340b86770c08c96191a</sys_update_name>
         <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-03-22 15:35:35</sys_updated_on>
+        <sys_updated_on>2019-04-10 18:23:19</sys_updated_on>
         <template><![CDATA[<div ng-controller="c" ng-cloak>
-
   <md-card>
     <md-toolbar>
       <div class="md-toolbar-tools">
@@ -105,9 +266,8 @@
     </md-toolbar>
     <md-card-content>
 
-      <!-- Filter search -->
+      <!-- Filter report  -->
       <div layout-gt-sm="row">
-
         <md-input-container class="md-block" flex-gt-sm>
           <label>Report Type</label>
           <md-select ng-model="c.reportType">
@@ -117,150 +277,151 @@
           </md-select>
         </md-input-container>
 
+        <div flex="5" hide-xs hide-sm></div>
         <md-input-container class="md-block" style="max-width: 200px;" flex-gt-sm>
-          <md-datepicker ng-model="c.startDate" md-placeholder="Enter start date"></md-datepicker>
+          <label>Start date</label>
+          <md-datepicker ng-model="c.startDate" md-max-date="c.endDate" md-placeholder="mm/dd/yyyy"></md-datepicker>
         </md-input-container>
 
+        <div flex="5" hide-xs hide-sm></div>
         <md-input-container class="md-block" flex-gt-sm>
-          <md-datepicker ng-model="c.endDate" md-placeholder="Enter end date"></md-datepicker>
+          <label>End date</label>
+          <md-datepicker ng-model="c.endDate" md-min-date="c.startDate"  md-placeholder="mm/dd/yyyy"></md-datepicker>
         </md-input-container>
 
+
+        <div flex="5" hide-xs hide-sm></div>
+        <div layout="row" layout-align="end center">
+          <md-button ng-click='clearFilter()' class="md-raised md-primary">Clear filter</md-button>
+        </div>
       </div>
 
-      <!-- Checked in/out table -->
-
-
-      <div ng-if="c.reportType == 'Assets checked in/out'">
-        <div class="panel margin-bottom-small">
-          <div class="panel-heading blue-panel" role="tab" id="heading_savedItems">
-            <h1 class="h4 panel-title">
-              <a role="button" data-toggle="collapse" data-target="#collapseCheckedOutTable" aria-expanded="true" aria-controls="collapseCheckedOutTable">
-                <span class="accordion_icon"><i class="fa fa-minus-square"></i></span> Assets checked in/out <span class="badge" id="ritm_count" >{{(c.data.checkOut|filter:search).length}}</span>
-              </a>
-            </h1>
-          </div>
-          <div ng-if="c.data.checkOut.length > 0" id="collapseCheckedOutTable" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading_savedItems">
-            <table class="table table-bordered table-striped table-condensed">
-              <tr>
-                <th ng-click="sort('assetName')">Asset name<span class="glyphicon sort-icon" ng-show="sortKey=='assetName'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
-                <th ng-click="sort('checkOutBy')">Checked out by<span class="glyphicon sort-icon" ng-show="sortKey=='checkOutBy'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
-                <th ng-click="sort('checkInBy')">Checked in by<span class="glyphicon sort-icon" ng-show="sortKey=='checkInBy'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
-                <th ng-click="sort('quantity')">Quantity<span class="glyphicon sort-icon" ng-show="sortKey=='quantity'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
-                <th ng-click="sort('start')">Checked out time<span class="glyphicon sort-icon" ng-show="sortKey=='start'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
-                <th ng-click="sort('end')">Checked in time<span class="glyphicon sort-icon" ng-show="sortKey=='end'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
-
-                <th ng-click="sort('comments')">comments<span class="glyphicon sort-icon" ng-show="sortKey=='comments'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
-              </tr>
-
-              <tr dir-paginate="data in c.data.checkOut|filter:search|orderBy:sortKey:reverse|itemsPerPage:pageSize" pagination-id="checkOutDataPagination">
-                <td class="ritm_number">{{data.assetName}}</td>
-                <td class="ritm_cat_item">{{data.checkOutBy}}</td>
-                <td class="ritm_cat_item">{{data.checkInBy}}</td>
-                <td class="ritm_cat_item">{{data.quantity}}</td>
-                <td class="ritm_cat_item">{{data.start}}</td>
-                <td class="ritm_cat_item">{{data.end}}</td>
-                <td class="ritm_cat_item">{{data.comments}}</td>
-
-
-              </tr>
-            </table>
-            <div>
-              <table width="100%" border="0">
+        <!-- Checked in/out table -->
+        <div ng-if="c.reportType == 'Checkout'">
+          <div class="panel margin-bottom-small">
+            <div class="panel-heading blue-panel" role="tab" id="heading_savedItems">
+              <h1 class="h4 panel-title">
+                <a role="button" data-toggle="collapse" data-target="#collapseCheckedOutTable" aria-expanded="true" aria-controls="collapseCheckedOutTable">
+                  <span class="accordion_icon"><i class="fa fa-minus-square"></i></span>Checkout<span class="badge" id="ritm_count" >{{c.tableData.length}}</span>
+                </a>
+              </h1>
+            </div>
+            <div id="collapseCheckedOutTable" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading_savedItems">
+              <table class="table table-bordered table-striped table-condensed">
                 <tr>
-                  <td width="70%">
-                    <dir-pagination-controls pagination-id="checkOutDataPagination" direction-links="true" boundary-links="true"></dir-pagination-controls>
-                  </td>
-                  <td width="25%" align="right">
-                    <label for="page-size">Items per page&#160;&#160;</label>
-                  </td>
-                  <td width="5%" align="right">
-                    <select class="form-control" id="page-size" ng-model="pageSize" ng-init="pageSize='5'" style="width:80px;">
-                      <option value="5">5</option>
-                      <option value="10">10</option>
-                      <option value="15">15</option>
-                      <option value="20">20</option>
-                    </select>
-                  </td>
+                  <th ng-click="sort('assetName')">Asset name<span class="glyphicon sort-icon" ng-show="sortKey=='assetName'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+                  <th ng-click="sort('checkOutBy')">Checked out by<span class="glyphicon sort-icon" ng-show="sortKey=='checkOutBy'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+                  <th ng-click="sort('checkInBy')">Checked in by<span class="glyphicon sort-icon" ng-show="sortKey=='checkInBy'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+                  <th ng-click="sort('quantity')">Quantity<span class="glyphicon sort-icon" ng-show="sortKey=='quantity'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+                  <th ng-click="sort('start')">Checked out time<span class="glyphicon sort-icon" ng-show="sortKey=='start'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+                  <th ng-click="sort('end')">Checked in time<span class="glyphicon sort-icon" ng-show="sortKey=='end'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+                  <th ng-click="sort('comments')">Comments<span class="glyphicon sort-icon" ng-show="sortKey=='comments'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+                </tr>
+
+                <tr dir-paginate="data in filterData(c.data.checkOutData)|filter:search|orderBy:sortKey:reverse|itemsPerPage:pageSize" pagination-id="checkOutDataPagination">
+                  <td class="ritm_number">{{data.assetName}}</td>
+                  <td class="ritm_cat_item">{{data.checkOutBy}}</td>
+                  <td class="ritm_cat_item">{{data.checkInBy}}</td>
+                  <td class="ritm_cat_item">{{data.quantity}}</td>
+                  <td class="ritm_cat_item">{{data.start.format('YYYY/MM/DD; h:mm:ss a')}}</td>
+                  <td class="ritm_cat_item">{{data.end.format('YYYY/MM/DD; h:mm:ss a').replace("Invalid date", "")}}</td>
+                  <td class="ritm_cat_item">{{data.comments}}</td>
+
+
                 </tr>
               </table>
+              <div>
+                <table width="100%" border="0">
+                  <tr>
+                    <td width="70%">
+                      <dir-pagination-controls pagination-id="checkOutDataPagination" direction-links="true" boundary-links="true"></dir-pagination-controls>
+                    </td>
+                    <td width="25%" align="right">
+                      <label for="page-size">Items per page&#160;&#160;</label>
+                    </td>
+                    <td width="5%" align="right">
+                      <select class="form-control" id="page-size" ng-model="pageSize" ng-init="pageSize='5'" style="width:80px;">
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="15">15</option>
+                        <option value="20">20</option>
+                      </select>
+                    </td>
+                  </tr>
+                </table>
+              </div>
             </div>
           </div>
         </div>
-        <md-button ng-click=""> Generate Report</md-button>
-
-      </div>
-
-
-
-
-      <!-- Trasnfer report table -->
-      <div ng-if="c.reportType == 'Assets transfer/ed'">
-        <div class="panel margin-bottom-small">
-          <div class="panel-heading blue-panel" role="tab" id="heading_savedItems">
-            <h1 class="h4 panel-title">
-              <a role="button" data-toggle="collapse" data-target="#collapseTransfer" aria-expanded="true" aria-controls="collapseTransfer">
-                <span class="accordion_icon"><i class="fa fa-minus-square"></i></span> Assets transfer/ed <span class="badge" id="ritm_count" >{{(c.data.transfer|filter:search).length}}</span>
-              </a>
-            </h1>
-          </div>
-          <div ng-if="c.data.transfer.length > 0" id="collapseTransfer" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading_savedItems">
-            <table class="table table-bordered table-striped table-condensed">
-              <tr>
-                <th ng-click="sort('assetName')">Asset name<span class="glyphicon sort-icon" ng-show="sortKey=='assetName'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
-                <th ng-click="sort('assignTo')">Assigned to<span class="glyphicon sort-icon" ng-show="sortKey=='assignTo'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
-                <th ng-click="sort('from')">From stockroom<span class="glyphicon sort-icon" ng-show="sortKey=='from'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
-                <th ng-click="sort('to')">To stockroom<span class="glyphicon sort-icon" ng-show="sortKey=='to'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
-                <th ng-click="sort('quantity')">Quantity<span class="glyphicon sort-icon" ng-show="sortKey=='quantity'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
-                <th ng-click="sort('receivedBy')">Received by<span class="glyphicon sort-icon" ng-show="sortKey=='receivedBy'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
-                <th ng-click="sort('start')">Trasnfer start time<span class="glyphicon sort-icon" ng-show="sortKey=='start'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
-                <th ng-click="sort('end')">Trasnfer end time<span class="glyphicon sort-icon" ng-show="sortKey=='end'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
-                <th ng-click="sort('comments')">Comments<span class="glyphicon sort-icon" ng-show="sortKey=='comments'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
-
-              </tr>
-
-              <tr dir-paginate="data in c.data.transfer|filter:search|orderBy:sortKey:reverse|itemsPerPage:pageSize" pagination-id="stockroomsDataPagination">
-                <td class="ritm_number">{{data.assetName}}</td>
-                <td class="ritm_cat_item">{{data.assignTo}}</td>
-                <td class="ritm_cat_item">{{data.from}}</td>
-                <td class="ritm_cat_item">{{data.to}}</td>
-                <td class="ritm_cat_item">{{data.quantity}}</td>
-                <td class="ritm_cat_item">{{data.receivedBy}}</td>
-                <td class="ritm_cat_item">{{data.start}}</td>
-                <td class="ritm_cat_item">{{data.end}}</td>
-                <td class="ritm_cat_item">{{data.comments}}</td>
-
-
-              </tr>
-            </table>
-            <div >
-              <table width="100%" border="0">
+        <!-- Trasnfer report table -->
+        <div ng-if="c.reportType == 'Transfer'">
+          <div class="panel margin-bottom-small">
+            <div class="panel-heading blue-panel" role="tab" id="heading_savedItems">
+              <h1 class="h4 panel-title">
+                <a role="button" data-toggle="collapse" data-target="#collapseTransfer" aria-expanded="true" aria-controls="collapseTransfer">
+                  <span class="accordion_icon"><i class="fa fa-minus-square"></i></span>Transfer<span class="badge" id="ritm_count" >{{c.tableData.length}}</span>
+                </a>
+              </h1>
+            </div>
+            <div id="collapseTransfer" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading_savedItems">
+              <table class="table table-bordered table-striped table-condensed">
                 <tr>
-                  <td width="70%">
-                    <dir-pagination-controls pagination-id="stockroomsDataPagination" direction-links="true" boundary-links="true"></dir-pagination-controls>
-                  </td>
-                  <td width="25%" align="right">
-                    <label for="page-size">Items per page&#160;&#160;</label>
-                  </td>
-                  <td width="5%" align="right">
-                    <select class="form-control" id="page-size" ng-model="pageSize" ng-init="pageSize='5'" style="width:80px;">
-                      <option value="5">5</option>
-                      <option value="10">10</option>
-                      <option value="15">15</option>
-                      <option value="20">20</option>
-                    </select>
-                  </td>
+                  <th ng-click="sort('assetName')">Asset name<span class="glyphicon sort-icon" ng-show="sortKey=='assetName'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+                  <th ng-click="sort('assignTo')">Assigned to<span class="glyphicon sort-icon" ng-show="sortKey=='assignTo'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+                  <th ng-click="sort('from')">From stockroom<span class="glyphicon sort-icon" ng-show="sortKey=='from'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+                  <th ng-click="sort('to')">To stockroom<span class="glyphicon sort-icon" ng-show="sortKey=='to'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+                  <th ng-click="sort('quantity')">Quantity<span class="glyphicon sort-icon" ng-show="sortKey=='quantity'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+                  <th ng-click="sort('receivedBy')">Received by<span class="glyphicon sort-icon" ng-show="sortKey=='receivedBy'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+                  <th ng-click="sort('start')">Transfer start time<span class="glyphicon sort-icon" ng-show="sortKey=='start'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+                  <th ng-click="sort('end')">Transfer end time<span class="glyphicon sort-icon" ng-show="sortKey=='end'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+                  <th ng-click="sort('comments')">Comments<span class="glyphicon sort-icon" ng-show="sortKey=='comments'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+                </tr>
+                <tr dir-paginate="data in filterData(c.data.transferData)|orderBy:sortKey:reverse|itemsPerPage:pageSize" pagination-id="trasnferReportDataPagination">
+                  <td class="ritm_number">{{data.assetName}}</td>
+                  <td class="ritm_cat_item">{{data.assignTo}}</td>
+                  <td class="ritm_cat_item">{{data.from}}</td>
+                  <td class="ritm_cat_item">{{data.to}}</td>
+                  <td class="ritm_cat_item">{{data.quantity}}</td>
+                  <td class="ritm_cat_item">{{data.receivedBy}}</td>
+                  <td class="ritm_cat_item">{{data.start.format('YYYY/MM/DD; h:mm:ss a')}}</td>
+                  <td class="ritm_cat_item">{{data.end.format('YYYY/MM/DD; h:mm:ss a').replace("Invalid date", "")}}</td>
+                  <td class="ritm_cat_item">{{data.comments}}</td>
                 </tr>
               </table>
+              <div >
+                <table width="100%" border="0">
+                  <tr>
+                    <td width="70%">
+                      <dir-pagination-controls pagination-id="trasnferReportDataPagination" direction-links="true" boundary-links="true"></dir-pagination-controls>
+                    </td>
+                    <td width="25%" align="right">
+                      <label for="page-size">Items per page&#160;&#160;</label>
+                    </td>
+                    <td width="5%" align="right">
+                      <select class="form-control" id="page-size" ng-model="pageSize" ng-init="pageSize='5'" style="width:80px;">
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="15">15</option>
+                        <option value="20">20</option>
+                      </select>
+                    </td>
+                  </tr>
+                </table>
+              </div>
             </div>
           </div>
         </div>
-        <md-button ng-click=""> Generate Report</md-button>
-
-      </div>
-
-    </md-card-content>
-  </md-card>
-
-</div>]]></template>
+        <div layout-gt-sm="row" class="d-flex justify-content-end">
+          <!--md-input-container class="md-block" flex-gt-sm style="max-width: 200px;">
+<label>Report Name</label>
+<input ng-model="c.reportName" />
+</md-input-container-->
+          <div layout="row" layout-align="end center">
+            <md-button class="md-raised md-primary" ng-click="downloadReport(c.reportType)">Generate Report</md-button>
+          </div>
+        </div>
+        </md-card-content>
+      </md-card>
+    </div>]]></template>
     </sp_widget>
 </record_update>

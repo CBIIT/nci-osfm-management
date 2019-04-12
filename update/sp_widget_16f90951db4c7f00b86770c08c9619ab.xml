@@ -2,17 +2,19 @@
 <record_update table="sp_widget">
     <sp_widget action="INSERT_OR_UPDATE">
         <category>custom</category>
-        <client_script><![CDATA[function($stateParams, $log, $scope, $http, $mdDialog, etrackUpdateAsset, $state) {
+        <client_script><![CDATA[function($stateParams, spUtil, $log, $scope, $http, $mdDialog, etrackAddAssets, $state) {
+	
 	/* widget controller */
 	var c = this;
-	c.data.asset.quantity = parseInt(c.data.asset.quantity);
+	c.data.form.quantity = parseInt(c.data.form.quantity);
+
 
 	$("#ownerName").autocomplete({
 		delay: 300,
 		source: function(request, response) {
 			$('.ui-autocomplete').css('display', 'block');
 			var term = $('#ownerName').val();
-			c.data.asset.ownerId = "";
+			c.data.form.ownerId = "";
 			response([]);
 			if (term.length < 4) {
 				return;
@@ -61,11 +63,11 @@
 
 			if (sys_id != null && sys_id.trim().length > 1) {
 
-				c.data.asset.owner = name;
-				c.data.asset.ownerId = sys_id;
+				c.data.form.owner = name;
+				c.data.form.ownerId = sys_id;
 			} else {
-				c.data.asset.owner = "";
-				c.data.asset.ownerId = "";
+				c.data.form.owner = "";
+				c.data.form.ownerId = "";
 			}
 
 			//$('#content').css('height', '550px');
@@ -75,19 +77,20 @@
 
 
 	$scope.$watch('c.data.asset.owner', function(){
-		if(c.data.asset.ownerId == "" || c.data.asset.ownerId == null){
-			c.data.asset.owner = c.data.reset.owner;
-			c.data.asset.ownerId = c.data.reset.ownerId;
+		if(c.data.form.ownerId == "" || c.data.form.ownerId == null){
+			c.data.form.owner = c.data.reset.owner;
+			c.data.form.ownerId = c.data.reset.ownerId;
 		}
 	});
-
+	
 	$scope.updateAsset = function(){
 		var confirm = $mdDialog.confirm()
 		.title('Are you sure you edit the Asset information?')
 		.ok('YES')
 		.cancel('NO');
 		$mdDialog.show(confirm).then(function() {
-			etrackUpdateAsset.updateAsset(c.data.asset).then(function(res){
+			c.data.form.method = 'update';
+			etrackAddAssets.proccessModel(c.data.form).then(function(res){
 				$mdDialog.show(
 					$mdDialog.alert()
 					.parent(angular.element(document.querySelector('#popupContainer')))
@@ -95,7 +98,7 @@
 					.title("Asset has been updated successfully!")
 					.ok('OK')
 				);
-				$state.go("display_asset", {id: c.data.model.modelID});
+				$state.go("display_asset", {id: c.data.form.modelID});
 				$log.log(res);
 			}, function(err){
 				$log.log(err);
@@ -104,6 +107,14 @@
 		}, function() {
 		});
 	};
+
+	$scope.doTheBack = function() {
+		window.history.back();
+	};
+	
+	spUtil.recordWatch($scope, "x_naci_e_tracking_manufacture", "", function(name, data) {  
+		spUtil.update($scope);
+	});
 
 }
 
@@ -126,10 +137,12 @@
         <script><![CDATA[(function() {
 
 	data.id = "";
-	data.asset = {};
-	data.model = {};
+	data.form = {};
 	data.reset = {};
 	data.stockrooms = [];
+	data.manufactures = [];
+	data.asset_type = ["Physical Security", "Emergency Preparedness"];
+
 	data.admin = gs.getUser().isMemberOf("ETracking_Admin")
 
 
@@ -141,25 +154,36 @@
 		asset.query();
 		asset.next();
 		var item = {};
-		data.asset.id = asset.sys_id.toString();
-		data.asset.barcode = asset.barcode.toString();
-		data.asset.owner = asset.owner.name.toString();
-		data.asset.ownerId = asset.owner.sys_id.toString();
-		data.asset.quantity = asset.quantity.toString();
-		data.asset.stockroom = asset.stockroom.sys_id.toString();
-		data.model.name = asset.model.name.toString();
-		data.model.modelID = asset.model.sys_id.toString();
-		data.model.manufacturer = asset.model.manufacture.name.toString();
-		data.model.description = asset.model.description.toString();
-		data.model.model_number = asset.model.model_number.toString();
-		data.model.unit_cost = asset.model.cost.toString();
+		data.form.id = asset.sys_id.toString();
+		data.form.barcode = asset.barcode.toString();
+		data.form.owner = asset.owner.name.toString();
+		data.form.ownerId = asset.owner.sys_id.toString();
+		data.form.quantity = asset.quantity.toString();
+		data.form.stockroom = asset.stockroom.sys_id.toString();
+		data.form.name = asset.model.name.toString();
+		data.form.modelID = asset.model.sys_id.toString();
+		data.form.manufacture = asset.model.manufacture.toString();
+		data.form.description = asset.model.description.toString();
+		data.form.model_number = asset.model.model_number.toString();
+		data.form.unit_cost = asset.model.cost.toString();
+		data.form.asset_type = asset.asset_type.toString();
 		data.reset.owner = asset.owner.name.toString();
 		data.reset.ownerId = asset.owner.sys_id.toString();
 	}
-	
-	
-	
-	
+
+	var manufacture = new GlideRecord('x_naci_e_tracking_manufacture');
+	manufacture.orderBy("name");
+	manufacture.query();
+	while(manufacture.next()){
+		item = {};
+		item.id = manufacture.sys_id.toString();
+		item.name = manufacture.name.toString();
+		data.manufactures.push(item);
+	}
+
+
+
+
 	var stockroom = new GlideRecord('x_naci_e_tracking_stock_room');
 	stockroom.orderBy("name");
 	stockroom.query();
@@ -180,7 +204,7 @@
         <sys_created_on>2019-03-06 17:22:54</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>16f90951db4c7f00b86770c08c9619ab</sys_id>
-        <sys_mod_count>98</sys_mod_count>
+        <sys_mod_count>148</sys_mod_count>
         <sys_name>Etrack Edit Asset</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
@@ -188,7 +212,7 @@
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sp_widget_16f90951db4c7f00b86770c08c9619ab</sys_update_name>
         <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-03-25 15:39:03</sys_updated_on>
+        <sys_updated_on>2019-04-11 20:19:34</sys_updated_on>
         <template><![CDATA[<div ng-controller="c" ng-cloak ng-show="c.data.admin">
   <md-card>
     <md-toolbar>
@@ -201,29 +225,34 @@
         Model Information
       </h4>
       <form name="userForm">
-        <div layout="column" class="disabledForm">
+        <div layout="column" >
 
-          <md-input-container class="md-block" flex-gt-sm>
+          <md-input-container class="md-block" flex-gt-sm class="disabledForm">
             <label>Name</label>
-            <input name="name" ng-model="c.data.model.name" disabled/>
+            <input name="name" ng-model="c.data.form.name" disabled/>
           </md-input-container>
-
           <md-input-container class="md-block" flex-gt-sm>
             <label>Manufacture</label>
-            <input name="name" ng-model="c.data.model.manufacturer" disabled/>
+            <md-select ng-required="true" ng-model="c.data.form.manufacture">
+              <md-option ng-repeat="manufacture in c.data.manufactures" value="{{manufacture.id}}">
+                {{manufacture.name}}
+              </md-option>
+            </md-select >
           </md-input-container>
+
+
           <md-input-container class="md-block">
             <label>Description</label>
-            <textarea ng-model="c.data.model.description" md-select-on-focus></textarea>
+            <textarea ng-model="c.data.form.description" md-select-on-focus></textarea>
           </md-input-container>
           <md-input-container class="md-block" flex-gt-sm>
             <label>Model Number</label>
-            <input name="model_number" ng-model="c.data.model.model_number" disabled/>
+            <input name="model_number" ng-model="c.data.form.model_number" />
           </md-input-container>
 
           <md-input-container class="md-block" flex-gt-sm>
             <label>Unit Cost</label>
-            <input name="unit_cost" ng-model="c.data.model.unit_cost" disabled/>
+            <input name="unit_cost" ng-model="c.data.form.unit_cost" />
           </md-input-container>
 
         </div>
@@ -238,7 +267,7 @@
 
           <md-input-container class="md-block" flex-gt-sm>
             <label>Owner</label>
-            <input id="ownerName" ng-required="true" name="stopAC" ng-model="c.data.asset.owner" ng-model-options="{ updateOn: 'blur' }"/>
+            <input id="ownerName" ng-required="true" name="stopAC" ng-model="c.data.form.owner" ng-model-options="{ updateOn: 'blur' }"/>
             <div ng-messages="userForm.stopAC.$error">
               <div ng-message="required">
                 Please select a valid owner
@@ -246,9 +275,18 @@
             </div>
           </md-input-container>
 
+          <md-input-container class="md-block" flex-gt-sm class="disabledForm">
+            <label>Type</label>
+            <md-select ng-required="true" ng-model="c.data.form.asset_type" disabled>
+              <md-option ng-repeat="type in c.data.asset_type" value="{{type}}">
+                {{type}}
+              </md-option>
+            </md-select >
+          </md-input-container>
+
           <md-input-container class="md-block" flex-gt-sm>
             <label>Quantity</label>
-            <input type="number" step="any" ng-required="true" name="quantity" ng-model="c.data.asset.quantity" min="0" ng-model-options="{ updateOn: 'blur' }"/>
+            <input type="number" step="any" ng-required="true" name="quantity" ng-model="c.data.form.quantity" min="0" ng-model-options="{ updateOn: 'blur' }"/>
             <div ng-messages="userForm.quantity.$error">
               <div ng-message="min">
                 Must be greater then 1
@@ -259,14 +297,14 @@
           <div ng-show="c.data.asset.quantity == 1">
             <md-input-container class="md-block" flex-gt-sm>
               <label>Barcode</label>
-              <input id="barcode" name="barcode" ng-model="c.data.asset.barcode" ng-disabled="c.data.asset.quantity > 1"/>
+              <input id="barcode" name="barcode" ng-model="c.data.form.barcode" ng-disabled="c.data.form.quantity > 1"/>
             </md-input-container>
 
           </div>
 
           <md-input-container class="md-block" flex-gt-sm>
             <label>Stockroom</label>
-            <md-select ng-required="true" ng-model="c.data.asset.stockroom">
+            <md-select ng-required="true" ng-model="c.data.form.stockroom">
               <md-option ng-repeat="stockroom in c.data.stockrooms" value="{{stockroom.id}}">
                 {{stockroom.name}}
               </md-option>
@@ -276,6 +314,8 @@
         <br>
         <div class="d-flex justify-content-center">
           <md-button ng-click="updateAsset()" class="md-raised md-primary">Submit</md-button>
+          <md-button ng-click="doTheBack()" class="md-raised">Back</md-button>
+
         </div>
       </form>
 

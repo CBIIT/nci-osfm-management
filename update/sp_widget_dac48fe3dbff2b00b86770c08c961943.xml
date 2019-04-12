@@ -37,7 +37,7 @@
 	data.admin = gs.getUser().isMemberOf("ETracking_Admin");
 
 	var stockroom = new GlideRecord("x_naci_e_tracking_stock_room");
-			stockroom.orderBy("name");
+			stockroom.orderByDesc("sys_created_on");
 			stockroom.query();
 	
 	while(stockroom.next()){
@@ -56,7 +56,7 @@
         <sys_created_on>2019-03-01 15:50:07</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>dac48fe3dbff2b00b86770c08c961943</sys_id>
-        <sys_mod_count>42</sys_mod_count>
+        <sys_mod_count>49</sys_mod_count>
         <sys_name>Etrack Stockrooms</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
@@ -64,100 +64,100 @@
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sp_widget_dac48fe3dbff2b00b86770c08c961943</sys_update_name>
         <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-03-22 18:02:40</sys_updated_on>
+        <sys_updated_on>2019-04-03 19:50:46</sys_updated_on>
         <template><![CDATA[<div ng-controller="c" ng-cloak>
 
-    <md-card>
-        <md-toolbar>
-            <div class="md-toolbar-tools">
-                <h2 flex md-truncate>Search Stockrooms</h2>
-            </div>
-        </md-toolbar>
-        <md-card-content>
+  <md-card>
+    <md-toolbar>
+      <div class="md-toolbar-tools">
+        <h2 flex md-truncate>Search Stockrooms</h2>
+      </div>
+    </md-toolbar>
+    <md-card-content>
 
-            <!-- Filter search -->
-            <div layout-gt-sm="row">
-                <md-input-container class="md-block" flex-gt-sm>
-                    <label>Name</label>
-                    <input name="name" ng-model="search.name" />
-                </md-input-container>
-                 <div flex="5" hide-xs hide-sm></div>
-                <md-input-container class="md-block" flex-gt-sm>
-                    <label>Location</label>
-                    <input name="location" ng-model="search.location" />
-                </md-input-container>
-               <div flex="5" hide-xs hide-sm></div>
-                <md-input-container class="md-block" flex-gt-sm>
-                    <label>Owner/Custodian</label>
-                    <input name="owner" ng-model="search.owner" />
-                </md-input-container>
-          			<div flex="5" hide-xs hide-sm></div>
-                
-                <div layout="row" layout-align="end center">
-                    <md-button ng-show="c.data.admin" ui-sref="add_stockrooms" class="md-raised md-primary">Add Stockroom</md-button>
-                </div>
-              	<br hide-md hide-lg>
-            </div>
-         
+      <!-- Filter search -->
+      <div layout-gt-sm="row">
+        <md-input-container class="md-block" flex-gt-sm>
+          <label>Name</label>
+          <input name="name" ng-model="search.name" />
+        </md-input-container>
+        <div flex="5" hide-xs hide-sm></div>
+        <md-input-container class="md-block" flex-gt-sm>
+          <label>Location</label>
+          <input name="location" ng-model="search.location" />
+        </md-input-container>
+        <div flex="5" hide-xs hide-sm></div>
+        <md-input-container class="md-block" flex-gt-sm>
+          <label>Owner</label>
+          <input name="owner" ng-model="search.owner" />
+        </md-input-container>
+        <div flex="5" hide-xs hide-sm></div>
 
-            <!-- Stoackrooms table -->
+        <div layout="row" layout-align="end center">
+          <md-button ng-show="c.data.admin" ui-sref="add_stockrooms" class="md-raised md-primary">Add Stockroom</md-button>
+        </div>
+        <br hide-md hide-lg>
+      </div>
+
+
+      <!-- Stoackrooms table -->
+      <div>
+        <div class="panel margin-bottom-small">
+          <div class="panel-heading blue-panel" role="tab" id="heading_savedItems">
+            <h1 class="h4 panel-title">
+              <a role="button" data-toggle="collapse" data-target="#collapseStockrooms" aria-expanded="true" aria-controls="collapseStockrooms">
+                <span class="accordion_icon"><i class="fa fa-minus-square"></i></span> Stockrooms <span class="badge" id="ritm_count" >{{(c.data.stockrooms|filter:search).length}}</span>
+              </a>
+            </h1>
+          </div>
+          <div ng-if="c.data.stockrooms.length > 0" id="collapseStockrooms" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading_savedItems">
+            <table class="table table-bordered table-striped table-condensed">
+              <tr>
+                <th ng-click="sort('name')">Name<span class="glyphicon sort-icon" ng-show="sortKey=='name'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+                <th ng-click="sort('type')">Type<span class="glyphicon sort-icon" ng-show="sortKey=='type'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+                <th ng-click="sort('location')">Location<span class="glyphicon sort-icon" ng-show="sortKey=='location'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+                <th ng-click="sort('owner')">Owner<span class="glyphicon sort-icon" ng-show="sortKey=='owner'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+
+                <th>Actions</th>
+              </tr>
+
+              <tr dir-paginate="data in c.data.stockrooms|filter:search|orderBy:sortKey:reverse|itemsPerPage:pageSize" pagination-id="stockroomsDataPagination">
+                <td class="ritm_number">{{data.name}}</td>
+                <td class="ritm_cat_item">{{data.type}}</td>
+                <td class="ritm_cat_item">{{data.location}}</td>
+                <td class="ritm_cat_item">{{data.owner}}</td>
+                <td>
+                  <md-button class="md-raised"  ui-sref="display_stockroom({id: data.id})">View</md-button>
+                </td>
+
+              </tr>
+            </table>
             <div>
-                <div class="panel margin-bottom-small">
-                    <div class="panel-heading blue-panel" role="tab" id="heading_savedItems">
-                        <h1 class="h4 panel-title">
-                            <a role="button" data-toggle="collapse" data-target="#collapseStockrooms" aria-expanded="true" aria-controls="collapseStockrooms">
-                  <span class="accordion_icon"><i class="fa fa-minus-square"></i></span> Assets <span class="badge" id="ritm_count" >{{(c.data.stockrooms|filter:search).length}}</span>
-                </a>
-                        </h1>
-                    </div>
-                    <div ng-if="c.data.stockrooms.length > 0" id="collapseStockrooms" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading_savedItems">
-                        <table class="table table-bordered table-striped table-condensed">
-                            <tr>
-                                <th ng-click="sort('name')">Name<span class="glyphicon sort-icon" ng-show="sortKey=='name'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
-                                <th ng-click="sort('type')">Type<span class="glyphicon sort-icon" ng-show="sortKey=='manufacture'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
-                                <th ng-click="sort('location')">Location<span class="glyphicon sort-icon" ng-show="sortKey=='description'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
-                                <th ng-click="sort('owner')">Owner<span class="glyphicon sort-icon" ng-show="sortKey=='model_number'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
-                        
-                                <th>Actions</th>
-                            </tr>
-   
-                            <tr dir-paginate="data in c.data.stockrooms|filter:search|orderBy:sortKey:reverse|itemsPerPage:pageSize" pagination-id="stockroomsDataPagination">
-                                <td class="ritm_number">{{data.name}}</td>
-                                <td class="ritm_cat_item">{{data.type}}</td>
-                                <td class="ritm_cat_item">{{data.location}}</td>
-                              <td class="ritm_cat_item">{{data.owner}}</td>
-                                <td>
-                                    <md-button class="md-raised"  ui-sref="display_stockroom({id: data.id})">View</md-button>
-                                </td>
-
-                            </tr>
-                        </table>
-                        <div>
-                            <table width="100%" border="0">
-                                <tr>
-                                    <td width="70%">
-                                        <dir-pagination-controls pagination-id="stockroomsDataPagination" direction-links="true" boundary-links="true"></dir-pagination-controls>
-                                    </td>
-                                    <td width="25%" align="right">
-                                        <label for="page-size">Items per page&#160;&#160;</label>
-                                    </td>
-                                    <td width="5%" align="right">
-                                        <select class="form-control" id="page-size" ng-model="pageSize" ng-init="pageSize='5'" style="width:80px;">
-                                            <option value="5">5</option>
-                                            <option value="10">10</option>
-                                            <option value="15">15</option>
-                                            <option value="20">20</option>
-                                        </select>
-                                    </td>
-                                </tr>
-                            </table>
-                        </div>
-                    </div>
-                </div>
+              <table width="100%" border="0">
+                <tr>
+                  <td width="70%">
+                    <dir-pagination-controls pagination-id="stockroomsDataPagination" direction-links="true" boundary-links="true"></dir-pagination-controls>
+                  </td>
+                  <td width="25%" align="right">
+                    <label for="page-size">Items per page&#160;&#160;</label>
+                  </td>
+                  <td width="5%" align="right">
+                    <select class="form-control" id="page-size" ng-model="pageSize" ng-init="pageSize='5'" style="width:80px;">
+                      <option value="5">5</option>
+                      <option value="10">10</option>
+                      <option value="15">15</option>
+                      <option value="20">20</option>
+                    </select>
+                  </td>
+                </tr>
+              </table>
             </div>
-     
-        </md-card-content>
-    </md-card>
+          </div>
+        </div>
+      </div>
+
+    </md-card-content>
+  </md-card>
 
 </div>]]></template>
     </sp_widget>

@@ -2,16 +2,34 @@
 <record_update table="sp_widget">
     <sp_widget action="INSERT_OR_UPDATE">
         <category>custom</category>
-        <client_script><![CDATA[function($scope, spUtil) {
+        <client_script><![CDATA[function($scope, spUtil, spModal) {
 	/* widget controller */
 	var c = this;
+	
+	c.data.checkedOutAssests = c.data.checkedOutAssests.map(function(item){
+		item.checkOutTime = moment(item.checkOutTime);
+		return item
+	})
+	
+	c.data.assetsInTransfer = c.data.assetsInTransfer.map(function(item){
+		item.transferStartTime = moment(item.transferStartTime);
+		return item
+	})
 
   //alert(c.data.admin);
 	$scope.sort = function(keyname){
 		$scope.sortKey = keyname;
 		$scope.reverse = !$scope.reverse;
 	};
-
+	$scope.cSort = function(keyname){
+		$scope.cSortKey = keyname;
+		$scope.cReverse = !$scope.cReverse;
+	};
+	$scope.tSort = function(keyname){
+		$scope.tSortKey = keyname;
+		$scope.tReverse = !$scope.tReverse;
+	};
+	
 	spUtil.recordWatch($scope, "x_naci_e_tracking_model", "", function(name, data) {  
 		spUtil.update($scope);
 	});
@@ -59,6 +77,8 @@
 		item.description = model.description.toString();
 		item.modelNumber = model.model_number.toString();
 		item.quantity = getQuantity(model.sys_id);
+		//item.stockrooms = getStockroons(model.sys_id);
+		item.stockrooms = getStockrooms(model.sys_id);
     if(item.quantity != 0){
 			data.assets.push(item);	
 		}
@@ -76,13 +96,13 @@
 		item.quantity = checkOut.quantity.toString();
 		item.id = checkOut.sys_id.toString();
 		item.owner = checkOut.asset.owner.name.toString();
+		item.stockroom = checkOut.asset.stockroom.name.toString();
 		data.checkedOutAssests.push(item);
 	}
 
 	function getQuantity(id){
 		var quantity = 0;
 		var asset = new GlideRecord("x_naci_e_tracking_etrack_assets");
-
 		asset.addQuery("model.sys_id", id);
 		asset.query();
 		while(asset.next()){
@@ -91,6 +111,46 @@
 		return quantity;
 	}
 	
+	/**function getStockroons(id){
+		var rooms = [];
+		var asset = new GlideRecord("x_naci_e_tracking_etrack_assets");
+		    asset.addQuery("model.sys_id", id);
+			  asset.orderBy("stockroom.name");
+		    asset.query();
+		while(asset.next()){
+			var item = {};
+			item.id = asset.stockroom.sys_id.toString();
+			item.name = asset.stockroom.name.toString();
+			item.
+			rooms.push(item);
+		}
+		
+		return rooms;
+	}*/
+	
+	function getStockrooms(id){
+		var rooms = [];
+		var asset = new GlideRecord("x_naci_e_tracking_etrack_assets");
+		    asset.addQuery("model.sys_id", id);
+			  asset.orderBy("stockroom.name");
+		    asset.query();
+		while(asset.next()){
+			var item = {};
+			item.id = asset.stockroom.sys_id.toString();
+			item.name = asset.stockroom.name.toString();
+			if(parseInt(asset.quantity) > 0){
+				rooms.push(item);
+			}
+		}
+		return uniq(rooms, 'id');; 
+	}
+	 function uniq(a, param){
+        return a.filter(function(item, pos, array){
+            return array.map(function(mapItem){ return mapItem[param]; }).indexOf(item[param]) === pos;
+        })
+    }
+
+    
 	
 	var transferAsset = new GlideRecord("x_naci_e_tracking_assdets_transfer");
 	transferAsset.addNullQuery("transfer_complete_time");
@@ -121,7 +181,7 @@
         <sys_created_on>2019-02-22 22:06:06</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>a5b714a5db3fa300b86770c08c961963</sys_id>
-        <sys_mod_count>577</sys_mod_count>
+        <sys_mod_count>719</sys_mod_count>
         <sys_name>Etrack Assets</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
@@ -129,7 +189,7 @@
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sp_widget_a5b714a5db3fa300b86770c08c961963</sys_update_name>
         <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-03-25 15:06:43</sys_updated_on>
+        <sys_updated_on>2019-04-12 19:41:53</sys_updated_on>
         <template><![CDATA[<div ng-controller="c" ng-cloak>
   <md-card>
     <md-toolbar>
@@ -138,48 +198,44 @@
       </div>
     </md-toolbar>
     <md-card-content>
-
-      <!-- Filter search -->
-      <div layout-gt-sm="row">
-        <md-input-container class="md-block" flex-gt-sm>
-          <label>Name</label>
-          <input name="name" ng-model="search.name" />
-        </md-input-container>
-        <div flex="5" hide-xs hide-sm></div>
-        <md-input-container class="md-block" flex-gt-sm>
-          <label>Manufacture</label>
-          <input name="manufacture" ng-model="search.manufacture" />
-        </md-input-container>
-        <div flex="5" hide-xs hide-sm></div>
-        <md-input-container class="md-block" flex-gt-sm>
-          <label>Model Number</label>
-          <input name="modelNumber" ng-model="search.modelNumber" />
-        </md-input-container>
-        <div flex="5" hide-xs hide-sm></div>
-        <md-input-container class="md-block" flex-gt-sm>
-          <label>Stockroom</label>
-          <input name="stockroom" ng-model="search.stockroom" />
-        </md-input-container>
-        <div flex="5" hide-xs hide-sm></div>
-        <md-input-container class="md-block" flex-gt-sm>
-          <label>Owner</label>
-          <input name="owner" ng-model="search.owner" />
-        </md-input-container>
-        <div flex="5" hide-xs hide-sm></div>
-        <div layout="row" layout-align="end center" ng-show="c.data.admin">
-          <md-button ui-sref="add_assets" class="md-raised md-primary">Add Assets</md-button>
-        </div>
-        <br hide-md hide-lg>
-      </div>
-
-
       <!-- Assets table -->
       <div>
+        <!-- Filter assets table  -->
+        <div layout-gt-sm="row">
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>Name</label>
+            <input name="stopAC" ng-model="assetFilter.name" />
+          </md-input-container>
+          <div flex="5" hide-xs hide-sm></div>
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>Manufacture</label>
+            <input ng-model="assetFilter.manufacture" />
+          </md-input-container>
+
+          <div flex="5" hide-xs hide-sm></div>
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>Description</label>
+            <input ng-model="assetFilter.description" />
+          </md-input-container>
+          
+          <div flex="5" hide-xs hide-sm></div>
+
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>Model Number</label>
+            <input ng-model="assetFilter.modelNumber" />
+          </md-input-container>
+          <div flex="5" hide-xs hide-sm></div>
+          <div layout="row" layout-align="end center" ng-show="c.data.admin">
+            <md-button ui-sref="add_assets" class="md-raised md-primary">Add Assets</md-button>
+          </div>
+
+          <br hide-md hide-lg>
+        </div>
         <div class="panel margin-bottom-small table-responsive responsive">
           <div class="panel-heading blue-panel" role="tab" id="heading_savedItems">
             <h1 class="h4 panel-title">
               <a role="button" data-toggle="collapse" data-target="#collapseAssets" aria-expanded="true" aria-controls="collapseAssets">
-                <span class="accordion_icon"><i class="fa fa-minus-square"></i></span> Assets in stock <span class="badge" id="ritm_count" >{{(c.data.assets|filter:search).length}}</span>
+                <span class="accordion_icon"><i class="fa fa-minus-square"></i></span> Assets in stock <span class="badge" id="ritm_count" >{{(c.data.assets|filter:assetFilter).length}}</span>
               </a>
             </h1>
           </div>
@@ -190,14 +246,16 @@
                 <th ng-click="sort('manufacture')">Manufacture<span class="glyphicon sort-icon" ng-show="sortKey=='manufacture'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
                 <th ng-click="sort('description')">Description<span class="glyphicon sort-icon" ng-show="sortKey=='description'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
                 <th ng-click="sort('modelNumber')">Model Number<span class="glyphicon sort-icon" ng-show="sortKey=='modelNumber'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+                <th>Stockroom(s)<span class="glyphicon sort-icon" ></span></th>
                 <th ng-click="sort('quantity')">Quantity<span class="glyphicon sort-icon" ng-show="sortKey=='quantity'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
                 <th>Actions</th>
               </tr>
-              <tr dir-paginate="data in c.data.assets|filter:search|orderBy:sortKey:reverse|itemsPerPage:pageSize" pagination-id="assetsDataPagination">
+              <tr dir-paginate="data in c.data.assets|filter:assetFilter|orderBy:sortKey:reverse|itemsPerPage:pageSize" pagination-id="assetsDataPagination">
                 <td class="ritm_number">{{data.name}}</td>
                 <td class="ritm_cat_item">{{data.manufacture}}</td>
                 <td class="ritm_cat_item">{{data.description}}</td>
                 <td class="ritm_cat_item">{{data.modelNumber}}</td>
+                <td class="ritm_cat_item"> <md-button ng-repeat="stockroom in data.stockrooms" class="md-primary" ui-sref="display_stockroom({id: stockroom.id})">{{stockroom.name}}<span ng-hide="$last">, </span> </md-button></td>
                 <td class="ritm_cat_item">{{data.quantity}}</td>
                 <td>
                   <md-button class="md-raised"  ui-sref="display_asset({id: data.id})" > View</md-button>
@@ -229,14 +287,23 @@
         </div>
       </div>
 
-      <!-- Checked out table -->
 
+      <!-- Checked out table -->
       <div>
+        <div layout-gt-sm="row">
+          <div>
+            <md-input-container class="md-block" flex-gt-sm>
+              <label>Search</label>
+              <input ng-model="checkedoutFilter" />
+            </md-input-container>
+          </div>
+          <br hide-md hide-lg>
+        </div>   
         <div class="panel margin-bottom-small table-responsive">
           <div class="panel-heading blue-panel" role="tab" id="heading_savedItems">
             <h1 class="h4 panel-title">
               <a role="button" data-toggle="collapse" data-target="#collapsecheckedOutAssets" aria-expanded="true" aria-controls="collapsecheckedOutAssets">
-                <span class="accordion_icon"><i class="fa fa-minus-square"></i></span> Checked out Assets <span class="badge" id="ritm_count">{{(c.data.checkedOutAssests|filter:search).length}}</span>
+                <span class="accordion_icon"><i class="fa fa-minus-square"></i></span> Checked out Assets <span class="badge" id="ritm_count">{{(c.data.checkedOutAssests|filter:checkedoutFilter).length}}</span>
               </a>
             </h1>
           </div>
@@ -244,23 +311,25 @@
           <div ng-if="c.data.checkedOutAssests.length > 0" id="collapsecheckedOutAssets" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading_savedItems">
             <table class="table table-bordered table-striped table-condensed">
               <tr>
-                <th ng-click="sort('name')">Name<span class="glyphicon sort-icon" ng-show="sortKey=='name'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
-                <th ng-click="sort('checkedOutBy')">Checked Out By<span class="glyphicon sort-icon" ng-show="sortKey=='checkedOutBy'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
-                <th ng-click="sort('checkOutTime')">Check Out Time<span class="glyphicon sort-icon" ng-show="sortKey=='checkOutTime'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
-                <th ng-click="sort('quantity')">Quantity<span class="glyphicon sort-icon" ng-show="sortKey=='quantity'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
-                <th ng-click="sort('owner')">Owner<span class="glyphicon sort-icon" ng-show="sortKey=='owner'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
-                <th ng-show="false" ng-click="sort('manufacture')">Manufacture<span class="glyphicon sort-icon" ng-show="sortKey=='manufacture'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+                <th ng-click="cSort('name')">Name<span class="glyphicon sort-icon" ng-show="cSortKey=='name'" ng-class="{'glyphicon-chevron-up':cReverse,'glyphicon-chevron-down':!cReverse}"></span></th>
+                <th ng-click="cSort('checkedOutBy')">Checked Out By<span class="glyphicon sort-icon" ng-show="cSortKey=='checkedOutBy'" ng-class="{'glyphicon-chevron-up':cReverse,'glyphicon-chevron-down':!cReverse}"></span></th>
+                <th ng-click="cSort('checkOutTime')">Checked Out Time<span class="glyphicon sort-icon" ng-show="cSortKey=='checkOutTime'" ng-class="{'glyphicon-chevron-up':cReverse,'glyphicon-chevron-down':!cReverse}"></span></th>
+                <th ng-click="cSort('checkedOutFrom')">Checked Out From<span class="glyphicon sort-icon" ng-show="cSortKey=='checkedOutFrom'" ng-class="{'glyphicon-chevron-up':cReverse,'glyphicon-chevron-down':!cReverse}"></span></th>
+                <th ng-click="cSort('quantity')">Quantity<span class="glyphicon sort-icon" ng-show="cSortKey=='quantity'" ng-class="{'glyphicon-chevron-up':cReverse,'glyphicon-chevron-down':!cReverse}"></span></th>
+                <th ng-click="cSort('owner')">Owner<span class="glyphicon sort-icon" ng-show="cSortKey=='owner'" ng-class="{'glyphicon-chevron-up':cReverse,'glyphicon-chevron-down':!cReverse}"></span></th>
+                <th ng-show="false" ng-click="cSort('manufacture')">Manufacture<span class="glyphicon sort-icon" ng-show="cSortKey=='manufacture'" ng-class="{'glyphicon-chevron-up':cReverse,'glyphicon-chevron-down':!cReverse}"></span></th>
                 <th>Actions</th>
               </tr>
-              <tr dir-paginate="data in c.data.checkedOutAssests|filter:search|orderBy:sortKey:reverse|itemsPerPage:pageSize" pagination-id="checkedOutAssetsDataPagination">
+              <tr dir-paginate="data in c.data.checkedOutAssests|filter:checkedoutFilter|orderBy:cSortKey:cReverse|itemsPerPage:pageSize" pagination-id="checkedOutAssetsDataPagination">
                 <td class="ritm_number">{{data.name}}</td>
                 <td class="ritm_cat_item">{{data.checkedOutBy}}</td>
-                <td class="ritm_cat_item">{{data.checkOutTime}}</td>
+                <td class="ritm_cat_item">{{data.checkOutTime.format('YYYY/MM/DD, h:mm:ss a')}}</td>
+                <td class="ritm_cat_item">{{data.stockroom}}</td>
                 <td class="ritm_cat_item">{{data.quantity}}</td>
                 <td class="ritm_cat_item">{{data.owner}}</td>
                 <td ng-show="false" class="ritm_cat_item"></td>
                 <td>
-                  <md-button ng-show="!c.data.admin" class="md-raised" ui-sref="checkout_asset_details({id: data.id})">View</md-button> 
+                  <md-button class="md-raised" ui-sref="checkout_asset_details({id: data.id})">View</md-button> 
                   <md-button  ng-show="c.data.admin" class="md-raised" ui-sref="checkin_asset({id: data.id})">Check in</md-button> 
                 </td>
               </tr>
@@ -290,41 +359,48 @@
       </div>
 
       <!-- In Transfer table -->
-
       <div>
-        <div class="panel margin-bottom-small">
-          <div class="panel-heading blue-panel" role="tab" id="heading_savedItems">
+
+        <div layout-gt-sm="row">
+          <div>
+            <md-input-container class="md-block" flex-gt-sm>
+              <label>Search</label>
+              <input ng-model="transferFilter" />
+            </md-input-container>
+          </div>
+
+          <br hide-md hide-lg>
+        </div>    
+        <div class="panel margin-bottom-small table-responsive">
+          <div class="panel-heading blue-panel" role="tab" id="heading_savedItems_test">
             <h1 class="h4 panel-title">
               <a role="button" data-toggle="collapse" data-target="#collapseassetsInTransfer" aria-expanded="true" aria-controls="collapseassetsInTransfer">
-                <span class="accordion_icon"><i class="fa fa-minus-square"></i></span> Assets in Transfer <span class="badge" id="ritm_count">{{(c.data.assetsInTransfer|filter:search).length}}</span>
+                <span class="accordion_icon"><i class="fa fa-minus-square"></i></span> Assets in Transfer <span class="badge" id="ritm_count">{{(c.data.assetsInTransfer|filter:transferFilter).length}}</span>
               </a>
             </h1>
           </div>
-
           <div ng-if="c.data.assetsInTransfer.length > 0" id="collapseassetsInTransfer" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading_savedItems">
             <table class="table table-bordered table-striped table-condensed">
               <tr>
-                <th ng-click="sort('name')">Name<span class="glyphicon sort-icon" ng-show="sortKey=='name'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
-
-
-                <th ng-click="sort('fromStockroom')">From Stockroom<span class="glyphicon sort-icon" ng-show="sortKey=='fromStockroom'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
-                <th ng-click="sort('toStockroom')">To Stockroom<span class="glyphicon sort-icon" ng-show="sortKey=='toStockroom'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
-                <th ng-click="sort('assignTo')">Assighned to<span class="glyphicon sort-icon" ng-show="sortKey=='assignTo'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
-                <th ng-click="sort('quantity')">Quantity<span class="glyphicon sort-icon" ng-show="sortKey=='quantity'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
-                <th ng-click="sort('transferStartTime')">Start Time<span class="glyphicon sort-icon" ng-show="sortKey=='transferStartTime'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+                <th ng-click="tSort('name')">Name<span class="glyphicon sort-icon" ng-show="tSortKey=='name'" ng-class="{'glyphicon-chevron-up':tReverse,'glyphicon-chevron-down':!tReverse}"></span></th>
+                <th ng-click="tSort('fromStockroom')">From Stockroom<span class="glyphicon sort-icon" ng-show="tSortKey=='fromStockroom'" ng-class="{'glyphicon-chevron-up':tReverse,'glyphicon-chevron-down':!tReverse}"></span></th>
+                <th ng-click="tSort('toStockroom')">To Stockroom<span class="glyphicon sort-icon" ng-show="tSortKey=='toStockroom'" ng-class="{'glyphicon-chevron-up':tReverse,'glyphicon-chevron-down':!tReverse}"></span></th>
+                <th ng-click="tSort('assignTo')">Assigned To<span class="glyphicon sort-icon" ng-show="tSortKey=='assignTo'" ng-class="{'glyphicon-chevron-up':tReverse,'glyphicon-chevron-down':!tReverse}"></span></th>
+                <th ng-click="tSort('quantity')">Quantity<span class="glyphicon sort-icon" ng-show="tSortKey=='quantity'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+                <th ng-click="tSort('transferStartTime')">Start Time<span class="glyphicon sort-icon" ng-show="tSortKey=='transferStartTime'" ng-class="{'glyphicon-chevron-up':tReverse,'glyphicon-chevron-down':!tReverse}"></span></th>
                 <th>Actions</th>
               </tr>
-              <tr dir-paginate="data in c.data.assetsInTransfer|filter:search|orderBy:sortKey:reverse|itemsPerPage:pageSize" pagination-id="assetsInTransferDataPagination">
+              <tr dir-paginate="data in c.data.assetsInTransfer|filter:transferFilter|orderBy:tSortKey:tReverse|itemsPerPage:pageSize" pagination-id="assetsInTransferDataPagination">
                 <td class="ritm_number">{{data.name}}</td>
                 <td class="ritm_cat_item">{{data.fromStockroom}}</td>
                 <td class="ritm_cat_item">{{data.toStockroom}}</td>
                 <td class="ritm_number">{{data.assignTo}}</td>
                 <td class="ritm_cat_item">{{data.quantity}}</td>
-                <td class="ritm_cat_item">{{data.transferStartTime}}</td>
+                <td class="ritm_cat_item">{{data.transferStartTime.format('YYYY/MM/DD, h:mm:ss a')}}</td>
 
                 <td>
 
-                  <md-button ng-show="!c.data.admin" class="md-raised" ui-sref="transfer_asset_detials({id: data.id})">View</md-button> 
+                  <md-button class="md-raised" ui-sref="transfer_asset_detials({id: data.id})">View</md-button> 
                   <md-button ng-show="c.data.admin" class="md-raised" ui-sref="complete_asset_transfer({id: data.id})">Complete</md-button> 
                 </td>
               </tr>
@@ -352,11 +428,8 @@
           </div>
         </div>
       </div>
-
-
     </md-card-content>
   </md-card>
-
 </div>
 
 

@@ -14,13 +14,13 @@
 		.cancel('NO');
 		$mdDialog.show(confirm).then(function() {
 			etrackCheckinAsset.checkinAsset(c.data.checkoutAsset).then(function(res){
-				$mdDialog.show(
+				/**$mdDialog.show(
 					$mdDialog.alert()
 					.parent(angular.element(document.querySelector('#popupContainer')))
 					.clickOutsideToClose(true)
 					.title("Asset has been checked in successfully!")
 					.ok('OK')
-				);
+				);*/
 				$state.go("assets");
 				$log.log(res);
 			}, function(err){
@@ -55,7 +55,7 @@
 	data.checkoutAsset = {};
 	var mysys_name = gs.getUserDisplayName();
 	var mysys_id = gs.getUserID();
-	data.info = {checkOutUser: mysys_name};
+	data.info = {checkedInUser: mysys_name};
 	data.admin = gs.getUser().isMemberOf("ETracking_Admin")
 
 
@@ -69,6 +69,7 @@
 		checkedOutAsset.next();
 		data.checkoutAsset.id = checkedOutAsset.sys_id.toString();
 		data.checkoutAsset.owner = checkedOutAsset.asset.owner.name.toString();
+		data.checkoutAsset.name = checkedOutAsset.asset.model.name.toString();
 		data.checkoutAsset.stockroom = checkedOutAsset.asset.stockroom.name.toString();
 		data.checkoutAsset.location = checkedOutAsset.asset.stockroom.location.name.toString();
 		data.checkoutAsset.quantityCheckedOut = checkedOutAsset.quantity.toString();
@@ -85,7 +86,7 @@
         <sys_created_on>2019-03-01 14:59:39</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>8b39b62fdbbf2b00b86770c08c961976</sys_id>
-        <sys_mod_count>54</sys_mod_count>
+        <sys_mod_count>60</sys_mod_count>
         <sys_name>Etrack Asset Check In</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
@@ -93,7 +94,7 @@
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sp_widget_8b39b62fdbbf2b00b86770c08c961976</sys_update_name>
         <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-03-25 15:12:41</sys_updated_on>
+        <sys_updated_on>2019-04-12 19:24:56</sys_updated_on>
         <template><![CDATA[<div ng-controller="c" ng-cloak ng-show="c.data.admin">
   <md-card>
     <md-toolbar>
@@ -103,13 +104,18 @@
     </md-toolbar>
     <md-card-content>      
       <form name="form" class="disabledForm">
-
+				<br>
         <div layout="column">
 
 
           <md-input-container class="md-block" flex-gt-sm>
             <label>Owner</label>
             <input id="ownerName" name="assignTo" ng-model="c.data.checkoutAsset.owner" disabled/>
+          </md-input-container>
+
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>Name</label>
+            <input ng-model="c.data.checkoutAsset.name" disabled/>
           </md-input-container>
 
           <md-input-container class="md-block" flex-gt-sm>
@@ -126,14 +132,19 @@
             <label>Quantity checked out</label>
             <input id="quantityCheckedOut" name="quantityCheckedOut" ng-model="c.data.checkoutAsset.quantityCheckedOut" disabled/>
           </md-input-container>
-         
+
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>Checked in buy</label>
+            <input ng-model="c.data.info.checkedInUser" disabled/>
+          </md-input-container>
+
         </div>
       </form>
 
- <div class="d-flex justify-content-center">
-            <md-button ng-click="checkIn()" class="md-raised md-primary">Check In</md-button>
-            <md-button ng-click="doTheBack()"class="md-raised">Back</md-button>
-          </div>
+      <div class="d-flex justify-content-center">
+        <md-button ng-click="checkIn()" class="md-raised md-primary">Check In</md-button>
+        <md-button ng-click="doTheBack()"class="md-raised">Back</md-button>
+      </div>
 
     </md-card-content>
   </md-card>

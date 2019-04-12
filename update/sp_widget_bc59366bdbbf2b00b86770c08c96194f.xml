@@ -5,7 +5,7 @@
         <client_script><![CDATA[function($stateParams, $log, $scope, $http, $mdDialog, spUtil, etrackCheckoutAsset, $state) {
 	/* widget controller */
 	var c = this;
-
+	/**
 	$("#ownerName").autocomplete({
 		delay: 300,
 		source: function(request, response) {
@@ -70,23 +70,22 @@
 			$scope.$apply();
 		}
 	});
-
+*/
 	$scope.checkoutAsset = function(){
 		var confirm = $mdDialog.confirm()
-		.title('Are you sure you check out these Assets?')
+		.htmlContent('<h4>Are you sure you check out <b>'+c.data.asset.quantity +'</b> assets of <b>'+c.data.asset.name +'</b>?</h4>')
 		.ok('YES')
 		.cancel('NO');
 		$mdDialog.show(confirm).then(function() {
 			etrackCheckoutAsset.checkoutAsset(c.data.asset).then(function(res){
-				$mdDialog.show(
+				/**$mdDialog.show(
 					$mdDialog.alert()
 					.parent(angular.element(document.querySelector('#popupContainer')))
 					.clickOutsideToClose(true)
-					.title("Asset has been checked out successfully!")
+					.htmlContent('<h4><b>'+c.data.asset.name +'</b> has been checked out successfully!</h4>')
 					.ok('OK')
-				);
+				);*/
 				$state.go("assets");
-				$log.log(res);
 			}, function(err){
 				$log.log(err);
 				alert("ERROR");
@@ -94,6 +93,11 @@
 		}, function() {
 		});
 	}
+
+	$scope.doTheBack = function() {
+		window.history.back();
+	};
+
 }
 ]]></client_script>
         <controller_as>c</controller_as>
@@ -120,8 +124,6 @@
 	data.info = {checkOutUser: mysys_name};
 	data.admin = gs.getUser().isMemberOf("ETracking_Admin")
 
-
-
 	if (input && input.id) {
 		data.id = input.id.toString();
 		var asset = new GlideRecord('x_naci_e_tracking_etrack_assets');
@@ -130,16 +132,14 @@
 		asset.next();
 		var item = {};
 		data.asset.id = asset.sys_id.toString();
+		data.asset.name = asset.model.name.toString();
+		data.asset.type = asset.asset_type.toString();
 		data.asset.barcode = asset.barcode.toString();
 		data.asset.owner = asset.owner.name.toString();
 		data.asset.quantity = asset.quantity.toString();
 		data.asset.stockroom = asset.stockroom.name.toString();
 		data.asset.checkOutUserID = mysys_id;
 	}
-
-
-
-
 })();]]></script>
         <servicenow>false</servicenow>
         <sys_class_name>sp_widget</sys_class_name>
@@ -147,7 +147,7 @@
         <sys_created_on>2019-03-01 15:00:03</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>bc59366bdbbf2b00b86770c08c96194f</sys_id>
-        <sys_mod_count>64</sys_mod_count>
+        <sys_mod_count>80</sys_mod_count>
         <sys_name>Etrack Asset Check Out</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
@@ -155,7 +155,7 @@
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sp_widget_bc59366bdbbf2b00b86770c08c96194f</sys_update_name>
         <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-03-25 15:37:05</sys_updated_on>
+        <sys_updated_on>2019-04-12 19:24:29</sys_updated_on>
         <template><![CDATA[<div ng-controller="c" ng-cloak ng-show="c.data.admin">
   <md-card>
     <md-toolbar>
@@ -171,6 +171,11 @@
             <label>Owner</label>
             <input id="ownerName" name="owner" ng-model="c.data.asset.owner" disabled />
           </md-input-container>
+          
+           <md-input-container class="md-block" flex-gt-sm>
+            <label>Name</label>
+            <input ng-model="c.data.asset.name" disabled />
+          </md-input-container>
 
           <md-input-container class="md-block" flex-gt-sm>
             <label>Available quantity</label>
@@ -180,6 +185,11 @@
           <md-input-container class="md-block" flex-gt-sm>
             <label>Location</label>
             <input name="quantity" ng-model="c.data.asset.stockroom" disabled/>
+          </md-input-container>
+          
+           <md-input-container class="md-block" flex-gt-sm>
+            <label>Type</label>
+            <input ng-model="c.data.asset.type" disabled/>
           </md-input-container>
 
           <md-input-container class="md-block" flex-gt-sm>
@@ -222,6 +232,8 @@
                      ng-disabled="userForm.$invalid" 
                      ng-click="userForm.$valid && checkoutAsset()" 
                      class="md-raised md-primary">Submit</md-button>
+          <md-button ng-click="doTheBack()" class="md-raised">Cancel</md-button>
+
 
         </div>
       </form>
