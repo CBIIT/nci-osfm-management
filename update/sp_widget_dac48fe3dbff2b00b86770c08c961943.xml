@@ -2,9 +2,11 @@
 <record_update table="sp_widget">
     <sp_widget action="INSERT_OR_UPDATE">
         <category>custom</category>
-        <client_script><![CDATA[function($scope, spUtil) {
+        <client_script><![CDATA[function($scope, spUtil, $log) {
 	/* widget controller */
 	var c = this;
+	c.data.gridSize = 15;
+	c.data.gridSizes = [10,20,30,50]
 
 	/**$scope.sort = function(keyname){
 		$scope.sortKey = keyname;
@@ -15,7 +17,7 @@
 	/*------------------------------------------------*/
 
 	function loadStockrooms(){
-		$scope.assetGridOptions = {
+		$scope.stockRoomGridOptions = {
 			columnDefs: [
 				{headerName: "Name", field: "name", width: 250, sortable: true, filter: true},
 				{headerName: "Type", field: "type", width: 300,  sortable: true, filter: true},
@@ -37,6 +39,17 @@
 			return '<md-button class="md-raised small-button"  ui-sref="display_stockroom({id: data.id})" >View</md-button>'
 		}
 	}
+
+	function onPageSizeChanged(newPageSize) {
+		var value = document.getElementById('page-size').value;
+		
+	}
+	
+	$scope.$watch('c.data.gridSize', function() {
+		$scope.stockRoomGridOptions.api.paginationSetPageSize(Number(c.data.gridSize));
+	});
+	
+	
 
 	spUtil.recordWatch($scope, "x_naci_e_tracking_stock_room", "", function(name, data) {  
 		spUtil.update($scope);
@@ -84,7 +97,7 @@
         <sys_created_on>2019-03-01 15:50:07</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>dac48fe3dbff2b00b86770c08c961943</sys_id>
-        <sys_mod_count>71</sys_mod_count>
+        <sys_mod_count>102</sys_mod_count>
         <sys_name>Etrack Stockrooms</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
@@ -92,22 +105,33 @@
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sp_widget_dac48fe3dbff2b00b86770c08c961943</sys_update_name>
         <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-04-16 18:35:22</sys_updated_on>
+        <sys_updated_on>2019-04-22 20:26:59</sys_updated_on>
         <template><![CDATA[<div ng-controller="c" ng-cloak>
 
   <md-card>
     <md-toolbar>
       <div class="md-toolbar-tools">
         <h2 flex md-truncate>Search Stockrooms</h2>
+
         <md-button ng-show="c.data.admin" ui-sref="add_stockrooms" class="md-raised">Add Stockroom</md-button>
       </div>
     </md-toolbar>
     <md-card-content>
       <md-card-title-text>
         <span class="md-headline">Stockrooms</span>
+        <span style="float: right;">
+          Page Size:
+          <select  ng-model="c.data.gridSize" >
+            <option ng-repeat="value in c.data.gridSizes">{{value}}</option>
+          </select>
+        </span>
+
       </md-card-title-text>
       <md-divider></md-divider>
-      <div ag-grid="assetGridOptions" class="ag-theme-material"></div>
+      <div ag-grid="stockRoomGridOptions" class="ag-theme-material"></div>
+
+
+
 
       <!-- Filter search 
 <div layout-gt-sm="row">
