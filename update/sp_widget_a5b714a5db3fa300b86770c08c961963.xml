@@ -8,9 +8,9 @@
 	loadAssetTable();
 	loadAssetsCheckedOut();
 	loadAssetsInTrasnfer();
-	c.data.gridSizeAssets = 15;
-	c.data.gridSizeCheckOut = 15;
-	c.data.gridSizeTransfer = 15;
+	c.data.gridSizeAssets = 10;
+	c.data.gridSizeCheckOut = 10;
+	c.data.gridSizeTransfer = 10;
 	c.data.gridSizes = [10,20,30,50]
 
 	$scope.$watch('c.data.gridSizeAssets', function() {
@@ -52,7 +52,7 @@
 				cellClass: 'white-space-normal'
 			},
 			pagination: true,
-			paginationPageSize: 5,
+			paginationPageSize: 10,
 			rowData: c.data.assets,
 			angularCompileRows: true,
 			domLayout: 'autoHeight'
@@ -82,7 +82,7 @@
 				resizable: true
 			},
 			pagination: true,
-			paginationPageSize: 5,
+			paginationPageSize: 10,
 			rowData: c.data.checkedOutAssests.map(function(item){
 				item.checkOutTime = moment(item.checkOutTime);
 				return item
@@ -112,7 +112,7 @@
 				resizable: true
 			},
 			pagination: true,
-			paginationPageSize: 5,
+			paginationPageSize: 10,
 			rowData:  c.data.assetsInTransfer.map(function(item){
 				item.transferStartTime = moment(item.transferStartTime);
 				return item
@@ -319,7 +319,7 @@
         <sys_created_on>2019-02-22 22:06:06</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>a5b714a5db3fa300b86770c08c961963</sys_id>
-        <sys_mod_count>1069</sys_mod_count>
+        <sys_mod_count>1077</sys_mod_count>
         <sys_name>Etrack Assets</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
@@ -327,7 +327,7 @@
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sp_widget_a5b714a5db3fa300b86770c08c961963</sys_update_name>
         <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-04-22 20:33:55</sys_updated_on>
+        <sys_updated_on>2019-04-22 20:52:47</sys_updated_on>
         <template><![CDATA[<div ng-controller="c" ng-cloak>
   <md-card>
     <md-toolbar>
@@ -341,7 +341,7 @@
         <span class="md-headline">Assets in stock</span>
         <span style="float: right;">
           Page Size:
-          <select  ng-model="c.data.gridSizeAssets" >
+          <select  ng-model="c.data.gridSizeAssets"  ng-init="c.data.gridSizeAssets='10'">
             <option ng-repeat="value in c.data.gridSizes">{{value}}</option>
           </select>
         </span>
@@ -353,7 +353,7 @@
         <span class="md-headline">Checked out assets</span>
         <span style="float: right;">
           Page Size:
-          <select  ng-model="c.data.gridSizeCheckOut" >
+          <select  ng-model="c.data.gridSizeCheckOut" ng-init="c.data.gridSizeCheckOut='10'" >
             <option ng-repeat="value in c.data.gridSizes">{{value}}</option>
           </select>
         </span>
@@ -365,7 +365,7 @@
         <span class="md-headline">Assets in transfer</span>
         <span style="float: right;">
           Page Size:
-          <select  ng-model="c.data.gridSizeTransfer" >
+          <select  ng-model="c.data.gridSizeTransfer" ng-init="c.data.gridSizeTransfer='10'" >
             <option ng-repeat="value in c.data.gridSizes">{{value}}</option>
           </select>
         </span>
