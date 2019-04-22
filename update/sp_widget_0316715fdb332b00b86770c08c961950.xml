@@ -3,20 +3,51 @@
     <sp_widget action="INSERT_OR_UPDATE">
         <category>custom</category>
         <client_script><![CDATA[function($scope, spUtil) {
-  /* widget controller */
-  var c = this;
-	
-	
-	$scope.sort = function(keyname){
-	   $scope.sortKey = keyname;
-	   $scope.reverse = !$scope.reverse;
+	/* widget controller */
+	var c = this;
+	loadAssets();
+
+	/**$scope.sort = function(keyname){
+		$scope.sortKey = keyname;
+		$scope.reverse = !$scope.reverse;
 	};
-	
+)*/
 	spUtil.recordWatch($scope, 'x_naci_e_tracking_etrack_assets', "", function(name, data) {  
-			spUtil.update($scope);
+		spUtil.update($scope);
+		loadAssets();
 	});
-	
-	
+
+	/*------------------------------------------------*/
+
+	function loadAssets(){
+		$scope.assetGridOptions = {
+			columnDefs: [
+				{headerName: "Stockroom", field: "stockroom", width: 150, sortable: true, filter: true},
+				{headerName: "Type", field: "type", width: 150,  sortable: true, filter: true},
+				{headerName: "Barcode", field: "barcode", width: 200,  sortable: true, filter: true},
+				{headerName: "Owner", field: "owner", width:150,  sortable: true, filter: true},
+				{headerName: "Quantity", field: "quantity", width: 100},
+				{headerName: "Actions", width: 300, cellRenderer: actions}
+			],
+			defaultColDef:{
+				resizable: true,
+				autoHeight: true
+			},
+			pagination: true,
+			paginationPageSize: 5,
+			rowData: c.data.assets,
+			angularCompileRows: true,
+			domLayout: 'autoHeight'
+		};
+		function actions(){	
+			return '<md-button  class="md-raised small-button"  ui-sref="view_asset_details({id: data.id, from: '+"'view_asset_details'"+'})">View</md-button> <span> </span>' +
+				'<md-button ng-show="c.data.admin" class="md-raised small-button"  ui-sref="edit_asset({id: data.id})">Edit</md-button> <span> </span>'+
+				'<md-button ng-show="c.data.admin"  class="md-raised small-button"  ui-sref="checkout_asset({id: data.id})">Checkout</md-button> <span> </span>'+
+				'<md-button ng-show="c.data.admin"  class="md-raised small-button"  ui-sref="transfer_asset({id: data.id})">Transfer</md-button>';
+		}
+
+	}
+
 	$scope.doTheBack = function() {
 		window.history.back();
 	};
@@ -82,7 +113,7 @@
         <sys_created_on>2019-02-28 15:27:54</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>0316715fdb332b00b86770c08c961950</sys_id>
-        <sys_mod_count>195</sys_mod_count>
+        <sys_mod_count>221</sys_mod_count>
         <sys_name>Etrack Asset Details</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
@@ -90,7 +121,7 @@
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sp_widget_0316715fdb332b00b86770c08c961950</sys_update_name>
         <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-04-09 14:54:14</sys_updated_on>
+        <sys_updated_on>2019-04-16 19:18:02</sys_updated_on>
         <template><![CDATA[<div ng-controller="c" layout="column" ng-cloak>
   <md-card>
     <md-toolbar>
@@ -99,21 +130,17 @@
       </div>
     </md-toolbar>
     <md-card-content>
-
       <!-- Asset details -->
-      <h4>
-        Asset Model
-      </h4>
+      <md-card-title-text>
+        <span class="md-headline">Asset Model</span>
+      </md-card-title-text>
       <form name="userForm" class="disabledForm">
-
         <div layout="column">
           <br>
           <md-input-container class="md-block" flex-gt-sm>
             <label>Name</label>
             <input name="name" ng-model="c.data.modelInfo.name" ng-disabled="true" />
           </md-input-container>
-
-
           <md-input-container class="md-block" flex-gt-sm>
             <label>Manufacturer</label>
             <input id="manufacturer"  name="owner" ng-model="c.data.modelInfo.manufacture"  ng-disabled="true"/>
@@ -133,101 +160,101 @@
             <label>Cost</label>
             <input id="cost"  name="cost" ng-model="c.data.modelInfo.cost"  ng-disabled="true"/>
           </md-input-container>
-
-
         </div>
       </form>
       <br>
-      <!-- Filter Assests table -->
-      <div layout-gt-sm="row">
-        <md-input-container class="md-block" flex-gt-sm>
-          <label>Barcode</label>
-          <input name="name" ng-model="search.barcode" />
-        </md-input-container>
-        <div flex="5" hide-xs hide-sm></div>
-        <md-input-container class="md-block" flex-gt-sm>
-          <label>Stockroom</label>
-          <input name="stockroom" ng-model="search.stockroom" />
-        </md-input-container>
-        <div flex="5" hide-xs hide-sm></div>
-        <md-input-container class="md-block" flex-gt-sm>
-          <label>Owner</label>
-          <input name="owner" ng-model="search.owner" />
-        </md-input-container>
-      </div>
-      <!-- Assets table -->
-      <div>
-        <div class="panel margin-bottom-small">
-          <div class="panel-heading blue-panel" role="tab" id="heading_savedItems">
-            <h1 class="h4 panel-title">
-              <a role="button" data-toggle="collapse" data-target="#collapseAssets" aria-expanded="true" aria-controls="collapseAssets">
-                <span class="accordion_icon"><i class="fa fa-minus-square"></i></span> Assets <span class="badge" id="ritm_count" >{{(c.data.assets|filter:search).length}}</span>
-              </a>
-            </h1>
-          </div>
-          <div ng-if="c.data.assets.length > 0" id="collapseAssets" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading_savedItems">
-            <table class="table table-bordered table-striped table-condensed">
-              <tr>
-                <th ng-click="sort('stockroom')">Stockroom<span class="glyphicon sort-icon" ng-show="sortKey=='stockroom'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
-                <th ng-click="sort('type')">Type<span class="glyphicon sort-icon" ng-show="sortKey=='type'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
-                <th ng-click="sort('barcode')">Barcode<span class="glyphicon sort-icon" ng-show="sortKey=='barcode'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
-                <th ng-click="sort('owner')">Owner<span class="glyphicon sort-icon" ng-show="sortKey=='owner'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
-                <th ng-click="sort('quantity')">Quantity<span class="glyphicon sort-icon" ng-show="sortKey=='quantity'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
-                <th>Actions</th>
-              </tr>
-              <tr dir-paginate="data in c.data.assets|filter:search|orderBy:sortKey:reverse|itemsPerPage:pageSize" pagination-id="assetsDataPagination">
-                <td class="ritm_cat_item">{{data.stockroom}}</td>
-                <td class="ritm_cat_item">{{data.type}}</td>
-                <td class="ritm_number">{{data.barcode}}</td>
-                <td class="ritm_cat_item">{{data.owner}}</td>
-                <td class="ritm_cat_item">{{data.quantity}}</td>
-                <td>
-                  <md-button  class="md-raised"  ui-sref="view_asset_details({id: data.id, from: 'view_asset_details'})">View</md-button>
 
-                  <md-button ng-show="c.data.admin" class="md-raised"  ui-sref="edit_asset({id: data.id})">Edit</md-button>
-                  <md-button ng-show="c.data.admin"  class="md-raised"  ui-sref="checkout_asset({id: data.id})">Checkout</md-button>
-                  <md-button ng-show="c.data.admin"  class="md-raised"  ui-sref="transfer_asset({id: data.id})">Transfer</md-button>
+      <div ag-grid="assetGridOptions" class="ag-theme-material"></div>
 
-                </td>
 
-              </tr>
-            </table>
-            <div>
-              <table width="100%" border="0">
-                <tr>
-                  <td width="70%">
-                    <dir-pagination-controls pagination-id="assetsDataPagination" direction-links="true" boundary-links="true"></dir-pagination-controls>
-                  </td>
-                  <td width="25%" align="right">
-                    <label for="page-size">Items per page&#160;&#160;</label>
-                  </td>
-                  <td width="5%" align="right">
-                    <select class="form-control" id="page-size" ng-model="pageSize" ng-init="pageSize='5'" style="width:80px;">
-                      <option value="5">5</option>
-                      <option value="10">10</option>
-                      <option value="15">15</option>
-                      <option value="20">20</option>
-                    </select>
-                  </td>
-                </tr>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
+      <!-- 
+<div layout-gt-sm="row">
+<md-input-container class="md-block" flex-gt-sm>
+<label>Barcode</label>
+<input name="name" ng-model="search.barcode" />
+</md-input-container>
+<div flex="5" hide-xs hide-sm></div>
+<md-input-container class="md-block" flex-gt-sm>
+<label>Stockroom</label>
+<input name="stockroom" ng-model="search.stockroom" />
+</md-input-container>
+<div flex="5" hide-xs hide-sm></div>
+<md-input-container class="md-block" flex-gt-sm>
+<label>Owner</label>
+<input name="owner" ng-model="search.owner" />
+</md-input-container>
+</div>
+<div>
+<div class="panel margin-bottom-small">
+<div class="panel-heading blue-panel" role="tab" id="heading_savedItems">
+<h1 class="h4 panel-title">
+<a role="button" data-toggle="collapse" data-target="#collapseAssets" aria-expanded="true" aria-controls="collapseAssets">
+<span class="accordion_icon"><i class="fa fa-minus-square"></i></span> Assets <span class="badge" id="ritm_count" >{{(c.data.assets|filter:search).length}}</span>
+</a>
+</h1>
+</div>
+<div ng-if="c.data.assets.length > 0" id="collapseAssets" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading_savedItems">
+<table class="table table-bordered table-striped table-condensed">
+<tr>
+<th ng-click="sort('stockroom')">Stockroom<span class="glyphicon sort-icon" ng-show="sortKey=='stockroom'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+<th ng-click="sort('type')">Type<span class="glyphicon sort-icon" ng-show="sortKey=='type'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+<th ng-click="sort('barcode')">Barcode<span class="glyphicon sort-icon" ng-show="sortKey=='barcode'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+<th ng-click="sort('owner')">Owner<span class="glyphicon sort-icon" ng-show="sortKey=='owner'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+<th ng-click="sort('quantity')">Quantity<span class="glyphicon sort-icon" ng-show="sortKey=='quantity'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+<th>Actions</th>
+</tr>
+<tr dir-paginate="data in c.data.assets|filter:search|orderBy:sortKey:reverse|itemsPerPage:pageSize" pagination-id="assetsDataPagination">
+<td class="ritm_cat_item">{{data.stockroom}}</td>
+<td class="ritm_cat_item">{{data.type}}</td>
+<td class="ritm_number">{{data.barcode}}</td>
+<td class="ritm_cat_item">{{data.owner}}</td>
+<td class="ritm_cat_item">{{data.quantity}}</td>
+<td>
+<md-button  class="md-raised"  ui-sref="view_asset_details({id: data.id, from: 'view_asset_details'})">View</md-button>
 
+<md-button ng-show="c.data.admin" class="md-raised"  ui-sref="edit_asset({id: data.id})">Edit</md-button>
+<md-button ng-show="c.data.admin"  class="md-raised"  ui-sref="checkout_asset({id: data.id})">Checkout</md-button>
+<md-button ng-show="c.data.admin"  class="md-raised"  ui-sref="transfer_asset({id: data.id})">Transfer</md-button>
+<md-button  class="md-raised small-button"  ui-sref='view_asset_details({id: data.id, from: "view_asset_details"})'>View</md-button>
+</td>
+
+</tr>
+</table>
+<div>
+<table width="100%" border="0">
+<tr>
+<td width="70%">
+<dir-pagination-controls pagination-id="assetsDataPagination" direction-links="true" boundary-links="true"></dir-pagination-controls>
+</td>
+<td width="25%" align="right">
+<label for="page-size">Items per page&#160;&#160;</label>
+</td>
+<td width="5%" align="right">
+<select class="form-control" id="page-size" ng-model="pageSize" ng-init="pageSize='5'" style="width:80px;">
+<option value="5">5</option>
+<option value="10">10</option>
+<option value="15">15</option>
+<option value="20">20</option>
+</select>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+
+<div class="d-flex justify-content-center">
+
+<md-button ng-click="doTheBack()" class="md-raised">Back</md-button>
+
+</div>
+-->
       <div class="d-flex justify-content-center">
-        <!--md-button ui-sref="assets" class="md-raised md-primary">Close</md-button-->
         <md-button ng-click="doTheBack()" class="md-raised">Back</md-button>
-
       </div>
-
     </md-card-content>
   </md-card>
-
-
-
-
 </div>]]></template>
     </sp_widget>
 </record_update>

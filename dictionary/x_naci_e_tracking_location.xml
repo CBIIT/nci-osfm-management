@@ -9,5 +9,6 @@
         <element label="Phone" max_length="50" name="phone" type="string"/>
         <element label="State" max_length="50" name="state" type="string"/>
         <element label="Street" max_length="300" name="street" type="string"/>
+        <element label="Zipcode" max_length="20" name="zipcode" type="string"/>
     </element>
 </database>
