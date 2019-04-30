@@ -13,13 +13,23 @@
 	c.startDate = "";
 	c.endDate = "";
 	c.data.temp = null;
+	c.data.gridSize = 10;
+	c.data.gridSizes = [10,20,30,50]
+
+
+	$scope.$watch('c.data.gridSize', function() {
+		$scope.assetTrasnferGridOptions.api.paginationSetPageSize(Number(c.data.gridSize));
+		$scope.assetCheckedOutGridOptions.api.paginationSetPageSize(Number(c.data.gridSize));
+
+	});
+
 
 	$scope.$watch("c.startDate", function(){
 		$timeout(function() {
 			$scope.assetTrasnferGridOptions.api.setRowData(filterData(c.data.transferData));
 			$scope.assetCheckedOutGridOptions.api.setRowData(filterData(c.data.checkOutData));
 		})
-		
+
 	});
 
 	$scope.$watch("c.endDate", function(){
@@ -47,7 +57,7 @@
 			autoHeight: true
 		},
 		pagination: true,
-		paginationPageSize: 5,
+		paginationPageSize: 10,
 		rowData: filterData(c.data.transferData),
 		angularCompileRows: true,
 		domLayout: 'autoHeight'
@@ -68,7 +78,7 @@
 			autoHeight: true
 		},
 		pagination: true,
-		paginationPageSize: 5,
+		paginationPageSize: 15,
 		rowData: filterData(c.data.checkOutData),
 		angularCompileRows: true,
 		domLayout: 'autoHeight'
@@ -120,7 +130,10 @@
 
 	$scope.downloadReport = function(){	
 		var clean = function(elem){
-			var cur = elem === null ? '' : elem;
+			var cur = elem === null? '' : elem;
+			if(cur === undefined){
+				cur = '';
+			}
 			if (cur instanceof moment){	
 				cur = cur.format('YYYY/MM/DD; h:mm:ss a').replace("Invalid date", "");
 			}
@@ -131,6 +144,12 @@
 			return cur;
 		}
 		/* generate a worksheet */
+		if(c.reportType == "Transfer"){
+			c.tableData = c.data.transferData;
+		}
+		if(c.reportType == "Checkout"){
+			c.tableData = c.data.checkOutData;
+		}
 		var ws = XLSX.utils.json_to_sheet(c.tableData.map(function(item){
 			if(c.reportType == "Transfer"){
 				return {
@@ -306,15 +325,15 @@
         <sys_created_on>2019-03-11 16:03:02</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>cda7623edb04b340b86770c08c96191a</sys_id>
-        <sys_mod_count>588</sys_mod_count>
+        <sys_mod_count>612</sys_mod_count>
         <sys_name>Etrack Report</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
         <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sp_widget_cda7623edb04b340b86770c08c96191a</sys_update_name>
-        <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-04-16 22:11:31</sys_updated_on>
+        <sys_updated_by>zhoujim@nih.gov</sys_updated_by>
+        <sys_updated_on>2019-04-30 15:33:53</sys_updated_on>
         <template><![CDATA[<div ng-controller="c" ng-cloak>
   <md-card>
     <md-toolbar>
@@ -347,19 +366,27 @@
           <md-datepicker ng-model="c.endDate" md-min-date="c.startDate"  md-placeholder="mm/dd/yyyy"></md-datepicker>
         </md-input-container>
 
-
         <div flex="5" hide-xs hide-sm></div>
         <div layout="row" layout-align="end center">
           <md-button ng-click='clearFilter()' class="md-raised md-primary">Clear filter</md-button>
         </div>
       </div>
 
-			
       <div ng-hide="c.reportType != 'Transfer'" ag-grid="assetTrasnferGridOptions" class="ag-theme-material"></div>
       <div ng-hide="c.reportType != 'Checkout'" ag-grid="assetCheckedOutGridOptions" class="ag-theme-material"></div>
-
-
-      <!-- Checked in/out table 
+      <span style="float: left;">
+        Page Size:
+        <select  ng-model="c.data.gridSize" ng-init="c.data.gridSize='10'">
+          <option ng-repeat="value in c.data.gridSizes">{{value}}</option>
+        </select>
+      </span>
+      <div layout="row" layout-align="end center">
+        <md-button class="md-raised md-primary" ng-click="downloadReport(c.reportType)">Generate Report</md-button>
+      </div>
+    </md-card-content>
+  </md-card>
+</div>
+<!-- Checked in/out table 
 <div ng-if="c.reportType == 'Checkout'">
 <div class="panel margin-bottom-small">
 <div class="panel-heading blue-panel" role="tab" id="heading_savedItems">
@@ -479,11 +506,6 @@
 <input ng-model="c.reportName" />
 </md-input-containe> 
 </div -->
-      <div layout="row" layout-align="end center">
-        <md-button class="md-raised md-primary" ng-click="downloadReport(c.reportType)">Generate Report</md-button>
-      </div>
-    </md-card-content>
-  </md-card>
-</div>]]></template>
+]]></template>
     </sp_widget>
 </record_update>

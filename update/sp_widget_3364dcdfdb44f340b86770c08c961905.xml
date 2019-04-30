@@ -131,9 +131,10 @@
 				{headerName: "Quantity", field: "quantity", width: 80},
 				{headerName: "Actions", width: 300, cellRenderer: actions}
 			],
-			defaultColDef:{
+			defaultColDef: {
 				resizable: true,
-				autoHeight: true
+				autoHeight: true,
+				cellClass: 'white-space-normal'
 			},
 			pagination: true,
 			paginationPageSize: 5,
@@ -242,15 +243,15 @@
         <sys_created_on>2019-03-12 18:36:51</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>3364dcdfdb44f340b86770c08c961905</sys_id>
-        <sys_mod_count>174</sys_mod_count>
+        <sys_mod_count>181</sys_mod_count>
         <sys_name>Etrack Display Stockroom</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
         <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sp_widget_3364dcdfdb44f340b86770c08c961905</sys_update_name>
-        <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-04-16 19:38:04</sys_updated_on>
+        <sys_updated_by>zhoujim@nih.gov</sys_updated_by>
+        <sys_updated_on>2019-04-29 14:57:06</sys_updated_on>
         <template><![CDATA[<div ng-controller="c" layout="column" ng-cloak>
   <md-card>
     <md-toolbar>
@@ -304,6 +305,7 @@
         <md-button ng-click="doTheBack()" class="md-raised">Back</md-button>
       </div>
       <br>
+      <h4>Assets in Stockrooms</h4>
       <div ag-grid="assetGridOptions" class="ag-theme-material"></div>
 
 

@@ -7,7 +7,65 @@
   var c = this;
 }]]></client_script>
         <controller_as>c</controller_as>
-        <css/>
+        <css>#footer .alert-info {&#13;
+    color: #31708f;&#13;
+    background-color: #d9edf7;&#13;
+    border-color: #bce8f1;&#13;
+    text-align: center;&#13;
+}&#13;
+#footer .alert {&#13;
+    padding: 15px;&#13;
+    margin-bottom: 20px;&#13;
+    border: 1px solid transparent;&#13;
+    border-radius: 4px;&#13;
+}&#13;
+#footer .footer-box{&#13;
+    width: 100%;&#13;
+    margin: 0 0 0 0;&#13;
+    padding: 30px 0 30px 0;&#13;
+    border-top: 3px #00678c solid;&#13;
+}&#13;
+.footer-box ul.footer-nav {&#13;
+    display: block;&#13;
+    width: auto;&#13;
+    text-align: center;&#13;
+    font-size: 100%;&#13;
+    font-weight: 400;&#13;
+    margin: 0 auto;&#13;
+    padding: 0 0 0 0;&#13;
+}&#13;
+.footer-box .footer-nav li {&#13;
+    color: #135B5D;&#13;
+    text-align: center;&#13;
+    display: inline;&#13;
+    margin: 0 0 0 0;&#13;
+    padding: 2px 0;&#13;
+    background: url(bg_footer_nav.png) center right no-repeat;&#13;
+}&#13;
+.footer-box .footer-nav a {&#13;
+    margin: 0 12px 0 6px;&#13;
+    padding: 2px 4px;&#13;
+    border-bottom: 1px #fff solid;&#13;
+    transition: all 200ms ease-out;&#13;
+}&#13;
+.footer-box .footer-nav a:hover {&#13;
+    color: #66665D;&#13;
+    border-bottom: 1px #91908A solid;&#13;
+}&#13;
+.footer-box .footer-nav li.no-right {&#13;
+    background: none;&#13;
+}&#13;
+.footer-box ul.footer-nav.external-links {&#13;
+    font-size: 90%;&#13;
+    margin-top: 20px;&#13;
+    padding-bottom: 10px;&#13;
+    background: url(bg_footer_rule.png) center bottom no-repeat;&#13;
+}&#13;
+#footer p {&#13;
+    color: #135B5D;&#13;
+    text-align: center;&#13;
+    width: 100%;&#13;
+}</css>
         <data_table>sp_instance</data_table>
         <demo_data/>
         <description/>
@@ -32,7 +90,7 @@
         <sys_created_on>2019-02-22 21:18:40</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>ddcc4ca9dbfba300b86770c08c96194a</sys_id>
-        <sys_mod_count>0</sys_mod_count>
+        <sys_mod_count>3</sys_mod_count>
         <sys_name>NCI ETracking Footer</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
@@ -40,9 +98,28 @@
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sp_header_footer_ddcc4ca9dbfba300b86770c08c96194a</sys_update_name>
         <sys_updated_by>zhoujim@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-02-22 21:18:40</sys_updated_on>
-        <template><![CDATA[<div>
-<!-- your widget template -->
+        <sys_updated_on>2019-04-30 15:15:03</sys_updated_on>
+        <template><![CDATA[<br/><br/><br/>
+<div id="footer">
+  <!--<div class="alert alert-info">
+    This site is currently under Section 508 review. In the interim, should you require any accessibility assistance with any content, please contact us at <a href="mailto:NCIGCPWebAdmin@mail.nih.gov ?subject=DCTD GCP Website 508">NCIGCPWebAdmin@mail.nih.gov</a>. Thank you!
+  </div>-->
+  <div class="footer-box">
+    <ul class="footer-nav">
+      <li><a href="http://www.cancer.gov/global/web/policies">Policies</a></li>
+      <li><a href="mailto:NCIGCPWebAdmin@mail.nih.gov ?subject=DCTD GCP Contact Us">Contact Us</a></li>
+      <li><a href="http://www.cancer.gov/global/web/policies/accessibility">Accessibility</a></li>
+      <li><a href="http://www.cancer.gov/global/web/policies/foia">FOIA</a></li>
+      <li class="no-right"><a href="http://get.adobe.com/reader/">Get Adobe Reader</a></li>
+    </ul>
+    <ul class="footer-nav external-links">
+      <li><a href="http://www.hhs.gov">U.S. Department of Health and Human Services</a></li>
+      <li><a href="http://www.nih.gov">National Institutes of Health</a></li>
+      <li><a href="http://www.cancer.gov">National Cancer Institute</a></li>
+      <li class="no-right"><a href="http://www.usa.gov">USA.gov</a></li>
+    </ul>
+    <p>NIH....Turning Discovery into Health®</p>
+  </div>
 </div>]]></template>
     </sp_header_footer>
 </record_update>

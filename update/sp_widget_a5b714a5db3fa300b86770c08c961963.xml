@@ -2,7 +2,7 @@
 <record_update table="sp_widget">
     <sp_widget action="INSERT_OR_UPDATE">
         <category>custom</category>
-        <client_script><![CDATA[function($scope, spUtil, spModal, $http) {
+        <client_script><![CDATA[function($scope, spUtil, spModal, $http, h) {
 	/* widget controller */
 	var c = this;
 	loadAssetTable();
@@ -23,47 +23,55 @@
 		$scope.assetGridOptions.api.paginationSetPageSize(Number(c.data.gridSizeTransfer));
 	});
 
-
-
 	/*------------------------------------------------*/
-
 	function loadAssetTable(){
 		$scope.assetGridOptions = {
-			getRowHeight: function(e) {
-				console.log('row height', e);
-				return 20 * (e.data.stockrooms.length + 1) + 5
-			},
-			columnDefs: [
-				{headerName: "Name", field: "name", width: 150, sortable: true, filter: true},
-				{headerName: "Manufacture", field: "manufacture", width: 150,  sortable: true, filter: true},
-				{headerName: "Description", field: "description", width: 200,  sortable: true, filter: true},
-				{headerName: "Model Number", field: "modelNumber", width:150,  sortable: true, filter: true},
-				{
-					headerName: "Stockroom(s)", 
-					width: 200, 
-					cellRenderer: assetStockrooms
-				},
-				{headerName: "Quantity", field: "quantity", width: 100},
-				{headerName: "Actions", width: 110, cellRenderer: viewAsset}
-			],
-			defaultColDef:{
+			defaultColDef: {
 				resizable: true,
 				autoHeight: true,
 				cellClass: 'white-space-normal'
 			},
 			pagination: true,
 			paginationPageSize: 10,
-			rowData: c.data.assets,
+			columnDefs: [
+				{headerName: "Name", field: "name", width: 150, sortable: true, filter: true},
+				{headerName: "Manufacture", field: "manufacture", width: 150,  sortable: true, filter: true},
+				{headerName: "Description", field: "description", width: 200,  sortable: true, filter: true},
+				{headerName: "Model Number", field: "modelNumber", width:150,  sortable: true, filter: true},
+				{
+					autoHeight: true,
+					headerName: "Stockroom(s)", 
+					width: 200, 
+					cellRenderer: function (args){
+						var items = args.data.stockrooms;
+						/* we can use a declarative way of creating dom elements (eg: hyperscript) */
+						return h('ul', null, items.map(function(item) {
+							return h('li', null, [
+								h('a', {href: '#!/display-stockroom/' + item.id}, item.name)
+							])
+						}));
+						//return '<ul><li ng-repeat="stockroom in data.stockrooms"><a ui-sref="display_stockroom({id: stockroom.id})">{{stockroom.name}}</a></li></ul>';
+					}
+				},
+				{headerName: "Quantity", field: "quantity", width: 100},
+				{headerName: "Actions", width: 110, cellRenderer: function (){
+					return '<md-button class="md-raised small-button"  ui-sref="display_asset({id: data.id})" > View</md-button>'
+				}}
+			],
+			domLayout: 'autoHeight',
+			rowHeight: 100,
 			angularCompileRows: true,
-			domLayout: 'autoHeight'
-		};
-		function viewAsset(){
-			return '<md-button class="md-raised small-button"  ui-sref="display_asset({id: data.id})" > View</md-button>'
-		}
-		function assetStockrooms(){			
-			return '<ul><li ng-repeat="stockroom in data.stockrooms"><a ui-sref="display_stockroom({id: stockroom.id})">{{stockroom.name}}</a></li></ul>';
+			rowData: c.data.assets,
+			onColumnResized: function resetRowHeight(){
+				setTimeout(function() {
+					$scope.testGridOptions.api.resetRowHeights();
+				}, 0);
+			}
 		}
 
+		setTimeout(function() {
+			$scope.assetGridOptions.api.resetRowHeights();
+		}, 100);
 	}
 
 
@@ -73,13 +81,15 @@
 				{headerName: "Name", field: "name", width: 150, sortable: true, filter: true},
 				{headerName: "Checked Out By", field: "checkedOutBy", width: 160,  sortable: true, filter: true},
 				{headerName: "Checked Out Time", field: "checkOutTime", width: 200,  sortable: true, filter: true},
-				{headerName: "Checked Out From", field: "stockroom", width:170,  sortable: true, filter: true},
+				{headerName: "Checked Out From", field: "stockroom", width:170,  sortable: true, filter: true, 	autoHeight: true},
 				{headerName: "Quantity", field: "quantity", width:100},
 				{headerName: "Owner", field: "owner", width: 100, sortable: true, filter: true},
 				{headerName: "Actions", width: 180, cellRenderer: viewCheckedOutAsset}
 			],
 			defaultColDef:{
-				resizable: true
+				resizable: true,
+				autoHeight: true,
+				cellClass: 'white-space-normal'
 			},
 			pagination: true,
 			paginationPageSize: 10,
@@ -88,8 +98,14 @@
 				return item
 			}),
 			angularCompileRows: true,
-			domLayout: 'autoHeight'
-		};
+			domLayout: 'autoHeight',
+			rowHeight: 100,
+			onColumnResized: function resetRowHeight(){
+				setTimeout(function() {
+					$scope.assetCheckedOutGridOptions.api.resetRowHeights();
+				}, 0);
+			}
+		}
 
 		function viewCheckedOutAsset(){
 			return '<md-button class="md-raised small-button" ui-sref="checkout_asset_details({id: data.id})">View</md-button><span> </span>' +
@@ -106,10 +122,12 @@
 				{headerName: "Assigned To", field: "assignTo", width:150,  sortable: true, filter: true},
 				{headerName: "Quantity", field: "quantity", width:100},
 				{headerName: "Start Time", field: "transferStartTime", sortable: true, width: 150},
-				{headerName: "Actions", width: 180, cellRenderer: viewAssetInTrasnfer}
+				{headerName: "Actions", width: 190, cellRenderer: viewAssetInTrasnfer}
 			],
-			defaultColDef:{
-				resizable: true
+			defaultColDef: {
+				resizable: true,
+				autoHeight: true,
+				cellClass: 'white-space-normal'
 			},
 			pagination: true,
 			paginationPageSize: 10,
@@ -126,32 +144,6 @@
 				'<md-button class="md-raised small-button"  ng-show="c.data.admin" ui-sref="complete_asset_transfer({id: data.id})">Complete</md-button>'
 		}
 	}
-
-	/*------------------------------------------------*/
-
-	/**	c.data.checkedOutAssests = c.data.checkedOutAssests.map(function(item){
-		item.checkOutTime = moment(item.checkOutTime);
-		return item
-	})
-
-	c.data.assetsInTransfer = c.data.assetsInTransfer.map(function(item){
-		item.transferStartTime = moment(item.transferStartTime);
-		return item
-	})
-
-	//alert(c.data.admin);
-	$scope.sort = function(keyname){
-		$scope.sortKey = keyname;
-		$scope.reverse = !$scope.reverse;
-	};
-	$scope.cSort = function(keyname){
-		$scope.cSortKey = keyname;
-		$scope.cReverse = !$scope.cReverse;
-	};
-	$scope.tSort = function(keyname){
-		$scope.tSortKey = keyname;
-		$scope.tReverse = !$scope.tReverse;
-	};**/
 
 	spUtil.recordWatch($scope, "x_naci_e_tracking_model", "", function(name, data) {  
 		spUtil.update($scope);
@@ -174,7 +166,6 @@
 }]]></client_script>
         <controller_as>c</controller_as>
         <css>
-
 .ag-theme-material ul &gt; li {
   line-height: 20px;
 }
@@ -182,7 +173,12 @@
 .ag-theme-material ul {
   margin-top: 1.5rem;
   margin-bottom: 1.5rem;
-}</css>
+}
+
+.ag-cell &gt; span {
+  display: block !important;
+}
+</css>
         <data_table>sp_instance</data_table>
         <demo_data/>
         <description/>
@@ -319,7 +315,7 @@
         <sys_created_on>2019-02-22 22:06:06</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>a5b714a5db3fa300b86770c08c961963</sys_id>
-        <sys_mod_count>1077</sys_mod_count>
+        <sys_mod_count>1248</sys_mod_count>
         <sys_name>Etrack Assets</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
@@ -327,8 +323,8 @@
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sp_widget_a5b714a5db3fa300b86770c08c961963</sys_update_name>
         <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-04-22 20:52:47</sys_updated_on>
-        <template><![CDATA[<div ng-controller="c" ng-cloak>
+        <sys_updated_on>2019-04-24 17:16:51</sys_updated_on>
+        <template><![CDATA[<div >
   <md-card>
     <md-toolbar>
       <div class="md-toolbar-tools">
@@ -339,6 +335,7 @@
     <md-card-content>
       <md-card-title-text>
         <span class="md-headline">Assets in stock</span>
+
         <span style="float: right;">
           Page Size:
           <select  ng-model="c.data.gridSizeAssets"  ng-init="c.data.gridSizeAssets='10'">
@@ -347,8 +344,10 @@
         </span>
       </md-card-title-text>
       <md-divider></md-divider>
-      <div ag-grid="assetGridOptions" class="ag-theme-material" ></div>
+      <div ag-grid="assetGridOptions" class="ag-theme-material" style="height: 100%"></div>
+
       <br>
+      
       <md-card-title-text>
         <span class="md-headline">Checked out assets</span>
         <span style="float: right;">
@@ -359,7 +358,8 @@
         </span>
       </md-card-title-text>
       <md-divider></md-divider>
-      <div ag-grid="assetCheckedOutGridOptions" class="ag-theme-material"></div>
+      <div ag-grid="assetCheckedOutGridOptions" class="ag-theme-material" style="height: 100%"></div>
+
       <br>
       <md-card-title-text>
         <span class="md-headline">Assets in transfer</span>

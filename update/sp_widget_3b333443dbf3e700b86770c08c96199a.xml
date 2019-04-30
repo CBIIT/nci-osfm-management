@@ -335,7 +335,7 @@
 				.ok('YES')
 				.cancel('NO');
 				$mdDialog.show(confirm).then(function() {
-					insertModel("insert", c.form.name + ' has been updated successfully!');
+					insertModel("insert", c.form.name + ' has been added successfully!');
 					$state.go("assets")
 				}, function() {
 
@@ -484,15 +484,15 @@
         <sys_created_on>2019-02-27 15:57:17</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>3b333443dbf3e700b86770c08c96199a</sys_id>
-        <sys_mod_count>604</sys_mod_count>
+        <sys_mod_count>613</sys_mod_count>
         <sys_name>Etrack Add Assets</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
         <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sp_widget_3b333443dbf3e700b86770c08c96199a</sys_update_name>
-        <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-04-12 15:42:30</sys_updated_on>
+        <sys_updated_by>zhoujim@nih.gov</sys_updated_by>
+        <sys_updated_on>2019-04-29 21:43:04</sys_updated_on>
         <template><![CDATA[<div ng-controller="c" ng-cloak ng-show="c.data.admin">
   <md-card>
     <md-toolbar>
@@ -502,7 +502,7 @@
     </md-toolbar>
     <md-subheader class="md-primary">If the Model exist, please select one. Otherwise a new model will be created for this asset.</md-subheader>
     <md-card-content>
-      <form name="modelForm" autocomplete="off">
+      <form name="userForm" autocomplete="off">
         <label>Search existing Model</label>
         <md-autocomplete 
                          md-selected-item="c.selectedItem"
@@ -532,7 +532,7 @@
           <md-input-container class="md-block" flex-gt-sm>
             <label>Name</label>
             <input ng-required="true" name="name" ng-model="c.form.name"  ng-disabled="!enableEdit()" ng-model-options="{ updateOn: 'blur' }"/>
-            <div ng-messages="modelForm.name.$error">
+            <div ng-messages="userForm.name.$error">
               <div ng-message="required">
                 {{c.nameErrMsg}}Please enter a unqiue model name. 
               </div>
@@ -541,7 +541,7 @@
 
 
           <md-input-container class="md-block" flex-gt-sm>
-            <label>Manufacture</label>
+            <label>Manufacturer</label>
             <md-select ng-required="true" ng-model="c.form.manufacture"  ng-disabled="!enableEdit()">
               <md-option ng-repeat="manufacture in c.data.manufactures" value="{{manufacture.id}}">
                 {{manufacture.name}}
@@ -569,10 +569,6 @@
             <input type="number" step="any" ng-required="true" min="0" name="unit_cost" ng-model="c.form.unit_cost"  ng-disabled="!enableEdit()"/>
           </md-input-container>
         </div>
-      </form>
-
-      <!------------------------------------->
-      <form name="userForm" autocomplete="off">
         <div layout="column">
           <h4>
             Asset Information

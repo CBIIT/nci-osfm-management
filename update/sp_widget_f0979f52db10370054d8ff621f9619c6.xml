@@ -40,6 +40,7 @@
 		data.asset.owner = asset.owner.name.toString();
 		data.asset.quantity = asset.quantity.toString();
 		data.asset.stockroom = asset.stockroom.name.toString();
+		data.asset.stockroom_id = asset.stockroom.sys_id.toString();
 		data.asset.type = asset.asset_type.toString();
 		data.model.name = asset.model.name.toString();
 		data.model.manufacturer = asset.model.manufacture.name.toString();
@@ -55,15 +56,15 @@
         <sys_created_on>2019-03-22 16:31:11</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>f0979f52db10370054d8ff621f9619c6</sys_id>
-        <sys_mod_count>39</sys_mod_count>
+        <sys_mod_count>56</sys_mod_count>
         <sys_name>Etrack View Asset Details</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
         <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sp_widget_f0979f52db10370054d8ff621f9619c6</sys_update_name>
-        <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-04-08 21:13:40</sys_updated_on>
+        <sys_updated_by>zhoujim@nih.gov</sys_updated_by>
+        <sys_updated_on>2019-04-29 14:54:28</sys_updated_on>
         <template><![CDATA[<div ng-controller="c" ng-cloak>
   <md-card>
     <md-toolbar>
@@ -147,10 +148,12 @@
         <div class="d-flex justify-content-center">
           <md-button ng-if="c.data.from == 'assets'" ui-sref="assets" class="md-raised md-primary">Assets</md-button>
           <md-button ng-if="c.data.from == 'view_asset_details'" ui-sref="display_asset({id: c.data.model.id})" class="md-raised md-primary">Asset Details</md-button>
+          <md-button ng-if="c.data.from == 'view_stockroom_details'" ui-sref="display_stockroom({id: c.data.asset.stockroom_id})" class="md-raised md-primary">Stockroom Details</md-button>
         </div>
       </form>
     </md-card-content>
   </md-card>
-</div>]]></template>
+</div>
+]]></template>
     </sp_widget>
 </record_update>
