@@ -178,6 +178,14 @@
 .ag-cell &gt; span {
   display: block !important;
 }
+
+.ag-cell &gt; span {
+  margin-top: 1.5rem;
+}
+
+.ag-cell {
+  line-height: 20px;
+}
 </css>
         <data_table>sp_instance</data_table>
         <demo_data/>
@@ -315,7 +323,7 @@
         <sys_created_on>2019-02-22 22:06:06</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>a5b714a5db3fa300b86770c08c961963</sys_id>
-        <sys_mod_count>1248</sys_mod_count>
+        <sys_mod_count>1261</sys_mod_count>
         <sys_name>Etrack Assets</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
@@ -323,7 +331,7 @@
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sp_widget_a5b714a5db3fa300b86770c08c961963</sys_update_name>
         <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-04-24 17:16:51</sys_updated_on>
+        <sys_updated_on>2019-04-30 20:44:07</sys_updated_on>
         <template><![CDATA[<div >
   <md-card>
     <md-toolbar>
