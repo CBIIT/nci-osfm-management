@@ -204,7 +204,7 @@
         <sys_created_on>2019-03-06 17:22:54</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>16f90951db4c7f00b86770c08c9619ab</sys_id>
-        <sys_mod_count>149</sys_mod_count>
+        <sys_mod_count>150</sys_mod_count>
         <sys_name>Etrack Edit Asset</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
@@ -212,7 +212,7 @@
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sp_widget_16f90951db4c7f00b86770c08c9619ab</sys_update_name>
         <sys_updated_by>zhoujim@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-04-29 21:42:44</sys_updated_on>
+        <sys_updated_on>2019-05-01 15:44:29</sys_updated_on>
         <template><![CDATA[<div ng-controller="c" ng-cloak ng-show="c.data.admin">
   <md-card>
     <md-toolbar>
@@ -289,7 +289,7 @@
             <input type="number" step="any" ng-required="true" name="quantity" ng-model="c.data.form.quantity" min="0" ng-model-options="{ updateOn: 'blur' }"/>
             <div ng-messages="userForm.quantity.$error">
               <div ng-message="min">
-                Must be greater then 1
+                Must be greater than 0
               </div>
             </div>
           </md-input-container>
