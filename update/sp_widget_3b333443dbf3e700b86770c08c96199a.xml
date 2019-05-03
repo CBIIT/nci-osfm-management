@@ -267,7 +267,7 @@
 					$mdDialog.alert()
 					.parent(angular.element(document.querySelector('#popupContainer')))
 					.clickOutsideToClose(true)
-					.title(result +" already exist")
+					.title(result +" already exists")
 					.ok('OK')
 				);
 			}else{
@@ -346,7 +346,7 @@
 			}else{
 				var assetId = res.data.result
 				var confirm = $mdDialog.confirm()
-				.htmlContent('<h4><b>'+ getStockroomName() +'</b>'+ ' already contain <b>'+  c.form.name +'</b></h4>' +
+				.htmlContent('<h4><b>'+ getStockroomName() +'</b>'+ ' already contains <b>'+  c.form.name +'</b></h4>' +
 										 "<p>If you would like to update the asset information, please do so on the asset details page.</p>")
 				.ok('Edit Asset')
 				.cancel('Cancel');
@@ -484,7 +484,7 @@
         <sys_created_on>2019-02-27 15:57:17</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>3b333443dbf3e700b86770c08c96199a</sys_id>
-        <sys_mod_count>616</sys_mod_count>
+        <sys_mod_count>618</sys_mod_count>
         <sys_name>Etrack Add Assets</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
@@ -492,7 +492,7 @@
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sp_widget_3b333443dbf3e700b86770c08c96199a</sys_update_name>
         <sys_updated_by>zhoujim@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-05-01 15:52:06</sys_updated_on>
+        <sys_updated_on>2019-05-03 17:44:39</sys_updated_on>
         <template><![CDATA[<div ng-controller="c" ng-cloak ng-show="c.data.admin">
   <md-card>
     <md-toolbar>

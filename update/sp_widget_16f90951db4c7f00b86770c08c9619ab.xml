@@ -74,9 +74,9 @@
 			$scope.$apply();
 		}
 	});
+	
 
-
-	$scope.$watch('c.data.asset.owner', function(){
+	$scope.$watch('c.data.form.owner', function(){
 		if(c.data.form.ownerId == "" || c.data.form.ownerId == null){
 			c.data.form.owner = c.data.reset.owner;
 			c.data.form.ownerId = c.data.reset.ownerId;
@@ -204,15 +204,15 @@
         <sys_created_on>2019-03-06 17:22:54</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>16f90951db4c7f00b86770c08c9619ab</sys_id>
-        <sys_mod_count>156</sys_mod_count>
+        <sys_mod_count>164</sys_mod_count>
         <sys_name>Etrack Edit Asset</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
         <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sp_widget_16f90951db4c7f00b86770c08c9619ab</sys_update_name>
-        <sys_updated_by>zhoujim@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-05-03 14:32:35</sys_updated_on>
+        <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
+        <sys_updated_on>2019-05-03 18:22:12</sys_updated_on>
         <template><![CDATA[<div ng-controller="c" ng-cloak ng-show="c.data.admin">
   <md-card>
     <md-toolbar>
@@ -243,22 +243,22 @@
 
           <md-input-container class="md-block">
             <label>Description</label>
-            <textarea ng-model="c.data.form.description" md-select-on-focus></textarea>
+            <textarea ng-model="c.data.form.description" ng-required="true" md-select-on-focus></textarea>
           </md-input-container>
+          
+          
           <md-input-container class="md-block" flex-gt-sm>
             <label>Model Number</label>
-            <input name="model_number" ng-model="c.data.form.model_number" />
+            <input name="model_number"ng-required="true" ng-model="c.data.form.model_number" />
           </md-input-container>
 
           <md-input-container class="md-block" flex-gt-sm>
             <label>Unit Cost</label>
-            <input name="unit_cost" ng-model="c.data.form.unit_cost" />
+            <input name="unit_cost" ng-required="true" ng-model="c.data.form.unit_cost" />
           </md-input-container>
 
         </div>
-      </form>
-
-      <form name="userForm">
+   
         <div layout="column">
 
           <h4>
@@ -267,7 +267,7 @@
 
           <md-input-container class="md-block" flex-gt-sm>
             <label>Owner</label>
-            <input id="ownerName" ng-required="true" name="stopAC" ng-model="c.data.form.owner" ng-model-options="{ updateOn: 'blur' }"/>
+            <input id="ownerName" ng-required="true" name="stopAC" ng-model="c.data.form.owner" ng-model-options="{ updateOn: 'blur' }" ng-required="true"/>
             <div ng-messages="userForm.stopAC.$error">
               <div ng-message="required">
                 Please select a valid owner
@@ -313,7 +313,11 @@
         </div>
         <br>
         <div class="d-flex justify-content-center">
-          <md-button ng-click="updateAsset()" class="md-raised md-primary">Submit</md-button>
+          <md-button 
+                     type="submit" 
+                     ng-disabled="userForm.$invalid" 
+                     ng-click="userForm.$valid && updateAsset()" 
+                     class="md-raised md-primary">Submit</md-button>
           <md-button ng-click="doTheBack()" class="md-raised">Back</md-button>
         </div>
       </form>

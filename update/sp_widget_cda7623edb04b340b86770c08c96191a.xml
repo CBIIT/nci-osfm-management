@@ -42,14 +42,21 @@
 
 	$scope.assetTrasnferGridOptions = {
 		columnDefs: [
-			{headerName: "Name", field: "assetName", width: 150},
+			{headerName: "Asset Name", field: "assetName", width: 150},
 			{headerName: "Assigned to", field: "assignTo", width: 150},
 			{headerName: "From stockroom", field: "from", width: 150},
 			{headerName: "To stockroom", field: "to", width: 150},
 			{headerName: "Quantity", field: "quantity", width: 150},
 			{headerName: "Received by", field: "receivedBy", width: 150},
 			{headerName: "Start time", field: "start", width: 150},
-			{headerName: "End time", field: "end", width: 150},
+			{headerName: "End time", width: 150,  cellRenderer: function (row){
+				if(!moment(row.data.end).isValid()){
+					return "";
+				}
+				else{
+					return moment(row.data.end).toString()
+				}
+			}},
 			{headerName: "Comments", field: "comments", width: 150}
 		],
 		defaultColDef:{
@@ -65,12 +72,19 @@
 
 	$scope.assetCheckedOutGridOptions = {
 		columnDefs: [
-			{headerName: "Name", field: "assetName", width: 150},
+			{headerName: "Asset Name", field: "assetName", width: 150},
 			{headerName: "Checked out by", field: "checkOutBy", width: 150},
 			{headerName: "Checked in by", field: "checkInBy", width: 150},
 			{headerName: "Quantity", field: "quantity", width: 150},
 			{headerName: "Checked out time", field: "start", width: 150},
-			{headerName: "Checked in time", field: "end", width: 150},
+			{headerName: "Checked in time", width: 150, cellRenderer: function (row){
+				if(!moment(row.data.end).isValid()){
+					return "";
+				}
+				else{
+					return moment(row.data.end).toString()
+				}
+			}},
 			{headerName: "Comments", field: "comments", width: 150}
 		],
 		defaultColDef:{
@@ -110,7 +124,11 @@
 	function filterData(table){
 		c.tableData = table.filter(function(item){
 			checkDate = true;
-			if( getStartDate() && getEndDate()){
+			$log.log("-----")
+			if(item.end.length == 0){
+
+			}
+			else if(getStartDate() && getEndDate()){
 				checkDate = (item.start.unix() >= moment(c.startDate).unix()) && (item.end.unix() <= moment(c.endDate).unix());
 			}else if( getStartDate() && !getEndDate() ){
 				checkDate = item.start.unix() >= moment(c.startDate).unix();
@@ -118,13 +136,13 @@
 				checkDate = item.end.unix() <= moment(c.endDate).unix();
 			}
 			if(checkDate){
-				if(!moment(item.end).isValid()){
+				/**if(!moment(item.end).isValid()){
 					item.end = "";
 				}
 				if(!moment(item.start).isValid()){
 					item.start = "";
 				}
-		
+		*/
 				return item
 			}
 		});
@@ -152,10 +170,10 @@
 		}
 		/* generate a worksheet */
 		if(c.reportType == "Transfer"){
-			c.tableData = c.data.transferData;
+			c.tableData = filterData(c.data.transferData);
 		}
 		if(c.reportType == "Checkout"){
-			c.tableData = c.data.checkOutData;
+			c.tableData = filterData(c.data.checkOutData);
 		}
 		var ws = XLSX.utils.json_to_sheet(c.tableData.map(function(item){
 			if(c.reportType == "Transfer"){
@@ -332,15 +350,15 @@
         <sys_created_on>2019-03-11 16:03:02</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>cda7623edb04b340b86770c08c96191a</sys_id>
-        <sys_mod_count>619</sys_mod_count>
+        <sys_mod_count>659</sys_mod_count>
         <sys_name>Etrack Report</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
         <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sp_widget_cda7623edb04b340b86770c08c96191a</sys_update_name>
-        <sys_updated_by>zhoujim@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-05-02 21:04:51</sys_updated_on>
+        <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
+        <sys_updated_on>2019-05-03 19:36:32</sys_updated_on>
         <template><![CDATA[<div ng-controller="c" ng-cloak>
   <md-card>
     <md-toolbar>
