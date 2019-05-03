@@ -4,18 +4,18 @@
         <sp_angular_provider display_value="etrackAddAssets">7bcffc57db04734054d8ff621f961968</sp_angular_provider>
         <sp_widget display_value="Etrack Edit Asset">16f90951db4c7f00b86770c08c9619ab</sp_widget>
         <sys_class_name>m2m_sp_ng_pro_sp_widget</sys_class_name>
-        <sys_created_by>abdullahz2@nih.gov</sys_created_by>
-        <sys_created_on>2019-04-03 21:49:41</sys_created_on>
+        <sys_created_by>zhoujim@nih.gov</sys_created_by>
+        <sys_created_on>2019-05-03 14:25:15</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
-        <sys_id>9f8392dedb24334054d8ff621f96199f</sys_id>
+        <sys_id>2d8dcbbbdb49ff0054d8ff621f9619db</sys_id>
         <sys_mod_count>0</sys_mod_count>
         <sys_name>etrackAddAssets.Etrack Edit Asset</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
         <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
-        <sys_update_name>m2m_sp_ng_pro_sp_widget_9f8392dedb24334054d8ff621f96199f</sys_update_name>
-        <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-04-03 21:49:41</sys_updated_on>
+        <sys_update_name>m2m_sp_ng_pro_sp_widget_2d8dcbbbdb49ff0054d8ff621f9619db</sys_update_name>
+        <sys_updated_by>zhoujim@nih.gov</sys_updated_by>
+        <sys_updated_on>2019-05-03 14:25:15</sys_updated_on>
     </m2m_sp_ng_pro_sp_widget>
 </record_update>
