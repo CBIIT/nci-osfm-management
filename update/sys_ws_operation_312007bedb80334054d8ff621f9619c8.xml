@@ -15,14 +15,14 @@
 		var stockroom = new GlideRecord('x_naci_e_tracking_stock_room');
 			stockroom.initialize();
 			stockroom.description = data.description.toString();
-			stockroom.name = data.name.toString();
+			stockroom.name = data.name.toString().trim();
 			stockroom.location = data.location.toString();
 			stockroom.owner = data.ownerId.toString();
 			stockroom.type = data.type.toString();
 			id = stockroom.insert();
 	}else if(data.method.toString() == 'update'){
 		var stockroom1 = new GlideRecord('x_naci_e_tracking_stock_room');
-		    stockroom1.addQuery("name", data.name.toString());
+		    stockroom1.addQuery("sys_id", data.id.toString());
 			stockroom1.query();
 		    stockroom1.next();
 		   	stockroom1.description = data.description.toString();
@@ -40,7 +40,18 @@
 			id = "0";
 		}else{
 			id = "1";
-		}
+		}                             
+	}else if(data.method.toString() == 'checkAdditional'){
+		var stockroom3 = new GlideRecord('x_naci_e_tracking_stock_room');
+		    stockroom3.addQuery("name", data.name.toString());
+		    stockroom3.addQuery("sys_id", "!=", data.id.toString());
+			stockroom3.query();
+		    var count1 = stockroom3.getRowCount();
+		if(count1 == 0){
+			id = "0";
+		}else{
+			id = "1";
+		}			 
 	}
 	
 	return id;
@@ -59,7 +70,7 @@
         <sys_created_on>2019-03-11 17:50:22</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>312007bedb80334054d8ff621f9619c8</sys_id>
-        <sys_mod_count>7</sys_mod_count>
+        <sys_mod_count>11</sys_mod_count>
         <sys_name>addStockRoom</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
@@ -67,7 +78,7 @@
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sys_ws_operation_312007bedb80334054d8ff621f9619c8</sys_update_name>
         <sys_updated_by>zhoujim@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-03-12 15:19:24</sys_updated_on>
+        <sys_updated_on>2019-06-19 15:36:26</sys_updated_on>
         <web_service_definition display_value="ETrack REST API">ac0dd2b6db00334054d8ff621f96192b</web_service_definition>
         <web_service_version/>
     </sys_ws_operation>

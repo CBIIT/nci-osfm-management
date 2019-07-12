@@ -31,13 +31,14 @@
 				autoHeight: true,
 				cellClass: 'white-space-normal'
 			},
+			suppressAndOrCondition:true,
 			pagination: true,
 			paginationPageSize: 10,
 			columnDefs: [
-				{headerName: "Name", field: "name", width: 150, sortable: true, filter: true},
-				{headerName: "Manufacture", field: "manufacture", width: 150,  sortable: true, filter: true},
-				{headerName: "Description", field: "description", width: 200,  sortable: true, filter: true},
-				{headerName: "Model Number", field: "modelNumber", width:150,  sortable: true, filter: true},
+				{headerName: "Name", field: "name", width: 150, sortable: true, filter: 'agTextColumnFilter', filterParams:{filterOptions:['contains'], suppressAndOrCondition:true }},
+				{headerName: "Manufacture", field: "manufacture", width: 150,  sortable: true,  filter: 'agTextColumnFilter', filterParams:{filterOptions:['contains'], suppressAndOrCondition:true }},
+				{headerName: "Description", field: "description", width: 200,  sortable: true,  filter: 'agTextColumnFilter', filterParams:{filterOptions:['contains'], suppressAndOrCondition:true }},
+				{headerName: "Model Number", field: "modelNumber", width:150,  sortable: true,  filter: 'agTextColumnFilter', filterParams:{filterOptions:['contains'], suppressAndOrCondition:true }},
 				{
 					autoHeight: true,
 					headerName: "Stockroom(s)", 
@@ -78,12 +79,13 @@
 	function loadAssetsCheckedOut(){
 		$scope.assetCheckedOutGridOptions = {
 			columnDefs: [
-				{headerName: "Name", field: "name", width: 150, sortable: true, filter: true},
-				{headerName: "Checked Out By", field: "checkedOutBy", width: 160,  sortable: true, filter: true},
-				{headerName: "Checked Out Time", field: "checkOutTime", width: 200,  sortable: true, filter: true},
-				{headerName: "Checked Out From", field: "stockroom", width:170,  sortable: true, filter: true, 	autoHeight: true},
-				{headerName: "Quantity", field: "quantity", width:100, sortable: true, filter: true},
-				{headerName: "Owner", field: "owner", width: 100, sortable: true, filter: true},
+				{headerName: "Name", field: "name", width: 150, sortable: true,  filter: 'agTextColumnFilter', filterParams:{filterOptions:['contains'], suppressAndOrCondition:true }},
+				{headerName: "Checked Out By", field: "checkedOutBy", width: 160,  sortable: true, filter: 'agTextColumnFilter', filterParams:{filterOptions:['contains'], suppressAndOrCondition:true }},
+				{headerName: "Checked Out Time", field: "checkOutTime", width: 200,  sortable: true,  filter: 'agTextColumnFilter', filterParams:{filterOptions:['contains'], suppressAndOrCondition:true }},
+				{headerName: "Checked Out From", field: "stockroom", width:170, 	autoHeight: true,  sortable: true,  filter: 'agTextColumnFilter', filterParams:{filterOptions:['contains'], suppressAndOrCondition:true }},
+				{headerName: "Quantity", field: "quantity", width:100, sortable: true,  filter: 'agTextColumnFilter', filterParams:{filterOptions:['contains'], suppressAndOrCondition:true }},
+				{headerName: "Owner", field: "owner", width: 100, sortable: true,  filter: 'agTextColumnFilter', filterParams:{filterOptions:['contains'], suppressAndOrCondition:true }},
+				{headerName: "Barcode", field: "barcode", width: 100, sortable: true,  filter: 'agTextColumnFilter', filterParams:{filterOptions:['contains'], suppressAndOrCondition:true }},
 				{headerName: "Actions", width: 180, cellRenderer: viewCheckedOutAsset}
 			],
 			defaultColDef:{
@@ -116,12 +118,13 @@
 	function loadAssetsInTrasnfer(){
 		$scope.assetInTrasnfer = {
 			columnDefs: [
-				{headerName: "Name", field: "name", width: 150, sortable: true, filter: true},
-				{headerName: "From Stockroom", field: "fromStockroom", width: 160,  sortable: true, filter: true},
-				{headerName: "To Stockroom", field: "toStockroom", width: 160,  sortable: true, filter: true},
-				{headerName: "Assigned To", field: "assignTo", width:150,  sortable: true, filter: true},
-				{headerName: "Quantity", field: "quantity", width:100, sortable: true, filter: true},
-				{headerName: "Start Time", field: "transferStartTime",width: 150, sortable: true, filter: true},
+				{headerName: "Name", field: "name", width: 150, sortable: true,  filter: 'agTextColumnFilter', filterParams:{filterOptions:['contains'], suppressAndOrCondition:true }},
+				{headerName: "From Stockroom", field: "fromStockroom", width: 160,  sortable: true,  filter: 'agTextColumnFilter', filterParams:{filterOptions:['contains'], suppressAndOrCondition:true }},
+				{headerName: "To Stockroom", field: "toStockroom", width: 160,  sortable: true,  filter: 'agTextColumnFilter', filterParams:{filterOptions:['contains'], suppressAndOrCondition:true }},
+				{headerName: "Assigned To", field: "assignTo", width:150,  sortable: true,  filter: 'agTextColumnFilter', filterParams:{filterOptions:['contains'], suppressAndOrCondition:true }},
+				{headerName: "Barcode", field: "barcode", width: 100, sortable: true,  filter: 'agTextColumnFilter', filterParams:{filterOptions:['contains'], suppressAndOrCondition:true }},
+				{headerName: "Quantity", field: "quantity", width:100, sortable: true,  filter: 'agTextColumnFilter', filterParams:{filterOptions:['contains'], suppressAndOrCondition:true }},
+				{headerName: "Start Time", field: "transferStartTime",width: 150, sortable: true,  filter: 'agTextColumnFilter', filterParams:{filterOptions:['contains'], suppressAndOrCondition:true }},
 				{headerName: "Actions", width: 190, cellRenderer: viewAssetInTrasnfer}
 			],
 			defaultColDef: {
@@ -238,6 +241,7 @@
 		item.quantity = checkOut.quantity.toString();
 		item.id = checkOut.sys_id.toString();
 		item.owner = checkOut.asset.owner.name.toString();
+		item.barcode = checkOut.asset.barcode.toString();
 		item.stockroom = checkOut.asset.stockroom.name.toString();
 		data.checkedOutAssests.push(item);
 	}
@@ -306,6 +310,7 @@
 		item.quantity = transferAsset.quantity.toString();
 		item.fromStockroom = transferAsset.from.name.toString();
 		item.toStockroom = transferAsset.to.name.toString();
+		item.barcode = transferAsset.asset.barcode.toString();
 		item.id = transferAsset.sys_id.toString();
 		data.assetsInTransfer.push(item);
 	}
@@ -323,15 +328,15 @@
         <sys_created_on>2019-02-22 22:06:06</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>a5b714a5db3fa300b86770c08c961963</sys_id>
-        <sys_mod_count>1266</sys_mod_count>
+        <sys_mod_count>1282</sys_mod_count>
         <sys_name>Etrack Assets</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
         <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sp_widget_a5b714a5db3fa300b86770c08c961963</sys_update_name>
-        <sys_updated_by>zhoujim@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-05-01 14:39:29</sys_updated_on>
+        <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
+        <sys_updated_on>2019-07-01 21:38:32</sys_updated_on>
         <template><![CDATA[<div >
   <md-card>
     <md-toolbar>

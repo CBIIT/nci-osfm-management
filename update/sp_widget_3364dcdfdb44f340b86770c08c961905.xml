@@ -7,6 +7,8 @@
 
 	/* widget controller */
 	var c = this;
+	var actionString = ""
+
 	loadAssets();
 	$scope.backPageId = ETrackingUtil.getBackPage('Stockroom');
 	$("#ownerName").autocomplete({
@@ -91,7 +93,7 @@
 
 	$scope.saveData = function(){
 		insertStockroom("update", "Stockroom has been updated successfully!")
-		$scope.enableEdit = false;
+		//$scope.enableEdit = false;
 	}
 
 	$scope.$watch('c.data.stockroom.owner', function(){
@@ -103,23 +105,37 @@
 		}
 	});
 
-
-
 	function insertStockroom(method, msg){
-		c.data.stockroom.method = method;
-
-		etrackingAddStockroom.addStockroom(c.data.stockroom)
-			.then(function(res){
-
-			$mdDialog.show(
-				$mdDialog.alert()
-				.parent(angular.element(document.querySelector('#popupContainer')))
-				.clickOutsideToClose(true)
-				.title(msg)
-				.ok('OK')
-			);
-
-			$log.log(res);
+		c.data.stockroom.method = 'checkAdditional';
+		etrackingAddStockroom.checkStockroom(c.data.stockroom).then(function(res){
+			var count = res.data.result;
+			if(count == '1'){
+				$mdDialog.show(
+					$mdDialog.alert()
+					.parent(angular.element(document.querySelector('#popupContainer')))
+					.clickOutsideToClose(true)
+					.title('Stock Room Name already exists, please choose an unique Stock Room Name.')
+					.ok('OK')
+				);
+				$scope.enableEdit = true;
+			}else{
+				c.data.stockroom.method = method;
+				etrackingAddStockroom.addStockroom(c.data.stockroom)
+					.then(function(res){
+					$mdDialog.show(
+						$mdDialog.alert()
+						.parent(angular.element(document.querySelector('#popupContainer')))
+						.clickOutsideToClose(true)
+						.title(msg)
+						.ok('OK')
+					);
+					$scope.enableEdit = false;
+					$log.log(res);
+				}, function(err){
+					$log.log(err);
+					alert("ERROR");
+				});				
+			}
 		}, function(err){
 			$log.log(err);
 			alert("ERROR");
@@ -130,15 +146,25 @@
 		window.history.back();
 	};
 
+	function getActions(){
+		var cur = '<md-button  class="md-raised small-button"  ui-sref="view_asset_details({id: data.id, from: '+"'view_stockroom_details'"+'})">View</md-button> <span> </span>';
+		if(c.data.admin){
+			cur  = cur +
+				'<md-button class="md-raised small-button"  ui-sref="checkout_asset({id: data.id})">Checkout</md-button> <span> </span>'+
+				'<md-button  class="md-raised small-button"  ui-sref="transfer_asset({id: data.id})">Transfer</md-button>';
+		}
+		return cur
+	}
+
 	function loadAssets(){
 		$scope.assetGridOptions = {
 			columnDefs: [
-				{headerName: "Name", field: "name", width: 150, sortable: true, filter: true},
-				{headerName: "Type", field: "type", width: 150,  sortable: true, filter: true},
-				{headerName: "Barcode", field: "barcode", width: 100,  sortable: true, filter: true},
-				{headerName: "Description", field: "description", width: 200,  sortable: true, filter: true},
-				{headerName: "Owner", field: "owner", width:130,  sortable: true, filter: true},
-				{headerName: "Quantity", field: "quantity", width: 80},
+				{headerName: "Name", field: "name", width: 150, sortable: true, filter: 'agTextColumnFilter', filterParams: {filterOptions:['contains'], suppressAndOrCondition:true }},
+				{headerName: "Type", field: "type", width: 150,  sortable: true, filter: 'agTextColumnFilter', filterParams: {filterOptions:['contains'], suppressAndOrCondition:true }},
+				{headerName: "Barcode", field: "barcode", width: 100,  sortable: true, filter: 'agTextColumnFilter', filterParams: {filterOptions:['contains'], suppressAndOrCondition:true }},
+				{headerName: "Description", field: "description", width: 200,  sortable: true, filter: 'agTextColumnFilter', filterParams: {filterOptions:['contains'], suppressAndOrCondition:true }},
+				{headerName: "Owner", field: "owner", width:130,  sortable: true, filter: 'agTextColumnFilter', filterParams: {filterOptions:['contains'], suppressAndOrCondition:true }},
+				{headerName: "Quantity", field: "quantity", width: 90},
 				{headerName: "Actions", width: 300, cellRenderer: actions}
 			],
 			defaultColDef: {
@@ -153,9 +179,11 @@
 			domLayout: 'autoHeight'
 		};
 		function actions(){	
-			return '<md-button  class="md-raised small-button"  ui-sref="view_asset_details({id: data.id, from: '+"'view_stockroom_details'"+'})">View</md-button> <span> </span>' +
-				'<md-button ng-show="c.data.admin"  class="md-raised small-button"  ui-sref="checkout_asset({id: data.id})">Checkout</md-button> <span> </span>'+
-				'<md-button ng-show="c.data.admin"  class="md-raised small-button"  ui-sref="transfer_asset({id: data.id})">Transfer</md-button>';
+			actionString = getActions();
+			return actionString;
+			//	return '<md-button  class="md-raised small-button"  ui-sref="view_asset_details({id: data.id, from: '+"'view_stockroom_details'"+'})">View</md-button> <span> </span>' +
+			//	'<md-button ng-show="c.data.admin"  class="md-raised small-button"  ui-sref="checkout_asset({id: data.id})">Checkout</md-button> <span> </span>'+
+			//'<md-button ng-show="c.data.admin"  class="md-raised small-button"  ui-sref="transfer_asset({id: data.id})">Transfer</md-button>';
 		}
 	}
 }]]></client_script>
@@ -264,7 +292,7 @@
         <sys_created_on>2019-03-12 18:36:51</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>3364dcdfdb44f340b86770c08c961905</sys_id>
-        <sys_mod_count>196</sys_mod_count>
+        <sys_mod_count>229</sys_mod_count>
         <sys_name>Etrack Display Stockroom</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
@@ -272,7 +300,7 @@
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sp_widget_3364dcdfdb44f340b86770c08c961905</sys_update_name>
         <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-05-03 18:43:15</sys_updated_on>
+        <sys_updated_on>2019-07-03 15:53:09</sys_updated_on>
         <template><![CDATA[<div ng-controller="c" layout="column" ng-cloak>
   <md-card>
     <md-toolbar>
@@ -286,9 +314,9 @@
 
         <div layout="column" ng-class="{'disabledForm': !enableEdit}">
           <br>
-          <md-input-container class="md-block" flex-gt-sm class="disabledForm">
+          <md-input-container class="md-block" flex-gt-sm >
             <label>Name</label>
-            <input required name="name" ng-model="c.data.stockroom.name" ng-disabled="true" />
+            <input required name="name" ng-model="c.data.stockroom.name" ng-disabled="!enableEdit" />
           </md-input-container>
           <md-input-container class="md-block">
             <label>Description</label>
@@ -337,7 +365,7 @@
                    class="md-raised md-primary" 
                    >Update</md-button>
         <!--md-button ng-href="#!/{{backPageId}}" class="md-raised">Back</md-button-->
-        <md-button ng-click="doTheBack()" class="md-raised">Back</md-button>
+        <md-button ui-sref='stockrooms' class="md-raised">Back</md-button>
       </div>
       <br>
       <h4>Assets in Stockrooms</h4>
@@ -404,6 +432,7 @@
 </div-->
     </md-card-content>
   </md-card>
-</div>]]></template>
+</div>
+]]></template>
     </sp_widget>
 </record_update>

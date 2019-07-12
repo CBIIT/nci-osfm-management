@@ -35,7 +35,7 @@
 	}else if(method == 'update'){
 		//model exist and update model
 		var model2 = new GlideRecord('x_naci_e_tracking_model');
-		model2.addQuery('model_number', data.model_number.toString());
+		model2.addQuery('name', data.name.toString());
 		model2.query();
 		model2.next();
 		model2.cost = data.unit_cost.toString();
@@ -94,8 +94,36 @@
 		manufacture.name = data.manufactureToAdd.toString();
 		manufacture.description = "";
 		id = manufacture.insert();
+	}else if(method == 'editAsset'){
+		//model exist and update model
+		var model3 = new GlideRecord('x_naci_e_tracking_model');
+		model3.addQuery('name', data.name.toString());
+		model3.query();
+		model3.next();
+		model3.cost = data.unit_cost.toString();
+		model3.description = data.description.toString();
+		model3.manufacture = data.manufacture.toString();
+		model3.model_number = data.model_number.toString();
+		id = model3.update();
+		id = editAsset(id);
 	}
 	return id;
+	
+	function editAsset(model_id){
+		var asset5 = new GlideRecord('x_naci_e_tracking_etrack_assets');
+		asset5.addQuery('sys_id', data.id);
+		asset5.query();
+		asset5.next();
+		var quantityNum = parseInt(data.quantity.toString());
+		asset5.quantity = quantityNum;
+		asset5.barcode = data.barcode.toString();
+		asset5.model = model_id;
+		asset5.owner = data.ownerId;
+		asset5.asset_type = data.asset_type;
+		asset5.stockroom = data.stockroom;
+		var asset_id = asset5.update();
+		return asset_id;
+	}
 
 
 	function checkAssets(model_id){
@@ -105,6 +133,7 @@
 		asset.addQuery('model.sys_id', model_id);
 		asset.addQuery('stockroom.sys_id', data.stockroom);
 		asset.addQuery('asset_type', data.asset_type);
+		asset.addQuery('barcode', data.barcode);
 		asset.query();
 		var count1 = asset.getRowCount();
 		if(count1 == 0 || (data.quantity == "1" && data.barcode.length > 0) ){
@@ -193,15 +222,15 @@
         <sys_created_on>2019-03-12 17:33:23</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>e7150c97db40734054d8ff621f96198f</sys_id>
-        <sys_mod_count>88</sys_mod_count>
+        <sys_mod_count>92</sys_mod_count>
         <sys_name>addAsset</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
         <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sys_ws_operation_e7150c97db40734054d8ff621f96198f</sys_update_name>
-        <sys_updated_by>zhoujim@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-05-03 14:31:26</sys_updated_on>
+        <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
+        <sys_updated_on>2019-07-05 21:12:45</sys_updated_on>
         <web_service_definition display_value="ETrack REST API">ac0dd2b6db00334054d8ff621f96192b</web_service_definition>
         <web_service_version/>
     </sys_ws_operation>

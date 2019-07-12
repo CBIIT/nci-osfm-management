@@ -15,6 +15,7 @@
 	var asset_type = '';
 	var stockroom_to_id = '';
 	var id = '';
+	
 
 	var transfer = new GlideRecord('x_naci_e_tracking_assdets_transfer');
 	transfer.get(data.id.toString());
@@ -33,7 +34,7 @@
 	asset.query();
 	asset.next();
 	var count = asset.getRowCount();
-	if(count == 0){
+	if(count == 0 || transfer.asset.barcode.toString().length > 0){
 		//add new asset
 		id = addAssets();
 	}
@@ -42,6 +43,7 @@
 		var test1 = parseInt(asset.quantity.toString());		
 		var test2 = parseInt(quantity);
 		asset.quantity = test1  + test2;
+		asset.owner = transfer.to.owner.sys_id.toString();
 		id = asset.update();
 	}
 
@@ -50,7 +52,7 @@
 		asset1.initialize();
 		asset1.barcode = transfer.asset.barcode.toString();
 		asset1.model = asset_model_id;
-		asset1.owner = transfer.asset.owner.sys_id.toString();
+		asset1.owner = transfer.to.owner.sys_id.toString();
 		asset1.quantity = quantity;
 		asset1.stockroom = stockroom_to_id;
 		asset1.asset_type = asset_type;
@@ -75,7 +77,7 @@
         <sys_created_on>2019-03-14 21:16:03</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>b10a4f33db40b30054d8ff621f961969</sys_id>
-        <sys_mod_count>20</sys_mod_count>
+        <sys_mod_count>25</sys_mod_count>
         <sys_name>completeTransfer</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
@@ -83,7 +85,7 @@
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sys_ws_operation_b10a4f33db40b30054d8ff621f961969</sys_update_name>
         <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-04-09 16:10:29</sys_updated_on>
+        <sys_updated_on>2019-06-28 20:41:29</sys_updated_on>
         <web_service_definition display_value="ETrack REST API">ac0dd2b6db00334054d8ff621f96192b</web_service_definition>
         <web_service_version/>
     </sys_ws_operation>

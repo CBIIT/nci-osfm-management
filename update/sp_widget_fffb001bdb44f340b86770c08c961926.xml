@@ -2,10 +2,11 @@
 <record_update table="sp_widget">
     <sp_widget action="INSERT_OR_UPDATE">
         <category>custom</category>
-        <client_script><![CDATA[function() {
-  /* widget controller */
+        <client_script><![CDATA[function($scope) {
   var c = this;
-	
+  if (!c.data.isLoggedIn)
+			window.location = '/api/x_naci_e_tracking/etrack_rest_api/login';
+//	  window.location = "/nav_to.do?uri=/" + $scope.portal.url_suffix + "&glide_sso_id=" + c.data.defaultIDP;
 }]]></client_script>
         <controller_as>c</controller_as>
         <css/>
@@ -20,24 +21,41 @@
         <link/>
         <name>Etrack Index</name>
         <option_schema/>
-        <public>false</public>
+        <public>true</public>
         <roles/>
-        <script><![CDATA[(function() {  /* populate the 'data' object */  /* e.g., data.table = $sp.getValue('table'); */})();]]></script>
+        <script><![CDATA[(function() { 
+	data.isLoggedIn = gs.isLoggedIn();
+	data.defaultIDP = getDefaultIDP();
+	
+	
+	function getDefaultIDP() {
+		var idp = gs.getProperty('glide.authenticate.sso.redirect.idp');
+		if (!idp) {
+			var grIDP = new GlideRecord('saml2_update1_properties');
+			grIDP.addActiveQuery();
+			grIDP.query('default', true);
+			if (grIDP.next())
+				idp = grIDP.getUniqueValue();
+		}
+		return idp;
+	}	
+	
+})();]]></script>
         <servicenow>false</servicenow>
         <sys_class_name>sp_widget</sys_class_name>
         <sys_created_by>abdullahz2@nih.gov</sys_created_by>
         <sys_created_on>2019-03-12 17:59:59</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>fffb001bdb44f340b86770c08c961926</sys_id>
-        <sys_mod_count>3</sys_mod_count>
+        <sys_mod_count>9</sys_mod_count>
         <sys_name>Etrack Index</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
         <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sp_widget_fffb001bdb44f340b86770c08c961926</sys_update_name>
-        <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-03-12 18:24:28</sys_updated_on>
+        <sys_updated_by>parkbw@nih.gov</sys_updated_by>
+        <sys_updated_on>2019-07-12 16:04:37</sys_updated_on>
         <template><![CDATA[<ui-view></ui-view>]]></template>
     </sp_widget>
 </record_update>

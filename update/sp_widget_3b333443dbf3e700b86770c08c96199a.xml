@@ -484,15 +484,15 @@
         <sys_created_on>2019-02-27 15:57:17</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>3b333443dbf3e700b86770c08c96199a</sys_id>
-        <sys_mod_count>618</sys_mod_count>
+        <sys_mod_count>623</sys_mod_count>
         <sys_name>Etrack Add Assets</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
         <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sp_widget_3b333443dbf3e700b86770c08c96199a</sys_update_name>
-        <sys_updated_by>zhoujim@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-05-03 17:44:39</sys_updated_on>
+        <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
+        <sys_updated_on>2019-06-27 18:16:01</sys_updated_on>
         <template><![CDATA[<div ng-controller="c" ng-cloak ng-show="c.data.admin">
   <md-card>
     <md-toolbar>
@@ -561,7 +561,7 @@
 
           <md-input-container class="md-block" flex-gt-sm>
             <label>Model Number</label>
-            <input name="model_number" ng-model="c.form.model_number" ng-disabled="!enableEdit()"/>
+            <input name="model_number" ng-required="true" ng-model="c.form.model_number" ng-disabled="!enableEdit()"/>
           </md-input-container>
 
           <md-input-container class="md-block" flex-gt-sm>
@@ -605,10 +605,10 @@
           </md-input-container>
 
 
-          <md-input-container ng-show="c.form.quantity == 1" class="md-block" flex-gt-sm>
+          <md-input-container class="md-block" flex-gt-sm >
             <label>Barcode</label>
             <input id="barcode" name="barcode" ng-model="c.form.barcode" ng-disabled="c.form.quantity > 1"/>
-            <div class="hint" style="font-size: 80%; color: #004A70;">Please leave this field empty if there is no barcode</div>
+            <div class="hint" style="font-size: 80%; color: #004A70;">Barcodes are only available when the quantity is equal to 1. Please leave this field empty if there is no barcode</div>
           </md-input-container>
 
 

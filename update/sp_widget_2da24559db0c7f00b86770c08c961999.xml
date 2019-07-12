@@ -108,7 +108,7 @@
 		});*/
 
 		var confirm = $mdDialog.confirm()
-		.htmlContent('<h4>Are you sure you want to trasnfer <b>'+c.data.transferAsset.quantity+'</b> assets of <b>'+c.data.asset.name+'</b> to <b>'+ getStockroomName() +'</b>?</h4>')
+		.htmlContent('<h4>Are you sure you want to transfer <b>'+c.data.transferAsset.quantity+'</b> assets of <b>'+c.data.asset.name+'</b> to <b>'+ getStockroomName() +'</b>?</h4>')
 		.ok('YES')
 		.cancel('NO');
 		$mdDialog.show(confirm).then(function() {
@@ -167,6 +167,7 @@
 		asset.next();
 		data.asset.owner = asset.owner.name.toString();
 		data.asset.name = asset.model.name.toString();
+		data.asset.barcode = asset.barcode.toString();
 
 		data.asset.stockroom = asset.stockroom.name.toString();
 		data.asset.inStock = asset.quantity.toString();
@@ -197,15 +198,15 @@
         <sys_created_on>2019-03-06 16:50:55</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>2da24559db0c7f00b86770c08c961999</sys_id>
-        <sys_mod_count>199</sys_mod_count>
+        <sys_mod_count>202</sys_mod_count>
         <sys_name>Etrack Transfer Asset</sys_name>
         <sys_package display_value="NCI Equipment Tracking System" source="x_naci_e_tracking">0d1eac28dbbfaf0054d8ff621f9619b2</sys_package>
         <sys_policy/>
         <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
         <sys_scope display_value="NCI Equipment Tracking System">0d1eac28dbbfaf0054d8ff621f9619b2</sys_scope>
         <sys_update_name>sp_widget_2da24559db0c7f00b86770c08c961999</sys_update_name>
-        <sys_updated_by>zhoujim@nih.gov</sys_updated_by>
-        <sys_updated_on>2019-05-01 15:41:41</sys_updated_on>
+        <sys_updated_by>abdullahz2@nih.gov</sys_updated_by>
+        <sys_updated_on>2019-06-27 22:32:34</sys_updated_on>
         <template><![CDATA[<div ng-controller="c" ng-cloak ng-show="c.data.admin">
   <md-card>
     <md-toolbar>
@@ -226,8 +227,8 @@
             <label>Owner</label>
             <input ng-model="c.data.asset.owner" ng-disabled="true" />
           </md-input-container>
-          
-           <md-input-container class="md-block" flex-gt-sm>
+
+          <md-input-container class="md-block" flex-gt-sm>
             <label>Name</label>
             <input ng-model="c.data.asset.name" ng-disabled="true" />
           </md-input-container>
@@ -237,6 +238,13 @@
             <label>Location</label>
             <input ng-model="c.data.asset.stockroom"  ng-disabled="true"/>
           </md-input-container>
+
+
+          <md-input-container class="md-block" flex-gt-sm ng-show="c.data.asset.barcode">
+            <label>Barcode</label>
+            <input ng-model="c.data.asset.barcode" disabled/>
+          </md-input-container>
+
           <md-input-container class="md-block" flex-gt-sm>
             <label>In stock</label>
             <input ng-model="c.data.asset.inStock"  ng-disabled="true"/>
@@ -249,7 +257,7 @@
         <div layout="column">
 
           <h4>
-            Transfer Form
+            Transfer To
           </h4>
           <md-input-container class="md-block" flex-gt-sm>
             <label>Assign to</label>
